@@ -48,6 +48,9 @@ cp claude-code-files/CLAUDE.md mon-projet/CLAUDE.md
 
 # Copier la config Claude Code
 cp -r claude-code-files/.claude mon-projet/.claude
+
+# Optionnel : copier le guide de workflow Sprint Obsidian → Code → PR
+cp claude-code-files/WORKFLOW.md mon-projet/WORKFLOW.md
 ```
 
 ### Option 2 — Utiliser comme base d'un nouveau projet
