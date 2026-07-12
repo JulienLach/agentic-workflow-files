@@ -231,11 +231,13 @@ claude mcp add obsidian -- npx -y mcp-obsidian /chemin/vers/ton/vault
 
 > Ce MCP est **optionnel** — il est utile si tu gères ta documentation de projet dans Obsidian. Il n'est pas nécessaire pour utiliser les skills et le CLAUDE.md.
 
+> **MCP vs CLI Obsidian — ne pas confondre :** ce MCP (`mcp-obsidian`) est un serveur que Claude appelle via des tool calls. Le workflow décrit ci-dessous (`WORKFLOW.md`) utilise plutôt le **[CLI natif `obsidian`](https://help.obsidian.md/cli)** (commande shell `obsidian ...`), qui communique directement avec l'app Obsidian ouverte via un socket local — pas besoin d'installer ce MCP pour suivre `WORKFLOW.md`. Utilise le MCP si tu veux intégrer Obsidian à d'autres automatisations Claude ; utilise le CLI pour le workflow sprint → code → PR documenté ici.
+
 ---
 
 ## Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 
-Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture des tâches depuis un point dev/une recette client via le **CLI Obsidian**, suivi des tâches dans le vault (sprints, checklists), implémentation dans le repo de code, commit/push, ouverture de PR avec `gh` CLI (y compris le contournement pour les environnements sandboxés sans `gh` ni credentials Git préinstallés), revue de la PR en solo dev (`/code-review`), puis retour cocher la tâche dans Obsidian une fois faite.
+Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture des tâches depuis un point dev/une recette client via le **CLI Obsidian** (voir encadré ci-dessus, distinct du MCP), suivi des tâches dans le vault (sprints, checklists), implémentation dans le repo de code, commit/push, ouverture de PR avec `gh` CLI (y compris le contournement pour les environnements sandboxés sans `gh` ni credentials Git préinstallés), revue de la PR en solo dev (`/code-review`), puis retour cocher la tâche dans Obsidian une fois faite.
 
 ---
 
