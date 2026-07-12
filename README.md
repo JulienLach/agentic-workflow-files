@@ -21,11 +21,13 @@ Ce repo contient un `CLAUDE.md` complet et des skills prêts à l'emploi pour ac
 ```
 claude-code-files/
 ├── CLAUDE.md                        ← Instructions transversales pour Claude Code
+├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 └── .claude/
     ├── settings.json                ← Permissions MCP (Context7)
     └── skills/
         ├── code-review.md           ← /code-review  : revue de code
         ├── debug.md                 ← /debug         : débogage structuré
+        ├── refactor.md              ← /refactor      : refacto sécurisé
         ├── add-entity.md            ← /add-entity    : création d'entité full-stack
         ├── write-tests.md           ← /write-tests   : rédaction de tests Vitest
         └── security-audit.md        ← /security-audit: audit sécurité OWASP
@@ -228,6 +230,12 @@ claude mcp add obsidian -- npx -y mcp-obsidian /chemin/vers/ton/vault
 ```
 
 > Ce MCP est **optionnel** — il est utile si tu gères ta documentation de projet dans Obsidian. Il n'est pas nécessaire pour utiliser les skills et le CLAUDE.md.
+
+---
+
+## Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
+
+Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture des tâches depuis un point dev/une recette client via le **CLI Obsidian**, suivi des tâches dans le vault (sprints, checklists), implémentation dans le repo de code, commit/push, ouverture de PR avec `gh` CLI (y compris le contournement pour les environnements sandboxés sans `gh` ni credentials Git préinstallés), revue de la PR en solo dev (`/code-review`), puis retour cocher la tâche dans Obsidian une fois faite.
 
 ---
 
