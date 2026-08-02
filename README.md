@@ -6,6 +6,27 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 
 ---
 
+## Table des matières
+
+- [Stack cible](#stack-cible)
+- [Contenu](#contenu)
+- [Pourquoi `AGENTS.md` plutôt que `CLAUDE.md` ?](#pourquoi-agentsmd-plutôt-que-claudemd)
+- [Installation](#installation)
+  - [Option 1 — Copier les fichiers dans un projet existant](#option-1--copier-les-fichiers-dans-un-projet-existant)
+  - [Option 2 — Utiliser comme base d'un nouveau projet](#option-2--utiliser-comme-base-dun-nouveau-projet)
+- [Configuration](#configuration)
+  - [Prérequis](#prérequis)
+  - [Skills vs MCP vs Plugins — quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
+  - [Plugins](#plugins)
+  - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
+  - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
+  - [Obsidian MCP — gestion des notes de projet](#obsidian-mcp--gestion-des-notes-de-projet)
+- [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
+- [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
+- [Skills disponibles](#skills-disponibles)
+
+---
+
 ## Stack cible
 
 - **Backend** : Node.js · Express · TypeScript · PostgreSQL (`pg`) · Zod · Vitest · Winston
