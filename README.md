@@ -20,7 +20,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
   - [Plugins](#plugins)
   - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
   - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
-  - [Obsidian MCP — gestion des notes de projet](#obsidian-mcp--gestion-des-notes-de-projet)
+  - [Obsidian skills — gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
   - [Agents personnalisés](#agents-personnalisés)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
@@ -193,9 +193,8 @@ Les MCP connectent Claude Code à des services externes (APIs, bases de données
 # Syntaxe générale
 claude mcp add <nom> -- <commande-de-lancement>
 
-# Exemples
+# Exemple
 claude mcp add context7 -- npx -y @upstash/context7-mcp
-claude mcp add obsidian -- npx -y mcp-obsidian
 ```
 
 #### Lister / supprimer les MCP
@@ -237,15 +236,25 @@ Utilise context7 pour me montrer comment configurer les middlewares dans Express
 
 ---
 
-### Obsidian MCP — gestion des notes de projet
+### Obsidian skills — gestion des notes de projet
 
-Le MCP Obsidian permet à Claude de lire, créer et modifier des notes dans ton vault Obsidian directement depuis une session Claude Code. Utile pour documenter les décisions d'architecture, gérer un backlog en Markdown, ou lier des notes techniques à ton code.
+Pas de MCP Obsidian ici : la gestion du vault passe uniquement par le plugin de skills **[obsidian-skills de kepano](https://github.com/kepano/obsidian-skills)**, pas par un serveur MCP. Ce plugin fournit les skills `obsidian:*` qui permettent à Claude de lire, créer et modifier des notes, gérer les propriétés/Bases/Canvas, et extraire du contenu web propre — directement depuis une session Claude Code.
 
 **Installation (une seule fois, globalement) :**
 
 ```bash
-claude mcp add obsidian -- npx -y mcp-obsidian /chemin/vers/ton/vault
+claude plugin install https://github.com/kepano/obsidian-skills
 ```
+
+**Skills fournies par ce plugin :**
+
+| Skill | Usage |
+| --- | --- |
+| `obsidian:obsidian-cli` | Lire/créer/rechercher des notes et tâches via le CLI natif `obsidian` |
+| `obsidian:obsidian-markdown` | Wikilinks, embeds, callouts, propriétés (frontmatter) — syntaxe Obsidian Flavored Markdown |
+| `obsidian:obsidian-bases` | Créer/éditer des fichiers `.base` (vues type base de données) |
+| `obsidian:json-canvas` | Créer/éditer des fichiers `.canvas` (mind maps, flowcharts) |
+| `obsidian:defuddle` | Extraire du contenu web propre en Markdown (remplace `WebFetch` pour une URL à lire) |
 
 **Cas d'usage :**
 
@@ -253,26 +262,7 @@ claude mcp add obsidian -- npx -y mcp-obsidian /chemin/vers/ton/vault
 - Rechercher dans tes notes de projet sans quitter le terminal
 - Mettre à jour un backlog ou un journal de bord en cours de session
 
-**Ajouter les permissions dans `.claude/settings.json` :**
-
-```json
-{
-    "permissions": {
-        "allow": [
-            "mcp__plugin_context7_context7__query-docs",
-            "mcp__plugin_context7_context7__resolve-library-id",
-            "mcp__obsidian__read_note",
-            "mcp__obsidian__write_note",
-            "mcp__obsidian__search_notes",
-            "mcp__obsidian__list_directory"
-        ]
-    }
-}
-```
-
-> Ce MCP est **optionnel** — il est utile si tu gères ta documentation de projet dans Obsidian. Il n'est pas nécessaire pour utiliser les skills et l'AGENTS.md.
-
-> **MCP vs CLI Obsidian — ne pas confondre :** ce MCP (`mcp-obsidian`) est un serveur que Claude appelle via des tool calls. Le workflow décrit ci-dessous (`WORKFLOW.md`) utilise plutôt le **[CLI natif `obsidian`](https://help.obsidian.md/cli)** (commande shell `obsidian ...`), qui communique directement avec l'app Obsidian ouverte via un socket local — pas besoin d'installer ce MCP pour suivre `WORKFLOW.md`. Utilise le MCP si tu veux intégrer Obsidian à d'autres automatisations Claude ; utilise le CLI pour le workflow sprint → code → PR documenté ici.
+> Ces skills utilisent le **[CLI natif `obsidian`](https://help.obsidian.md/cli)** (commande shell `obsidian ...`, binaire dans `~/.local/bin/obsidian`), qui communique directement avec l'app Obsidian ouverte via un socket local. Il faut donc qu'Obsidian soit **lancé** pour que le CLI fonctionne — à défaut, Claude peut toujours lire/écrire les fichiers du vault directement (`Read`/`Edit`/`Write`).
 
 ---
 
@@ -305,7 +295,7 @@ Instructions système de l'agent (rôle, expertise, méthode de travail, règles
 
 ## Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 
-Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture des tâches depuis un point dev/une recette client via le **CLI Obsidian** (voir encadré ci-dessus, distinct du MCP), suivi des tâches dans le vault (sprints, checklists), implémentation dans le repo de code, commit/push, ouverture de PR avec `gh` CLI (y compris le contournement pour les environnements sandboxés sans `gh` ni credentials Git préinstallés), revue de la PR en solo dev (`/code-review`), puis retour cocher la tâche dans Obsidian une fois faite.
+Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture des tâches depuis un point dev/une recette client via les **Obsidian skills** (voir encadré ci-dessus), suivi des tâches dans le vault (sprints, checklists), implémentation dans le repo de code, commit/push, ouverture de PR avec `gh` CLI (y compris le contournement pour les environnements sandboxés sans `gh` ni credentials Git préinstallés), revue de la PR en solo dev (`/code-review`), puis retour cocher la tâche dans Obsidian une fois faite.
 
 ---
 

@@ -45,7 +45,7 @@ Le vault Obsidian et le repo de code sont deux répertoires distincts sur la mê
 - **Obsidian skills** (plugin `obsidian:*` — `obsidian-cli`, `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `defuddle`) : ce sont les skills que Claude invoque pour lire/écrire dans le vault, y compris via le binaire CLI (`obsidian ...`, dans `~/.local/bin/obsidian`) — nécessite qu'Obsidian soit **lancé** (communication via socket local).
 - **Lecture/écriture directe des fichiers** (`Read`, `Edit`, `Write`) via le chemin absolu du vault (`~/Documents/vault/...`) — toujours possible, même si Obsidian n'est pas lancé. Indispensable pour les insertions précises **sous un sous-titre donné**, que le CLI ne gère pas (`append`/`prepend` n'agissent que sur le début/la fin du fichier entier).
 
-> **MCP Obsidian vs Obsidian skills — ne pas confondre :** le MCP `mcp-obsidian` (voir `README.md`) est un serveur externe optionnel appelé via des tool calls. Les **Obsidian skills** utilisées dans ce workflow sont un plugin de skills Claude Code (pas un MCP) qui enveloppe le CLI natif `obsidian` — c'est ce qui est utilisé par défaut ici, pas besoin du MCP pour suivre ce document.
+> Ce workflow n'utilise pas de MCP Obsidian : les **Obsidian skills** ([kepano/obsidian-skills](https://github.com/kepano/obsidian-skills), voir `README.md`) sont un plugin de skills Claude Code qui enveloppe le CLI natif `obsidian` — c'est la seule brique utilisée ici pour interagir avec le vault.
 
 ---
 
