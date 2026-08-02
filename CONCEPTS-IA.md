@@ -22,6 +22,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Tool use / function calling](#tool-use--function-calling)
    - [MCP (Model Context Protocol)](#mcp-model-context-protocol)
    - [Skills, plugins et subagents](#skills-plugins-et-subagents)
+   - [MCP vs Skill — quand choisir quoi](#mcp-vs-skill--quand-choisir-quoi)
    - [Prompt injection — le risque de sécurité des agents](#prompt-injection--le-risque-de-sécurité-des-agents)
 3. [Endpoints](#3-endpoints)
    - [C'est quoi un endpoint](#cest-quoi-un-endpoint)
@@ -146,6 +147,32 @@ Standard ouvert créé par Anthropic pour connecter un LLM à des sources de don
 - **Plugin** : un bundle complet (skills + MCP + hooks) packagé et installable en une commande.
 - **Subagent** : une instance séparée du modèle, avec son propre contexte, ses propres outils et parfois son propre modèle, lancée par l'agent principal pour isoler ou paralléliser une tâche. Ex. `obsidian-expert` dans ce repo.
 - **Hook** : une commande shell déclenchée **automatiquement** par le harness en réaction à un événement précis (avant/après un appel d'outil, fin de session...) — de l'automatisation "dure", pas pilotée par une décision du modèle.
+
+### MCP vs Skill — quand choisir quoi
+
+Un choix concret et récurrent : pour connecter un outil ou un service à Claude, MCP (serveur) ou Skill (CLI + instructions) ?
+
+**MCP l'emporte quand :**
+
+- **État/connexion persistante nécessaire** — session live avec une API tierce (base de données, service cloud), pas juste un appel one-shot.
+- **Données structurées complexes** — retour JSON typé, pagination, besoin de raisonner sur une structure précise plutôt que parser du texte de sortie CLI.
+- **Pas de CLI existant** — le service n'expose qu'une API REST/GraphQL, aucun outil shell mature à appeler.
+- **Auth/secrets centralisés** — le token est géré une fois côté serveur MCP, plutôt qu'éparpillé dans des commandes shell.
+- **Opérations fréquentes à faible latence** — un serveur déjà "chaud" plutôt que relancer un process CLI à chaque appel.
+
+**Skill l'emporte quand :**
+
+- Un CLI officiel déjà mature existe (`gh`, `obsidian`, `git`) — passer par le shell directement, sans couche supplémentaire.
+- La tâche consiste à suivre une convention/syntaxe (écrire du markdown Obsidian, respecter un format de commit) — de simples instructions suffisent, pas besoin de serveur.
+- La fiabilité est prioritaire — moins de pièces mobiles, moins de casse. Exemple concret : `mcp-obsidian`, non maintenu depuis fin 2024, schéma cassé — une bonne illustration du risque à dépendre d'un serveur MCP tiers peu entretenu plutôt que d'un CLI officiel stable.
+
+**Application concrète (dans ce repo) :**
+
+| Cas | Choix | Pourquoi |
+| --- | --- | --- |
+| GitHub | `gh` CLI | CLI déjà mature, pas d'état persistant requis |
+| Obsidian | CLI natif + Obsidian skills | CLI officiel (nécessite l'app ouverte) + skills pour les formats (markdown, canvas, bases) — pas besoin de MCP |
+| GitHub Projects (hypothétique) | MCP GitHub | En cas de besoin futur de requêtes multi-étapes avec état, un MCP deviendrait pertinent |
 
 ### Prompt injection — le risque de sécurité des agents
 
