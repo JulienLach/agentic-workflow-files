@@ -187,6 +187,10 @@ claude plugin install https://claude.com/plugins/superpowers
 - `/debugging` en complément du skill `/debug` de ce repo pour les bugs récalcitrants
 - `/skill-authoring` pour créer tes propres skills personnalisés au projet
 
+> **Déclenchement automatique — pas besoin de taper `/debugging` :** Superpowers embarque un skill méta, `using-superpowers`, chargé à chaque session (hook `SessionStart`). Sa règle : avant toute réponse, vérifier si un skill de la liste s'applique à la situation, et l'utiliser sans que ce soit négociable. `systematic-debugging` (le skill derrière `/debugging`) a pour description *"Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes"* — dès qu'un bug ou un test qui échoue est décrit, ce skill peut donc s'activer tout seul, sans commande explicite.
+>
+> **Où ça s'intègre dans `WORKFLOW.md` :** à l'étape 4 (Implémentation), au moment de *"Vérifier (tests, lint, exécution locale) avant de committer"*. Exemple : sur un test qui échoue sans raison apparente, avant de proposer un correctif à l'aveugle, le skill s'invoque et suit sa méthode en 4 phases — localisation → hypothèses testables → correction → prévention (test de non-régression) — la même philosophie que le skill `/debug` de ce repo. Différence : si 3 tentatives de correction échouent d'affilée, une **revue architecturale automatique** se déclenche en plus. D'où la fréquence rare de son apparition : il ne s'active vraiment que sur les bugs qui résistent, pas sur un fix trivial.
+
 ---
 
 ### MCP (Model Context Protocol) — outils externes
