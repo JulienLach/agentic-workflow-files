@@ -22,6 +22,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
   - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
   - [Obsidian skills — gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
   - [Agents personnalisés](#agents-personnalisés)
+- [Design — maquette client avant le code](#design--maquette-client-avant-le-code)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
 - [Skills disponibles](#skills-disponibles)
@@ -46,6 +47,9 @@ claude-code-files/
 ├── AGENTS.md                        ← Instructions transversales (standard agents.md)
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
+├── design/
+│   ├── design.md                    ← Charte graphique (Brand Guide) à remplir pour le client
+│   └── instructions-maquette.md     ← Instructions de maquettage (écrans, navigation, règles UX)
 └── .claude/
     ├── settings.json                ← Permissions MCP (Context7)
     ├── agents/
@@ -292,6 +296,30 @@ Instructions système de l'agent (rôle, expertise, méthode de travail, règles
 ```
 
 > Le champ `memory: project` dans le frontmatter active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale.
+
+---
+
+## Design — maquette client avant le code
+
+Avant d'écrire la moindre ligne de code métier sur une nouvelle application, remplir les deux templates du dossier [`design/`](./design) pour cadrer visuellement le projet avec le client :
+
+| Fichier | Contenu |
+| --- | --- |
+| [`design/design.md`](./design/design.md) | Charte graphique (Brand Guide) : identité de marque, logo, palette de couleurs, typographie, iconographie, composants UI, accessibilité |
+| [`design/instructions-maquette.md`](./design/instructions-maquette.md) | Instructions de maquettage : contexte/objectif, périmètre des écrans, structure/navigation, détail écran par écran, règles UX, modèle de données, livrables attendus |
+
+**Usage :**
+
+```bash
+cp claude-code-files/design/design.md mon-projet/design.md
+cp claude-code-files/design/instructions-maquette.md mon-projet/instructions-maquette.md
+```
+
+1. Remplir les deux fichiers (placeholders `{{...}}`) avec les informations du client et du projet.
+2. Donner les deux fichiers en contexte à Claude pour générer le prototype / la maquette client — avant de démarrer le développement.
+3. Une fois la maquette validée par le client, elle sert de référence visuelle pour l'implémentation (étape 4 du [`WORKFLOW.md`](./WORKFLOW.md)).
+
+> Cette étape se place **avant** le cycle Obsidian → Code → PR décrit ci-dessous — c'est la phase de cadrage visuel qui précède la création des tâches de sprint.
 
 ---
 
