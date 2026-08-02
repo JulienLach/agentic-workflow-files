@@ -25,6 +25,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
 - [Skills disponibles](#skills-disponibles)
+- [Concepts IA — glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
 
 ---
 
@@ -44,6 +45,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 claude-code-files/
 ├── AGENTS.md                        ← Instructions transversales (standard agents.md)
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
+├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
 └── .claude/
     ├── settings.json                ← Permissions MCP (Context7)
     ├── agents/
@@ -348,3 +350,9 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 /write-tests backend/services/user.services.ts
 /security-audit backend/routes/auth.routes.ts
 ```
+
+---
+
+## Concepts IA — glossaire et fondamentaux
+
+Voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) : un doc de référence pour comprendre le vocabulaire et les concepts qu'on croise partout autour des LLM et des agents IA — harness, tokens, paramètres, fenêtre de contexte, RAG, MCP, comment choisir un modèle selon le besoin — avec des outils concrets (Claude Code, OpenCode, Cursor, etc.) pour illustrer chaque concept.
