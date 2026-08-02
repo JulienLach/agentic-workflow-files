@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-Ce fichier fournit les instructions à Claude Code (claude.ai/code) pour travailler sur ce dépôt.
+Ce fichier fournit les instructions à Claude Code (claude.ai/code) et à tout autre outil agentique compatible avec le standard [AGENTS.md](https://agents.md/) pour travailler sur ce dépôt.
 
 > **Note** : Ce fichier est un template transversal pour tous les projets TypeScript / Node.js / React / PostgreSQL. Remplis la section **[Contexte projet]** en bas avec les détails spécifiques à ton application pour donner à Claude le contexte nécessaire pour répondre précisément à tes questions et implémenter les fonctionnalités.
 

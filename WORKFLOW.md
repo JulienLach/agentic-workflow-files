@@ -2,7 +2,7 @@
 
 Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**, via **Claude Code**, le **CLI Obsidian** et **`gh` CLI**.
 
-Il complète le `CLAUDE.md` (conventions de code) et le `README.md` (setup des skills/MCP) de ce repo : ceux-ci décrivent *comment coder*, celui-ci décrit *comment on articule réunion → tâche → code → PR → mise à jour du suivi*.
+Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des skills/MCP) de ce repo : ceux-ci décrivent *comment coder*, celui-ci décrit *comment on articule réunion → tâche → code → PR → mise à jour du suivi*.
 
 ---
 
@@ -89,7 +89,7 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / A
 
 ## 2. Implémentation dans le repo de code
 
-1. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `CLAUDE.md` :
+1. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` :
 
    | Préfixe | Usage |
    |---|---|
@@ -101,14 +101,14 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / A
    ```bash
    git checkout -b feat/nom-de-la-feature
    ```
-2. Implémenter en suivant le `CLAUDE.md` du repo concerné (stack, conventions, tests).
+2. Implémenter en suivant le `AGENTS.md` du repo concerné (stack, conventions, tests).
 3. Vérifier (tests, lint, exécution locale) avant de committer.
 
 ---
 
 ## 3. Commit & Push
 
-Les règles de commit sont **celles définies dans `CLAUDE.md`** — ce workflow ne fait que les appliquer, il n'en redéfinit aucune :
+Les règles de commit sont **celles définies dans `AGENTS.md`** — ce workflow ne fait que les appliquer, il n'en redéfinit aucune :
 
 - **Format (Conventional Commits)** : `type(scope): description courte`
 
@@ -169,7 +169,7 @@ Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait 
    ```bash
    /code-review
    ```
-   (vérifie la conformité au `CLAUDE.md`, les bugs potentiels, la sécurité — voir la section Plugins du `README.md`)
+   (vérifie la conformité au `AGENTS.md`, les bugs potentiels, la sécurité — voir la section Plugins du `README.md`)
 2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits — pas d'amend sur un commit déjà pushé sans raison explicite).
 3. Relire soi-même le diff final (`gh pr diff` ou l'interface GitHub) avant de merger.
 4. Merger :

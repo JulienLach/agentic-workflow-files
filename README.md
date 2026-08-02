@@ -2,7 +2,7 @@
 
 Ressources Claude Code transversales pour les projets **TypeScript / Node.js / React / PostgreSQL**.
 
-Ce repo contient un `CLAUDE.md` complet et des skills prêts à l'emploi pour accélérer le développement sur toute la stack.
+Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour accélérer le développement sur toute la stack.
 
 ---
 
@@ -20,7 +20,7 @@ Ce repo contient un `CLAUDE.md` complet et des skills prêts à l'emploi pour ac
 
 ```
 claude-code-files/
-├── CLAUDE.md                        ← Instructions transversales pour Claude Code
+├── AGENTS.md                        ← Instructions transversales (standard agents.md)
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 └── .claude/
     ├── settings.json                ← Permissions MCP (Context7)
@@ -35,6 +35,20 @@ claude-code-files/
 
 ---
 
+## Pourquoi `AGENTS.md` plutôt que `CLAUDE.md` ?
+
+Ce repo utilisait auparavant un `CLAUDE.md`, la convention propre à Claude Code. Il est désormais remplacé par [`AGENTS.md`](https://agents.md/), un standard ouvert, indépendant d'Anthropic, adopté par plusieurs outils agentiques (Claude Code, Cursor, Codex CLI, Jules, Amp, etc.).
+
+Intérêt du changement :
+
+- **Un seul fichier pour tous les outils** : plus besoin de dupliquer les mêmes instructions (stack, commandes, conventions) dans un fichier différent par outil si tu alternes entre plusieurs assistants IA sur ce repo.
+- **Compatibilité Claude Code conservée** : Claude Code lit nativement un `AGENTS.md` s'il est présent, donc rien n'est perdu côté fonctionnalités.
+- **Format libre** : `AGENTS.md` est du Markdown simple, sans structure imposée — le contenu de ce repo (stack, architecture, patterns, workflow git) reste identique, seul le nom du fichier change.
+
+> Si un jour tu as besoin d'instructions **strictement spécifiques à Claude Code** (hooks, comportements propres à l'outil) en plus des instructions génériques, tu peux ajouter un `CLAUDE.md` minimal en complément — Claude Code combine alors les deux. Ce n'est pas nécessaire pour l'instant.
+
+---
+
 ## Installation
 
 ### Option 1 — Copier les fichiers dans un projet existant
@@ -43,8 +57,8 @@ claude-code-files/
 # Cloner ce repo
 git clone https://github.com/JulienLach/claude-code-files.git
 
-# Copier le CLAUDE.md à la racine de ton projet
-cp claude-code-files/CLAUDE.md mon-projet/CLAUDE.md
+# Copier l'AGENTS.md à la racine de ton projet
+cp claude-code-files/AGENTS.md mon-projet/AGENTS.md
 
 # Copier la config Claude Code
 cp -r claude-code-files/.claude mon-projet/.claude
@@ -93,7 +107,7 @@ Claude Code propose trois mécanismes d'extension complémentaires :
 
 Le plugin officiel Anthropic pour la revue de PR. Il lance **5 agents spécialisés en parallèle** :
 
-- Vérification conformité `CLAUDE.md`
+- Vérification conformité `AGENTS.md`
 - Détection de bugs
 - Analyse du contexte git (historique, commits liés)
 - Revue des commentaires PR précédents
@@ -232,7 +246,7 @@ claude mcp add obsidian -- npx -y mcp-obsidian /chemin/vers/ton/vault
 }
 ```
 
-> Ce MCP est **optionnel** — il est utile si tu gères ta documentation de projet dans Obsidian. Il n'est pas nécessaire pour utiliser les skills et le CLAUDE.md.
+> Ce MCP est **optionnel** — il est utile si tu gères ta documentation de projet dans Obsidian. Il n'est pas nécessaire pour utiliser les skills et l'AGENTS.md.
 
 > **MCP vs CLI Obsidian — ne pas confondre :** ce MCP (`mcp-obsidian`) est un serveur que Claude appelle via des tool calls. Le workflow décrit ci-dessous (`WORKFLOW.md`) utilise plutôt le **[CLI natif `obsidian`](https://help.obsidian.md/cli)** (commande shell `obsidian ...`), qui communique directement avec l'app Obsidian ouverte via un socket local — pas besoin d'installer ce MCP pour suivre `WORKFLOW.md`. Utilise le MCP si tu veux intégrer Obsidian à d'autres automatisations Claude ; utilise le CLI pour le workflow sprint → code → PR documenté ici.
 
@@ -244,9 +258,9 @@ Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture d
 
 ---
 
-## Personnaliser CLAUDE.md pour le projet
+## Personnaliser AGENTS.md pour le projet
 
-Le `CLAUDE.md` contient une section `## [Contexte projet]` en bas du fichier. Remplir avec les informations spécifiques de l'application :
+Le `AGENTS.md` contient une section `## [Contexte projet]` en bas du fichier. Remplir avec les informations spécifiques de l'application :
 
 ```markdown
 ## [Contexte projet]
