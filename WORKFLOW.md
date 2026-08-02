@@ -134,7 +134,7 @@ Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatr
   - `Agent pédagogique` — ton explicatif, pas-à-pas, pour comprendre une notion avant de l'implémenter.
   - `Agent autonome` — exécution en arrière-plan sur une tâche bien définie, sans allers-retours.
 
-  > Un agent custom existant en config globale : `obsidian-expert` (voir `~/.claude/agents/`). Si tu veux un exemple d'agent Obsidian **local à ce repo** (pour que le template inclue directement un `.claude/agents/obsidian-expert.md`), dis-le-moi — c'est une tâche séparée de cette mise à jour du workflow.
+  > L'agent `obsidian-expert` est inclus dans ce repo (`.claude/agents/obsidian-expert.md`) — voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
 
 ---
 

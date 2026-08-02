@@ -21,6 +21,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
   - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
   - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
   - [Obsidian MCP — gestion des notes de projet](#obsidian-mcp--gestion-des-notes-de-projet)
+  - [Agents personnalisés](#agents-personnalisés)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
 - [Skills disponibles](#skills-disponibles)
@@ -45,6 +46,8 @@ claude-code-files/
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 └── .claude/
     ├── settings.json                ← Permissions MCP (Context7)
+    ├── agents/
+    │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
     └── skills/
         ├── code-review.md           ← /code-review  : revue de code
         ├── debug.md                 ← /debug         : débogage structuré
@@ -111,14 +114,14 @@ git remote add origin https://github.com/<ton-nom-utilisateur>/mon-projet.git
 
 Claude Code propose trois mécanismes d'extension complémentaires :
 
-|                         | **Skills**                            | **MCP**                               | **Plugins**                             |
-| ----------------------- | ------------------------------------- | ------------------------------------- | --------------------------------------- |
-| **Qu'est-ce que c'est** | Fichiers `.md` dans `.claude/skills/` | Serveurs externes connectés à Claude  | Bundles complets (skills + MCP + hooks) |
-| **Invoquer**            | `/nom-du-skill`                       | Automatique ou à la demande           | `/nom-du-plugin:commande`               |
-| **Installer**           | Copier le fichier `.md`               | `claude mcp add`                      | `claude plugin install`                 |
-| **Usage**               | Prompts guidés réutilisables          | Accès outils externes (API, DB, docs) | Features complètes packagées            |
+|                         | **Skills**                            | **MCP**                               | **Plugins**                             | **Agents**                                    |
+| ----------------------- | ------------------------------------- | ------------------------------------- | ---------------------------------------- | ---------------------------------------------- |
+| **Qu'est-ce que c'est** | Fichiers `.md` dans `.claude/skills/` | Serveurs externes connectés à Claude  | Bundles complets (skills + MCP + hooks)  | Fichiers `.md` dans `.claude/agents/`          |
+| **Invoquer**            | `/nom-du-skill`                       | Automatique ou à la demande           | `/nom-du-plugin:commande`                | Automatique ou via l'outil `Agent`             |
+| **Installer**           | Copier le fichier `.md`               | `claude mcp add`                      | `claude plugin install`                  | Copier le fichier `.md`                        |
+| **Usage**               | Prompts guidés réutilisables          | Accès outils externes (API, DB, docs) | Features complètes packagées             | Subagent avec rôle, ton et outils dédiés       |
 
-> Ce repo fournit des **skills** et un **MCP** (Context7). Les plugins officiels Anthropic s'installent séparément.
+> Ce repo fournit des **skills**, un **MCP** (Context7) et un **agent custom** (`obsidian-expert`). Les plugins officiels Anthropic s'installent séparément.
 
 ---
 
@@ -270,6 +273,33 @@ claude mcp add obsidian -- npx -y mcp-obsidian /chemin/vers/ton/vault
 > Ce MCP est **optionnel** — il est utile si tu gères ta documentation de projet dans Obsidian. Il n'est pas nécessaire pour utiliser les skills et l'AGENTS.md.
 
 > **MCP vs CLI Obsidian — ne pas confondre :** ce MCP (`mcp-obsidian`) est un serveur que Claude appelle via des tool calls. Le workflow décrit ci-dessous (`WORKFLOW.md`) utilise plutôt le **[CLI natif `obsidian`](https://help.obsidian.md/cli)** (commande shell `obsidian ...`), qui communique directement avec l'app Obsidian ouverte via un socket local — pas besoin d'installer ce MCP pour suivre `WORKFLOW.md`. Utilise le MCP si tu veux intégrer Obsidian à d'autres automatisations Claude ; utilise le CLI pour le workflow sprint → code → PR documenté ici.
+
+---
+
+### Agents personnalisés
+
+Un **agent** est un fichier `.md` dans `.claude/agents/` qui définit un subagent avec son propre rôle, ton, modèle et outils — invocable explicitement (outil `Agent`) ou automatiquement quand une tâche correspond à sa description.
+
+Ce repo inclut :
+
+| Agent | Rôle |
+| --- | --- |
+| `obsidian-expert` | Expert Obsidian : notes structurées, plugins (Dataview, Templater, Tasks...), templates, organisation du vault |
+
+**Structure d'un fichier agent :**
+
+```markdown
+---
+name: "nom-de-l-agent"
+description: "Quand utiliser cet agent, avec des exemples de déclenchement"
+model: sonnet
+color: purple
+---
+
+Instructions système de l'agent (rôle, expertise, méthode de travail, règles).
+```
+
+> Le champ `memory: project` dans le frontmatter active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale.
 
 ---
 
