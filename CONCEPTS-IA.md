@@ -105,6 +105,14 @@ Standard ouvert créé par Anthropic pour connecter un LLM à des sources de don
 - **Modèles propriétaires** : accessibles uniquement via API du fournisseur (Claude/Anthropic, GPT/OpenAI, Gemini/Google, Grok/xAI). Pas de poids téléchargeables.
 - **Modèles open-weights** : les poids sont publiés et téléchargeables (Llama/Meta, Mistral, DeepSeek, Qwen/Alibaba). Exécutables en local ou chez n'importe quel hébergeur — utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
 
+### Fine-tunes communautaires — l'exemple Nous Hermes
+
+Un modèle open-weights publié par son créateur (le "modèle de base") peut être **re-fine-tuné par un tiers** sur des données ciblées, pour produire une variante spécialisée — publiée elle aussi en open-weights, sous un nouveau nom. C'est un fine-tuning fait par la communauté, pas par le fournisseur d'origine.
+
+- **Nous Hermes** (Nous Research) est l'exemple le plus connu : une famille de fine-tunes construits par-dessus des modèles de base (Llama, Mistral, Qwen selon la version), réputée pour son bon comportement en **tool use / function calling** et en tâches agentiques — d'où la confusion fréquente avec un "agent" ou un harness : **Hermes reste un modèle**, pas un outil d'orchestration. C'est le harness (Claude Code, OpenCode...) qui l'utiliserait comme moteur si on voulait le faire tourner dans un contexte agentique.
+- Autres fine-tunes communautaires connus : Dolphin, OpenHermes, WizardLM — chacun optimisé pour un usage particulier (moins de refus, meilleur suivi d'instructions, function calling, etc.).
+- Pour choisir entre un modèle de base et un de ses fine-tunes : le fine-tune apporte un comportement plus ciblé sur son cas d'usage (souvent mieux pour l'agentique/tool use), mais peut perdre en performance générale par rapport au modèle de base sur d'autres tâches — à tester sur le besoin réel, pas sur la réputation seule.
+
 ### Frontier vs petits modèles
 
 Chaque fournisseur propose en général plusieurs tailles de modèles, avec un arbitrage capacité/vitesse/coût :
@@ -190,6 +198,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | Catégorie | Outils |
 | --- | --- |
 | **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
+| **Fine-tunes communautaires** | Nous Hermes (Nous Research), Dolphin, OpenHermes, WizardLM |
 | **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Gemini CLI, Aider |
 | **IDE avec agent intégré** | Cursor, Windsurf, GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Devin, Claude Code (mode cloud/remote), Jules (Google) |
@@ -206,6 +215,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | Terme | Définition courte |
 | --- | --- |
 | **LLM** | Modèle entraîné à prédire le prochain token d'un texte |
+| **Fine-tune communautaire** | Modèle open-weights ré-entraîné par un tiers sur un modèle de base (ex. Nous Hermes sur Llama/Mistral/Qwen), pour un usage spécialisé |
 | **Token** | Unité de texte de base manipulée par le modèle (≈ un mot ou un fragment de mot) |
 | **Paramètre** | Poids numérique appris pendant l'entraînement ; leur nombre approxime la "taille" du modèle |
 | **Context window** | Nombre max de tokens (entrée + sortie) que le modèle peut traiter en une fois |
