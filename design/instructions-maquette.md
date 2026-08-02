@@ -19,7 +19,21 @@
 
 ---
 
-## 2. Périmètre des écrans à maquetter
+## 2. Profils utilisateurs
+
+Lister les profils qui utiliseront l'application — chaque écran maquetté (section 3) doit être pensé en fonction du profil qui l'utilise.
+
+| Profil | Objectif principal | Niveau technique | Fréquence d'usage |
+|---|---|---|---|
+| {{Profil 1 — ex. Administrateur}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
+| {{Profil 2}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
+| {{Profil 3}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
+
+**Contraintes spécifiques par profil :** {{ex. profil terrain sur mobile, profil admin sur poste fixe, profil en conditions d'usage dégradées...}}
+
+---
+
+## 3. Périmètre des écrans à maquetter
 
 ### Priorité 1 — Écrans indispensables (V1)
 
@@ -47,7 +61,7 @@
 
 ---
 
-## 3. Structure et navigation globale
+## 4. Structure et navigation globale
 
 ### Layout général
 
@@ -78,7 +92,27 @@ La sidebar affiche uniquement les rubriques accessibles selon le profil connect�
 
 ---
 
-## 4. Détail des écrans à maquetter
+## 5. Parcours utilisateur (user flows)
+
+Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (section 3) mais **comment on passe de l'un à l'autre**, pour que les maquettes reflètent un vrai parcours plutôt que des écrans isolés.
+
+### Parcours principal — {{Nom du parcours, ex. "Créer une demande"}}
+
+```
+{{Écran de départ}} → {{Action, ex. clic "Créer"}} → {{Écran suivant}} → {{Action}} → {{Écran de confirmation}}
+```
+
+**Profil concerné :** {{Profil}}
+**Déclencheurs de sortie du parcours :** {{ex. annulation, erreur de validation, timeout}}
+
+### Autres parcours à couvrir
+
+- {{Parcours 2 — ex. "Modifier un statut"}}
+- {{Parcours 3 — ex. "Rechercher et filtrer"}}
+
+---
+
+## 6. Détail des écrans à maquetter
 
 ---
 
@@ -144,7 +178,7 @@ La sidebar affiche uniquement les rubriques accessibles selon le profil connect�
 
 ---
 
-## 5. Règles UX transversales
+## 7. Règles UX transversales
 
 ### {{Règle UX 1 — ex. Navigation séquentielle et blocages}}
 
@@ -173,7 +207,7 @@ Prévoir systématiquement les états suivants pour chaque composant interactif 
 
 ---
 
-## 6. Modèle de données à illustrer
+## 8. Modèle de données à illustrer
 
 ### Hiérarchie des données
 
@@ -195,7 +229,7 @@ Prévoir systématiquement les états suivants pour chaque composant interactif 
 
 ---
 
-## 7. Données fictives pour les maquettes
+## 9. Données fictives pour les maquettes
 
 **{{Entité principale}} exemple :**
 - {{Champ 1}} : {{Valeur fictive}}
@@ -209,7 +243,7 @@ Prévoir systématiquement les états suivants pour chaque composant interactif 
 
 ---
 
-## 8. Points ouverts à signaler dans les maquettes
+## 10. Points ouverts à signaler dans les maquettes
 
 Les points suivants sont **en suspens**. Les maquettes peuvent les matérialiser avec des états "À définir" ou des placeholders :
 
@@ -219,7 +253,7 @@ Les points suivants sont **en suspens**. Les maquettes peuvent les matérialiser
 
 ---
 
-## 9. Livrables attendus de {{Prestataire design}}
+## 11. Livrables attendus de {{Prestataire design}}
 
 1. **Wireframes haute-fidélité** des {{N}} écrans prioritaires
 2. **Design system** documenté (composants, états, tokens de couleur) conforme à `design.md`
@@ -229,7 +263,7 @@ Les points suivants sont **en suspens**. Les maquettes peuvent les matérialiser
 
 ---
 
-## 10. Contraintes techniques
+## 12. Contraintes techniques
 
 | Contrainte | Valeur |
 |---|---|
