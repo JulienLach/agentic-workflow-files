@@ -10,11 +10,12 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
 
 1. [Les fondamentaux d'un LLM](#1-les-fondamentaux-dun-llm)
 2. [Harness, agents et boucle agentique](#2-harness-agents-et-boucle-agentique)
-3. [Les modèles : familles, tailles, comment choisir](#3-les-modèles--familles-tailles-comment-choisir)
-4. [Prompting et context engineering](#4-prompting-et-context-engineering)
-5. [RAG, embeddings et mémoire](#5-rag-embeddings-et-mémoire)
-6. [Panorama des outils](#6-panorama-des-outils)
-7. [Glossaire condensé](#7-glossaire-condensé)
+3. [Endpoints](#3-endpoints)
+4. [Les modèles : familles, tailles, comment choisir](#4-les-modèles--familles-tailles-comment-choisir)
+5. [Prompting et context engineering](#5-prompting-et-context-engineering)
+6. [RAG, embeddings et mémoire](#6-rag-embeddings-et-mémoire)
+7. [Panorama des outils](#7-panorama-des-outils)
+8. [Glossaire condensé](#8-glossaire-condensé)
 
 ---
 
@@ -42,7 +43,7 @@ Un **token** est un fragment de texte (souvent un mot, un bout de mot, ou un car
 - **Le prix d'un appel API se calcule en tokens**, pas en mots ni en caractères (tokens en entrée + tokens en sortie).
 - **La fenêtre de contexte (context window)** est aussi mesurée en tokens : c'est le nombre maximum de tokens que le modèle peut "voir" en une fois, en comptant l'historique de conversation, les fichiers fournis, les instructions système et la réponse générée.
   - Exemple d'ordre de grandeur courant : 100k à 1M+ tokens selon le modèle et le fournisseur.
-  - Une fenêtre plus grande ne veut pas dire "utilise tout sans réfléchir" : au-delà d'un certain volume, la qualité peut se dégrader (effet *lost in the middle* — le modèle "oublie" ce qui est au milieu d'un contexte très long). D'où l'intérêt du **context engineering** (section 4).
+  - Une fenêtre plus grande ne veut pas dire "utilise tout sans réfléchir" : au-delà d'un certain volume, la qualité peut se dégrader (effet *lost in the middle* — le modèle "oublie" ce qui est au milieu d'un contexte très long). D'où l'intérêt du **context engineering** (section 5).
 
 ### Training vs inference
 
@@ -98,7 +99,37 @@ Standard ouvert créé par Anthropic pour connecter un LLM à des sources de don
 
 ---
 
-## 3. Les modèles : familles, tailles, comment choisir
+## 3. Endpoints
+
+### C'est quoi un endpoint
+
+Un **endpoint**, c'est une URL précise à laquelle on envoie une requête pour parler à un service — la "porte d'entrée" d'une API. Dans un workflow IA, on en croise plusieurs types :
+
+- **Endpoint de modèle (API)** : l'URL que le harness appelle pour envoyer un prompt et récupérer une réponse. Un même fournisseur expose souvent plusieurs endpoints selon la fonction : chat/génération, embeddings, batch (traitement asynchrone en masse, moins cher), fine-tuning.
+- **Endpoint auto-hébergé / déployé** : quand un modèle est déployé sur ta propre infra (cloud ML type SageMaker/Vertex AI, ou en local avec **Ollama**), il expose son propre endpoint, distinct de celui du fournisseur d'origine.
+- **Endpoint compatible OpenAI** : beaucoup de fournisseurs exposent un endpoint qui respecte le même format que l'API OpenAI, pour permettre de changer de modèle/fournisseur juste en changeant l'URL et la clé, sans réécrire le code.
+- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint — en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP/SSE** — auquel le harness se connecte pour appeler ses outils.
+- **Streaming vs non-streaming** : un endpoint peut renvoyer la réponse complète d'un coup, ou la **streamer** token par token au fur et à mesure de la génération.
+
+Un endpoint est généralement protégé par une **authentification** (clé API, token), soumis à des **rate limits** (nombre de requêtes/tokens max par minute), et a sa propre latence — des critères qui comptent dans le choix d'un fournisseur ou d'un déploiement.
+
+### Exemple concret : exposer une app métier comme endpoint MCP
+
+Un cas très courant en dev : rendre une application interne interrogeable par un agent IA, en l'exposant comme **serveur MCP distant (HTTP)** plutôt qu'en local.
+
+Concrètement : l'app définit une route (ex. `/api/mcp`), génère un **token propre à chaque utilisateur** (authentification), et l'URL complète devient l'endpoint à donner à l'agent :
+
+```
+https://mon-app.exemple.com/api/mcp?token=<token-utilisateur>
+```
+
+Côté Claude Desktop (ou Claude Code), on ajoute ensuite cet endpoint comme **MCP personnalisé** — via l'UI de Claude Desktop, ou en CLI avec `claude mcp add --transport http mon-app https://mon-app.exemple.com/api/mcp?token=...`. Dès lors, l'agent peut appeler les outils exposés par cette app, **authentifié en tant que cet utilisateur précis** — exactement le même principe qu'un endpoint MCP local (Context7, Obsidian skills), sauf qu'il tourne sur ton propre serveur, à distance, avec une authentification par token plutôt qu'une clé API globale partagée.
+
+> Le token dans l'URL joue le même rôle qu'une clé API : il identifie et authentifie l'appelant. Comme il apparaît en clair dans l'URL, il faut le traiter comme un secret (ne pas le committer, le régénérer s'il est exposé) — au même titre qu'une clé API classique.
+
+---
+
+## 4. Les modèles : familles, tailles, comment choisir
 
 ### Propriétaire vs open-weights
 
@@ -138,7 +169,7 @@ Certains modèles (ou certains modes de modèles existants) peuvent "réfléchir
 
 ---
 
-## 4. Prompting et context engineering
+## 5. Prompting et context engineering
 
 ### Prompt engineering
 
@@ -160,14 +191,14 @@ Une discipline de plus en plus centrale avec les agents autonomes : **gérer act
 
 - Ne charger que les fichiers pertinents pour la tâche en cours, pas tout le repo.
 - Résumer/compacter l'historique de conversation quand il devient trop long (Claude Code le fait automatiquement en approchant la limite).
-- Séparer la mémoire long-terme (voir section 5) du contexte de la tâche en cours, pour ne pas polluer chaque requête avec tout l'historique.
+- Séparer la mémoire long-terme (voir section 6) du contexte de la tâche en cours, pour ne pas polluer chaque requête avec tout l'historique.
 - Utiliser des subagents pour isoler des recherches volumineuses (ex. explorer un gros repo) sans polluer le contexte principal avec les résultats intermédiaires.
 
 Un contexte mal géré (trop long, mal trié) dégrade la qualité des réponses et fait grimper le coût — c'est souvent plus déterminant pour la qualité du résultat que le choix du modèle lui-même.
 
 ---
 
-## 5. RAG, embeddings et mémoire
+## 6. RAG, embeddings et mémoire
 
 ### Embeddings
 
@@ -193,7 +224,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 ---
 
-## 6. Panorama des outils
+## 7. Panorama des outils
 
 | Catégorie | Outils |
 | --- | --- |
@@ -210,7 +241,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 ---
 
-## 7. Glossaire condensé
+## 8. Glossaire condensé
 
 | Terme | Définition courte |
 | --- | --- |
@@ -231,6 +262,8 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **Agent** | Système qui exécute une tâche de façon autonome via une boucle observer/agir |
 | **Tool use / function calling** | Capacité du modèle à appeler un outil avec des arguments structurés |
 | **MCP** | Standard ouvert pour connecter un LLM à des outils/données externes de façon uniforme |
+| **Endpoint** | URL précise à laquelle on envoie une requête pour parler à un service (API modèle, serveur MCP, déploiement local...) |
+| **Rate limit** | Nombre maximum de requêtes/tokens qu'un endpoint accepte par unité de temps |
 | **Skill** | Prompt réutilisable et versionné, invocable à la demande |
 | **Subagent** | Instance séparée du modèle avec son propre contexte/rôle, lancée par l'agent principal |
 | **Hook** | Commande shell déclenchée automatiquement par le harness sur un événement |
