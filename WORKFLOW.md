@@ -30,7 +30,8 @@ Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des s
 │  MCP Excalidraw ──▶ Conception / Architecture                           │
 │                                                                          │
 │  Skills ──▶ /code-review · /debug · /refactor · /security-audit …       │
-│  Agents (.claude/agents/*.md) ──▶ Plan · Agent pédagogique · Agent autonome │
+│  Agents (.claude/agents/*.md) ──▶ Plan · obsidian-expert                │
+│  Modes de prompt ──▶ agentique standard · pédagogique (sur demande)     │
 └──────────────────────┬───────────────────────────────────────────────┘
                         │ 4. implémentation
                         ▼
@@ -129,12 +130,14 @@ Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatr
   | Débug | `/debug` |
   | Qualité du code | `/refactor`, `/write-tests`, `/security-audit` |
 
-- **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` :
-  - `Plan` — agent intégré pour concevoir des plans d'implémentation.
-  - `Agent pédagogique` — ton explicatif, pas-à-pas, pour comprendre une notion avant de l'implémenter.
-  - `Agent autonome` — exécution en arrière-plan sur une tâche bien définie, sans allers-retours.
+- **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
+  - `Plan` — agent intégré à Claude Code pour concevoir des plans d'implémentation.
+  - `obsidian-expert` — agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
 
-  > L'agent `obsidian-expert` est inclus dans ce repo (`.claude/agents/obsidian-expert.md`) — voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
+Deux **modes d'interaction** viennent s'ajouter par-dessus — ce ne sont pas des agents séparés, juste la façon dont la demande est formulée dans le prompt :
+
+- **Mode agentique standard** — c'est le fonctionnement par défaut de Claude Code : que le mode Auto soit activé ou non, Claude exécute la tâche de bout en bout (recherche, édition, tests, commits) à partir de ta demande, sans configuration particulière.
+- **Mode pédagogique** — sur demande explicite dans le prompt (« explique-moi », « guide-moi », « je veux comprendre par moi-même »), Claude oriente vers la solution par indices et explications plutôt que de l'implémenter directement.
 
 ---
 
