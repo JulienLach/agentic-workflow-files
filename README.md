@@ -1,4 +1,4 @@
-# claude-code-files
+# agentic-workflow-files
 
 Ressources Claude Code transversales pour les projets **TypeScript / Node.js / React / PostgreSQL**.
 
@@ -43,7 +43,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 ## Contenu
 
 ```
-claude-code-files/
+agentic-workflow-files/
 ├── AGENTS.md                        ← Instructions transversales (standard agents.md)
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
@@ -85,22 +85,22 @@ Intérêt du changement :
 
 ```bash
 # Cloner ce repo
-git clone https://github.com/JulienLach/claude-code-files.git
+git clone https://github.com/JulienLach/agentic-workflow-files.git
 
 # Copier l'AGENTS.md à la racine de ton projet
-cp claude-code-files/AGENTS.md mon-projet/AGENTS.md
+cp agentic-workflow-files/AGENTS.md mon-projet/AGENTS.md
 
 # Copier la config Claude Code
-cp -r claude-code-files/.claude mon-projet/.claude
+cp -r agentic-workflow-files/.claude mon-projet/.claude
 
 # Optionnel : copier le guide de workflow Sprint Obsidian → Code → PR
-cp claude-code-files/WORKFLOW.md mon-projet/WORKFLOW.md
+cp agentic-workflow-files/WORKFLOW.md mon-projet/WORKFLOW.md
 ```
 
 ### Option 2 — Utiliser comme base d'un nouveau projet
 
 ```bash
-git clone https://github.com/JulienLach/claude-code-files.git mon-projet
+git clone https://github.com/JulienLach/agentic-workflow-files.git mon-projet
 cd mon-projet
 # Supprimer l'origine et rattacher à ton propre repo
 git remote remove origin
@@ -311,8 +311,8 @@ Avant d'écrire la moindre ligne de code métier sur une nouvelle application, r
 **Usage :**
 
 ```bash
-cp claude-code-files/design/design.md mon-projet/design.md
-cp claude-code-files/design/instructions-maquette.md mon-projet/instructions-maquette.md
+cp agentic-workflow-files/design/design.md mon-projet/design.md
+cp agentic-workflow-files/design/instructions-maquette.md mon-projet/instructions-maquette.md
 ```
 
 1. Remplir les deux fichiers (placeholders `{{...}}`) avec les informations du client et du projet.
