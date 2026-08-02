@@ -161,6 +161,34 @@ claude plugin install https://claude.com/plugins/code-review
 
 ---
 
+#### Superpowers
+
+Le couteau suisse de Claude Code — 20+ skills battle-tested couvrant tout le cycle de développement. 350k+ installs, maintenu par Jesse Vincent.
+
+**Installation :**
+
+```bash
+claude plugin install https://claude.com/plugins/superpowers
+```
+
+**Commandes disponibles :**
+
+| Commande           | Description                                                                            |
+| ------------------ | -------------------------------------------------------------------------------------- |
+| `/brainstorming`   | Session Socratique pour explorer et affiner les besoins **avant** de coder             |
+| `/execute-plan`    | Implémente un plan par batches avec un agent de revue intégré à chaque checkpoint      |
+| `/debugging`       | Débogage en 4 phases avec revue architecturale automatique après 3 tentatives échouées |
+| `/skill-authoring` | Crée et teste de nouveaux skills Claude Code en appliquant les principes TDD           |
+
+**Pourquoi l'utiliser avec cette stack :**
+
+- `/brainstorming` avant toute nouvelle feature pour clarifier le besoin avant de toucher au code
+- `/execute-plan` pour les implémentations complexes (nouvelle entité, refacto) avec validation continue
+- `/debugging` en complément du skill `/debug` de ce repo pour les bugs récalcitrants
+- `/skill-authoring` pour créer tes propres skills personnalisés au projet
+
+---
+
 ### MCP (Model Context Protocol) — outils externes
 
 Les MCP connectent Claude Code à des services externes (APIs, bases de données, documentation, etc.). Ils s'installent via CLI et peuvent être configurés **globalement** (tous tes projets) ou **par projet** (dans `.claude/`).
