@@ -24,28 +24,36 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Skills, plugins et subagents](#skills-plugins-et-subagents)
    - [MCP vs Skill — quand choisir quoi](#mcp-vs-skill--quand-choisir-quoi)
    - [Prompt injection — le risque de sécurité des agents](#prompt-injection--le-risque-de-sécurité-des-agents)
-3. [Endpoints](#3-endpoints)
+3. [Design patterns agentiques](#3-design-patterns-agentiques)
+   - [ReAct (Reason + Act)](#react-reason--act)
+   - [Prompt Chaining](#prompt-chaining)
+   - [Routing](#routing)
+   - [Parallelization](#parallelization)
+   - [Orchestrator-Workers](#orchestrator-workers)
+   - [Reflection et Evaluator-Optimizer](#reflection-et-evaluator-optimizer)
+   - [Planning](#planning)
+4. [Endpoints](#4-endpoints)
    - [C'est quoi un endpoint](#cest-quoi-un-endpoint)
    - [Exemple concret : exposer une app métier comme endpoint MCP](#exemple-concret--exposer-une-app-métier-comme-endpoint-mcp)
-4. [Les modèles : familles, tailles, comment choisir](#4-les-modèles--familles-tailles-comment-choisir)
+5. [Les modèles : familles, tailles, comment choisir](#5-les-modèles--familles-tailles-comment-choisir)
    - [Propriétaire vs open-weights](#propriétaire-vs-open-weights)
    - [Fine-tunes communautaires — l'exemple Nous Hermes](#fine-tunes-communautaires--lexemple-nous-hermes)
    - [Frontier vs petits modèles](#frontier-vs-petits-modèles)
    - [Évaluer et comparer les modèles (benchmarks)](#évaluer-et-comparer-les-modèles-benchmarks)
    - [Comment choisir un modèle pour une tâche donnée](#comment-choisir-un-modèle-pour-une-tâche-donnée)
    - [Le "raisonnement étendu" (extended thinking / reasoning models)](#le-raisonnement-étendu-extended-thinking--reasoning-models)
-5. [Prompting et context engineering](#5-prompting-et-context-engineering)
+6. [Prompting et context engineering](#6-prompting-et-context-engineering)
    - [Prompt engineering](#prompt-engineering)
    - [System prompt](#system-prompt)
    - [Zero-shot, few-shot, chain-of-thought](#zero-shot-few-shot-chain-of-thought)
    - [Context engineering](#context-engineering)
-6. [RAG, embeddings et mémoire](#6-rag-embeddings-et-mémoire)
+7. [RAG, embeddings et mémoire](#7-rag-embeddings-et-mémoire)
    - [Embeddings](#embeddings)
    - [RAG (Retrieval-Augmented Generation)](#rag-retrieval-augmented-generation)
    - [Fine-tuning vs prompting vs RAG — quand utiliser quoi](#fine-tuning-vs-prompting-vs-rag--quand-utiliser-quoi)
    - [Mémoire d'agent](#mémoire-dagent)
-7. [Panorama des outils](#7-panorama-des-outils)
-8. [Glossaire condensé](#8-glossaire-condensé)
+8. [Panorama des outils](#8-panorama-des-outils)
+9. [Glossaire condensé](#9-glossaire-condensé)
 
 ---
 
@@ -59,13 +67,13 @@ Un **LLM** (Large Language Model, grand modèle de langage) est un réseau de ne
 
 Depuis 2017 (article de recherche *"Attention Is All You Need"*), la quasi-totalité des LLM utilisent l'architecture **Transformer**. Son ingrédient clé : le mécanisme d'**attention** (self-attention).
 
-- Le texte est découpé en tokens, chacun transformé en vecteur numérique (embedding, voir section 6).
+- Le texte est découpé en tokens, chacun transformé en vecteur numérique (embedding, voir section 7).
 - L'**attention** permet à chaque token de "regarder" tous les autres tokens de la séquence et de pondérer leur importance pour construire son sens en contexte — ex. dans *"la banque au bord de la rivière"*, l'attention relie "banque" à "rivière" pour désambiguïser vers le sens géographique plutôt que financier.
 - Le modèle empile des dizaines de "blocs" Transformer (attention + réseau de neurones classique), chacun affinant un peu plus la représentation du texte.
 - Contrairement aux architectures plus anciennes (RNN/LSTM) qui lisaient le texte token par token dans l'ordre, l'attention traite **toute la séquence en parallèle** — c'est ce qui a rendu possible l'entraînement sur des volumes de données massifs, et donc l'explosion de capacité des LLM depuis la fin des années 2010.
 - **Génération auto-régressive** : à l'inférence, le modèle prédit un token, l'ajoute à la séquence, puis prédit le suivant — un token à la fois, jusqu'à la fin de la réponse. C'est ce mécanisme qui explique l'effet "texte qui s'affiche progressivement" en streaming.
 
-> Pas besoin de savoir implémenter un Transformer pour bien utiliser un LLM — mais comprendre que c'est l'attention qui permet au modèle de relier des éléments distants dans un long contexte, c'est la base pour saisir pourquoi la taille de la fenêtre de contexte et sa bonne gestion (context engineering, section 5) comptent autant pour la qualité des réponses.
+> Pas besoin de savoir implémenter un Transformer pour bien utiliser un LLM — mais comprendre que c'est l'attention qui permet au modèle de relier des éléments distants dans un long contexte, c'est la base pour saisir pourquoi la taille de la fenêtre de contexte et sa bonne gestion (context engineering, section 6) comptent autant pour la qualité des réponses.
 
 ### Paramètres — c'est quoi, et pourquoi on en parle tout le temps
 
@@ -85,7 +93,7 @@ Un **token** est un fragment de texte (souvent un mot, un bout de mot, ou un car
 - **Le prix d'un appel API se calcule en tokens**, pas en mots ni en caractères (tokens en entrée + tokens en sortie).
 - **La fenêtre de contexte (context window)** est aussi mesurée en tokens : c'est le nombre maximum de tokens que le modèle peut "voir" en une fois, en comptant l'historique de conversation, les fichiers fournis, les instructions système et la réponse générée.
   - Exemple d'ordre de grandeur courant : 100k à 1M+ tokens selon le modèle et le fournisseur.
-  - Une fenêtre plus grande ne veut pas dire "utilise tout sans réfléchir" : au-delà d'un certain volume, la qualité peut se dégrader (effet *lost in the middle* — le modèle "oublie" ce qui est au milieu d'un contexte très long). D'où l'intérêt du **context engineering** (section 5).
+  - Une fenêtre plus grande ne veut pas dire "utilise tout sans réfléchir" : au-delà d'un certain volume, la qualité peut se dégrader (effet *lost in the middle* — le modèle "oublie" ce qui est au milieu d'un contexte très long). D'où l'intérêt du **context engineering** (section 6).
 
 ### Prompt caching — réduire coût et latence sur un contexte répété
 
@@ -94,7 +102,7 @@ Beaucoup d'API de LLM (dont celle d'Anthropic) permettent de **mettre en cache**
 - La première requête d'une session "écrit" le cache pour la partie stable du prompt (ex. le contenu de `AGENTS.md`, l'historique de conversation) ; les requêtes suivantes qui réutilisent ce même préfixe le lisent depuis le cache — nettement moins cher et plus rapide qu'un traitement complet.
 - Le cache a une **durée de vie limitée** (TTL — souvent de l'ordre de l'heure) : passé ce délai, il expire et la requête suivante doit "réécrire" le cache depuis zéro.
 - C'est exactement ce qui se passe dans une session Claude Code : tant que tu enchaînes des messages dans ce délai, le contexte déjà envoyé (fichiers lus, instructions système) reste en cache plutôt que d'être refacturé à chaque tour.
-- Implication pratique pour le **context engineering** (section 5) : placer le contenu stable (instructions, docs) **en début de prompt**, et le contenu variable (la question du moment) à la fin — ça maximise la portion réutilisable du cache d'un appel à l'autre.
+- Implication pratique pour le **context engineering** (section 6) : placer le contenu stable (instructions, docs) **en début de prompt**, et le contenu variable (la question du moment) à la fin — ça maximise la portion réutilisable du cache d'un appel à l'autre.
 
 ### Training vs inference
 
@@ -129,7 +137,7 @@ Un modèle seul ne fait que **générer du texte**. Le **harness** est le logici
 
 ### La boucle agentique (agentic loop)
 
-Ce qui distingue un **agent** d'un simple chatbot : le cycle **observer → planifier → agir → observer le résultat → recommencer**, de façon autonome, jusqu'à ce que la tâche soit terminée (ou qu'un point de blocage nécessite l'humain). Concrètement, dans Claude Code : tu donnes une tâche, l'agent lit des fichiers, exécute des commandes, regarde le résultat, corrige, jusqu'à ce que ce soit fait — sans que tu valides chaque étape individuellement (sauf configuration contraire).
+Ce qui distingue un **agent** d'un simple chatbot : le cycle **observer → planifier → agir → observer le résultat → recommencer**, de façon autonome, jusqu'à ce que la tâche soit terminée (ou qu'un point de blocage nécessite l'humain). Concrètement, dans Claude Code : tu donnes une tâche, l'agent lit des fichiers, exécute des commandes, regarde le résultat, corrige, jusqu'à ce que ce soit fait — sans que tu valides chaque étape individuellement (sauf configuration contraire). Cette boucle de base se décline en plusieurs patterns nommés (ReAct, Reflection, Planning, Orchestrator-Workers), détaillés en section 3.
 
 ### Tool use / function calling
 
@@ -185,7 +193,62 @@ Le **prompt injection** est le risque de sécurité spécifique aux LLM agentiqu
 
 ---
 
-## 3. Endpoints
+## 3. Design patterns agentiques
+
+Au-delà de la boucle agentique de base (section 2), plusieurs **patterns de conception** reviennent pour structurer le travail d'un agent sur des tâches complexes ou multi-étapes. Ce ne sont pas des standards techniques comme MCP — plutôt des façons récurrentes d'organiser le raisonnement et les actions d'un agent, qu'on retrouve autant dans la littérature (Anthropic, Google Cloud, etc.) que dans les skills de ce repo.
+
+**Workflow vs agent** : les patterns ci-dessous se répartissent en deux familles. Un **workflow** a un chemin d'exécution **fixé à l'avance dans le code** (Prompt Chaining, Routing, Parallelization) — le LLM exécute des étapes prédéfinies, il ne décide pas de la structure. Un **agent** décide **dynamiquement**, au moment de la requête, combien d'étapes faire et lesquelles (Orchestrator-Workers, Evaluator-Optimizer, ReAct). Plus un système est agentique, plus il est flexible sur des tâches imprévisibles — mais aussi moins prévisible, plus lent et plus coûteux à exécuter. Un workflow fixe reste préférable dès que la tâche est bien connue et répétitive ; ne monter en agentique que si la variabilité de la tâche le justifie.
+
+### ReAct (Reason + Act)
+
+Le pattern le plus fondamental : l'agent alterne explicitement entre **raisonner** (une étape de réflexion sur ce qu'il faut faire) et **agir** (un appel d'outil), en observant le résultat avant de raisonner à nouveau. En pratique, c'est exactement la boucle agentique décrite en section 2 — "ReAct" est le nom donné à ce mécanisme dans la littérature de recherche (article *"ReAct: Synergizing Reasoning and Acting in Language Models"*, 2022). Il s'appuie directement sur le **tool use / function calling** (section 2) : sans appel d'outil structuré, il n'y a rien à "agir".
+
+### Prompt Chaining
+
+Décomposer une tâche en une **séquence fixe d'étapes** : la sortie d'un LLM devient l'entrée du suivant, avec parfois un point de contrôle ("gate") qui valide la sortie intermédiaire avant de continuer — plutôt que de laisser filer une erreur vers l'étape suivante.
+
+- Différence avec Orchestrator-Workers (plus bas) : le nombre et l'ordre des étapes sont **fixés à l'avance**, pas décidés dynamiquement par l'agent.
+- Dans ce repo : le cycle `superpowers:test-driven-development` (écrire un test qui échoue → **vérifier qu'il échoue pour la bonne raison** → écrire le code minimal → **vérifier qu'il passe**) est une chaîne à gates — chaque étape doit être validée avant de passer à la suivante, exactement le rôle du bloc *GATE* de ce type de schéma.
+
+### Routing
+
+Un premier LLM (ou une règle plus simple) classe la requête entrante et la dirige vers un LLM ou un chemin de traitement **spécialisé** parmi plusieurs possibles, plutôt que de tout faire passer par un seul modèle généraliste.
+
+- Exemple générique : un support client qui route une question technique vers un LLM avec accès à la doc produit, et une demande de remboursement vers un flux différent avec accès au système de facturation.
+- Dans ce repo, deux variantes du même principe : choisir le modèle (Haiku/Sonnet/Opus) selon la complexité de la tâche (section 5, "Comment choisir un modèle pour une tâche donnée") ; ou choisir **quel subagent** invoquer selon la nature de la demande (`claude-code-guide` pour une question sur Claude Code, `obsidian-expert` pour une tâche Obsidian) — un routing piloté par les descriptions de subagents plutôt que par un LLM routeur dédié.
+
+### Parallelization
+
+Une tâche est éclatée en plusieurs appels LLM **indépendants et connus à l'avance**, exécutés simultanément, puis agrégés — soit pour la vitesse (*sectioning* : chaque LLM traite une portion différente de la tâche), soit pour la fiabilité (*voting* : plusieurs tentatives indépendantes sur la même question, dont on retient la réponse majoritaire ou la meilleure).
+
+- Différence avec Orchestrator-Workers : ici, le nombre de branches et leur contenu sont **fixés avant de lancer les LLM** — pas de décision dynamique en cours de route.
+- Dans ce repo : `superpowers:dispatching-parallel-agents` correspond au sectioning — plusieurs subagents indépendants, lancés en parallèle dans un seul message, chacun sur une portion de la tâche connue à l'avance (voir aussi la règle "un seul message, plusieurs appels d'outils indépendants" côté harness).
+
+### Orchestrator-Workers
+
+Un agent central (l'orchestrateur) découpe une tâche volumineuse et distribue les morceaux à des **subagents spécialisés** (workers) qui travaillent en parallèle ou isolément, puis synthétise leurs résultats — mais contrairement à Parallelization, c'est l'orchestrateur qui **décide dynamiquement**, en fonction de la requête reçue, combien de sous-tâches créer et lesquelles.
+
+- Dans ce repo : `superpowers:subagent-driven-development` implémente directement ce pattern — l'agent principal utilise l'outil `Agent` (section 2) pour lancer des subagents (`Explore`, `general-purpose`...) sur des sous-tâches décidées au fil de l'eau, et protège son propre contexte en ne récupérant que leur synthèse finale plutôt que tous leurs résultats intermédiaires.
+- Côté frameworks dédiés : LangChain, CrewAI, AutoGen (section 8, "Orchestration multi-agents") formalisent ce pattern comme brique de base.
+
+### Reflection et Evaluator-Optimizer
+
+L'agent relit et critique sa propre sortie avant de la considérer terminée, plutôt que de s'arrêter à la première génération — un cycle "génère → critique → corrige" répété jusqu'à un résultat satisfaisant. **Evaluator-Optimizer** en est la version la plus structurée : deux rôles explicitement **séparés** — un LLM **générateur** produit une solution, un LLM **évaluateur** distinct la juge et soit l'accepte, soit la rejette avec un feedback précis qui relance une nouvelle tentative du générateur, en boucle jusqu'à acceptation. Séparer les rôles (plutôt qu'un seul LLM qui se relit lui-même) réduit le risque de complaisance envers sa propre sortie.
+
+- Dans ce repo : `superpowers:verification-before-completion` applique la reflection "simple" (l'agent vérifie lui-même son travail) ; `superpowers:requesting-code-review` / `receiving-code-review` implémentent l'Evaluator-Optimizer avec des rôles séparés (code écrit par un agent, revu par un autre) et une boucle accepter/rejeter-avec-feedback.
+- Même principe hors contexte agentique : le **LLM-as-judge** (section 5) utilise aussi un modèle évaluateur distinct pour noter la sortie d'un autre.
+
+### Planning
+
+Décomposer un objectif de haut niveau en sous-tâches, séquentielles ou parallèles, **avant** de commencer à exécuter — plutôt que d'improviser au fil de l'eau.
+
+- Dans ce repo : `superpowers:brainstorming` (clarifier l'intention avant de coder), puis `superpowers:writing-plans` (rédiger un plan d'implémentation détaillé) et `superpowers:executing-plans` (l'exécuter avec des points de contrôle) forment ensemble un pipeline de planning complet.
+
+> Ces patterns ne s'excluent pas — un système réel les combine. Claude Code, par exemple, exécute une boucle ReAct de base, applique Reflection en fin de tâche (vérification), et bascule en Orchestrator-Workers dès qu'il lance des subagents pour une recherche volumineuse.
+
+---
+
+## 4. Endpoints
 
 ### C'est quoi un endpoint
 
@@ -215,7 +278,7 @@ Côté Claude Desktop (ou Claude Code), on ajoute ensuite cet endpoint comme **M
 
 ---
 
-## 4. Les modèles : familles, tailles, comment choisir
+## 5. Les modèles : familles, tailles, comment choisir
 
 ### Propriétaire vs open-weights
 
@@ -271,7 +334,7 @@ Certains modèles (ou certains modes de modèles existants) peuvent "réfléchir
 
 ---
 
-## 5. Prompting et context engineering
+## 6. Prompting et context engineering
 
 ### Prompt engineering
 
@@ -293,14 +356,14 @@ Une discipline de plus en plus centrale avec les agents autonomes : **gérer act
 
 - Ne charger que les fichiers pertinents pour la tâche en cours, pas tout le repo.
 - Résumer/compacter l'historique de conversation quand il devient trop long (Claude Code le fait automatiquement en approchant la limite).
-- Séparer la mémoire long-terme (voir section 6) du contexte de la tâche en cours, pour ne pas polluer chaque requête avec tout l'historique.
+- Séparer la mémoire long-terme (voir section 7) du contexte de la tâche en cours, pour ne pas polluer chaque requête avec tout l'historique.
 - Utiliser des subagents pour isoler des recherches volumineuses (ex. explorer un gros repo) sans polluer le contexte principal avec les résultats intermédiaires.
 
 Un contexte mal géré (trop long, mal trié) dégrade la qualité des réponses et fait grimper le coût — c'est souvent plus déterminant pour la qualité du résultat que le choix du modèle lui-même.
 
 ---
 
-## 6. RAG, embeddings et mémoire
+## 7. RAG, embeddings et mémoire
 
 ### Embeddings
 
@@ -326,7 +389,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 ---
 
-## 7. Panorama des outils
+## 8. Panorama des outils
 
 | Catégorie | Outils |
 | --- | --- |
@@ -344,7 +407,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 ---
 
-## 8. Glossaire condensé
+## 9. Glossaire condensé
 
 | Terme | Définition courte |
 | --- | --- |
@@ -363,6 +426,15 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **Temperature / top-p** | Paramètres qui contrôlent le degré d'aléatoire/créativité de la génération |
 | **Harness** | Logiciel qui entoure un LLM pour lui donner des outils, une mémoire et une boucle d'exécution |
 | **Agent** | Système qui exécute une tâche de façon autonome via une boucle observer/agir |
+| **ReAct** | Pattern où l'agent alterne raisonnement explicite et appel d'outil — nom donné à la boucle agentique de base |
+| **Prompt Chaining** | Décomposition d'une tâche en une séquence fixe d'étapes, la sortie de l'une nourrissant l'entrée de la suivante |
+| **Routing** | Dispatch d'une requête vers un LLM ou un chemin de traitement spécialisé parmi plusieurs, selon sa nature |
+| **Parallelization** | Exécution simultanée de plusieurs LLM sur des sous-tâches connues à l'avance (sectioning) ou sur la même tâche (voting), suivie d'une agrégation |
+| **Orchestrator-Workers** | Pattern où un agent central distribue dynamiquement des sous-tâches à des subagents spécialisés puis synthétise leurs résultats |
+| **Reflection** | Pattern où l'agent critique et corrige sa propre sortie avant de la considérer terminée |
+| **Evaluator-Optimizer** | Version structurée de reflection avec un LLM générateur et un LLM évaluateur séparés, en boucle accepter/rejeter-avec-feedback |
+| **Planning (agentique)** | Pattern de décomposition d'un objectif en sous-tâches avant exécution |
+| **Workflow (vs agent)** | Système dont le chemin d'exécution est fixé à l'avance dans le code, par opposition à un agent qui décide dynamiquement de son parcours |
 | **Tool use / function calling** | Capacité du modèle à appeler un outil avec des arguments structurés |
 | **MCP** | Standard ouvert pour connecter un LLM à des outils/données externes de façon uniforme |
 | **Endpoint** | URL précise à laquelle on envoie une requête pour parler à un service (API modèle, serveur MCP, déploiement local...) |
