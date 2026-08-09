@@ -65,6 +65,7 @@ agentic-workflow-files/
         ├── security-audit.md        ← /security-audit: audit sécurité OWASP
         ├── prep.md                  ← /prep          : préparation d'une tâche complexe avant le plan
         ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
+        ├── roast.md                  ← /roast          : revue de code sans complaisance, façon senior
         └── ai-news.md                ← /ai-news        : briefing IA quotidien
 ```
 
@@ -347,6 +348,7 @@ Application de gestion des congés pour PME. Utilisateurs : RH (admin) et employ
 | `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données               |
 | `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan     |
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                          |
+| `/roast`          | Revue de code sans complaisance, façon senior — au-delà de la checklist `/code-review` |
 | `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation               |
 
 ### Utilisation
@@ -361,6 +363,7 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 /security-audit backend/routes/auth.routes.ts
 /prep Ajouter un système de notifications temps réel pour les demandes de congé
 /prep-check Ajouter un système de notifications temps réel pour les demandes de congé
+/roast backend/services/leaveRequest.services.ts
 ```
 
 ---

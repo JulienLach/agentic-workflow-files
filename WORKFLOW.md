@@ -129,7 +129,7 @@ Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatr
     | Préparation     | `/prep`, `/prep-check`                         |
     | Review          | `/code-review`                                 |
     | Débug           | `/debug`                                       |
-    | Qualité du code | `/refactor`, `/write-tests`, `/security-audit` |
+    | Qualité du code | `/refactor`, `/write-tests`, `/security-audit`, `/roast` |
 
 - **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
     - `Plan` — agent intégré à Claude Code pour concevoir des plans d'implémentation.
