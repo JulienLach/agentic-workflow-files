@@ -2,7 +2,7 @@
 
 Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**, avec **Claude Code** comme hub central (contexte, plugins, skills, agents), le **CLI Obsidian** et **`gh` CLI**.
 
-Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des skills/MCP) de ce repo : ceux-ci décrivent *comment coder*, celui-ci décrit *comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi*.
+Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des skills/MCP) de ce repo : ceux-ci décrivent _comment coder_, celui-ci décrit _comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi_.
 
 ---
 
@@ -25,11 +25,11 @@ Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des s
 ┌───────────────────────────────────────────────────────────────────────┐
 │                         Claude Code (hub central)                       │
 │                                                                          │
-│  AGENTS.md ──▶ context window        Plugins ──▶ Context7               │
+│  AGENTS.md/CLAUDE.md ──▶ context window   Plugins ──▶ Context7          │
 │                                             └───▶ Obsidian skills        │
 │  MCP Excalidraw ──▶ Conception / Architecture                           │
 │                                                                          │
-│  Skills ──▶ /code-review · /debug · /refactor · /security-audit …       │
+│  Skills ──▶ /prep · /prep-check · /code-review · /debug · /refactor …   │
 │  Agents (.claude/agents/*.md) ──▶ Plan · obsidian-expert                │
 │  Modes de prompt ──▶ agentique standard · pédagogique (sur demande)     │
 └──────────────────────┬───────────────────────────────────────────────┘
@@ -67,17 +67,17 @@ Pour une tâche qui demande de clarifier une architecture ou un flux avant de co
 Après une réunion (point dev interne, recette client), transformer les échanges en tâches de sprint plutôt que de les laisser dans des notes volantes :
 
 1. **Noter à chaud** pendant/juste après la réunion, dans une note dédiée ou la note du jour :
-   ```bash
-   obsidian daily:append content="## Point dev 2026-07-15\n- Rozenn: retirer les phases non nécessaires à la sync\n- Anthony: tester la modif de phase a posteriori"
-   ```
-   ou une note dédiée :
-   ```bash
-   obsidian create name="Recette client 2026-07-15" content="- Retour Laurent: ..." folder="Projets/Simon Médical/notes"
-   ```
+    ```bash
+    obsidian daily:append content="## Point dev 2026-07-15\n- Rozenn: retirer les phases non nécessaires à la sync\n- Anthony: tester la modif de phase a posteriori"
+    ```
+    ou une note dédiée :
+    ```bash
+    obsidian create name="Recette client 2026-07-15" content="- Retour Laurent: ..." folder="Projets/Simon Médical/notes"
+    ```
 2. **Demander à Claude Code de structurer** : « transforme les notes de la réunion du 15/07 en tâches dans le Sprint courant ». Claude :
-   - lit la note de réunion (`obsidian read file="..."` ou lecture directe) ;
-   - lit le sprint courant pour repérer le bon sous-titre (ex. `#### App Audit`) ;
-   - insère les nouvelles lignes `- [ ] ...` **sous ce sous-titre précis**, via édition directe du fichier (le CLI `append` ajouterait à la fin du fichier entier, pas sous la bonne section).
+    - lit la note de réunion (`obsidian read file="..."` ou lecture directe) ;
+    - lit le sprint courant pour repérer le bon sous-titre (ex. `#### App Audit`) ;
+    - insère les nouvelles lignes `- [ ] ...` **sous ce sous-titre précis**, via édition directe du fichier (le CLI `append` ajouterait à la fin du fichier entier, pas sous la bonne section).
 3. Vérifier le résultat (`obsidian read path="Projets/<Projet>/sprints/Sprint NN.md"`) avant de passer à l'implémentation.
 
 Les notes de réunion et les tâches ponctuelles alimentent aussi le **Backlog** du projet (`Index` → `Backlog`) — utile pour tout ce qui n'est pas encore priorisé dans un sprint actif ; l'`Index` d'un projet pointe également vers ses **Ressources** (docs, liens, comptes-rendus).
@@ -94,10 +94,10 @@ Chaque projet a ses sprints dans `Projets/<Projet>/sprints/Sprint NN.md`, avec u
 ---
 numero: 10
 titre: Titre du sprint
-statut: active   # planifié | active | done
+statut: active # planifié | active | done
 debut: 2026-06-18
 fin: 2026-07-31
-progression: 60  # % — mis à jour à la main
+progression: 60 # % — mis à jour à la main
 type: sprint
 tags: [project, sprint]
 ---
@@ -124,15 +124,16 @@ Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatr
 - **Plugins** → `Context7` (doc à jour des librairies) et `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble).
 - **Skills** (`.claude/skills/*.md` de ce repo) → invoqués à la demande selon le besoin :
 
-  | Catégorie | Skills |
-  |---|---|
-  | Review | `/code-review` |
-  | Débug | `/debug` |
-  | Qualité du code | `/refactor`, `/write-tests`, `/security-audit` |
+    | Catégorie       | Skills                                         |
+    | --------------- | ---------------------------------------------- |
+    | Préparation     | `/prep`, `/prep-check`                         |
+    | Review          | `/code-review`                                 |
+    | Débug           | `/debug`                                       |
+    | Qualité du code | `/refactor`, `/write-tests`, `/security-audit` |
 
 - **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
-  - `Plan` — agent intégré à Claude Code pour concevoir des plans d'implémentation.
-  - `obsidian-expert` — agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
+    - `Plan` — agent intégré à Claude Code pour concevoir des plans d'implémentation.
+    - `obsidian-expert` — agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
 
 Deux **modes d'interaction** viennent s'ajouter par-dessus — ce ne sont pas des agents séparés, juste la façon dont la demande est formulée dans le prompt :
 
@@ -143,20 +144,28 @@ Deux **modes d'interaction** viennent s'ajouter par-dessus — ce ne sont pas de
 
 ## 4. Implémentation dans le repo de code
 
-1. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` :
+1. **Si la tâche est complexe** (feature non triviale, besoin flou, risque de casser la prod) : préparer avant de coder plutôt que de foncer sur un plan incomplet.
+    ```
+    /prep <tâche>         # doc, remise en question, angles morts (prod/edge cases/sécu), archi de base
+    /prep-check <tâche>   # vérifie que /prep est complet avant d'entrer en mode plan
+    ```
+    Une fois `/prep-check` au vert, entrer en mode plan (agent `Plan`, section 3). Pour une tâche simple, passer directement à l'étape suivante.
 
-   | Préfixe | Usage |
-   |---|---|
-   | `feat/nom-de-la-feature` | Nouvelle fonctionnalité |
-   | `fix/description-du-bug` | Correction de bug |
-   | `chore/tâche-technique` | Tâche technique (deps, config, CI) |
-   | `refactor/scope-du-refacto` | Refacto sans changement de comportement |
+2. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` :
 
-   ```bash
-   git checkout -b feat/nom-de-la-feature
-   ```
-2. Implémenter en suivant le `AGENTS.md` du repo concerné (stack, conventions, tests).
-3. Vérifier (tests, lint, exécution locale) avant de committer.
+    | Préfixe                     | Usage                                   |
+    | --------------------------- | --------------------------------------- |
+    | `feat/nom-de-la-feature`    | Nouvelle fonctionnalité                 |
+    | `fix/description-du-bug`    | Correction de bug                       |
+    | `chore/tâche-technique`     | Tâche technique (deps, config, CI)      |
+    | `refactor/scope-du-refacto` | Refacto sans changement de comportement |
+
+    ```bash
+    git checkout -b feat/nom-de-la-feature
+    ```
+
+3. Implémenter en suivant le `AGENTS.md` du repo concerné (stack, conventions, tests).
+4. Vérifier (tests, lint, exécution locale) avant de committer.
 
 ---
 
@@ -171,15 +180,15 @@ Les règles de commit sont **celles définies dans `AGENTS.md`** — que ce soit
 
 - **Format (Conventional Commits)** : `type(scope): description courte`
 
-  | Type | Usage |
-  |---|---|
-  | `feat` | Nouvelle fonctionnalité |
-  | `fix` | Correction de bug |
-  | `refactor` | Refacto sans changement de comportement |
-  | `test` | Ajout ou modification de tests |
-  | `chore` | Tâche technique (deps, config, CI) |
-  | `docs` | Documentation uniquement |
-  | `perf` | Amélioration de performance |
+    | Type       | Usage                                   |
+    | ---------- | --------------------------------------- |
+    | `feat`     | Nouvelle fonctionnalité                 |
+    | `fix`      | Correction de bug                       |
+    | `refactor` | Refacto sans changement de comportement |
+    | `test`     | Ajout ou modification de tests          |
+    | `chore`    | Tâche technique (deps, config, CI)      |
+    | `docs`     | Documentation uniquement                |
+    | `perf`     | Amélioration de performance             |
 
 - **Message en anglais** (convention standard open source) — même si le reste des échanges avec Claude se fait en français.
 - **Une seule responsabilité par commit** — ne pas mélanger un `feat` et un `fix` dans le même commit.
@@ -227,30 +236,31 @@ Avant de repartir de zéro sur un nouvel environnement, vérifier d'abord si `~/
 Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait la revue lui-même**, assisté par Claude Code, avant de merger. Ne pas sauter cette étape sous prétexte d'être seul sur le projet — c'est justement ce qui remplace la revue par les pairs.
 
 1. Lancer une revue automatisée sur la branche de la PR :
-   ```bash
-   /code-review
-   ```
-   (vérifie la conformité au `AGENTS.md`, les bugs potentiels, la sécurité — voir la section Plugins du `README.md`)
+    ```bash
+    /code-review
+    ```
+    (vérifie la conformité au `AGENTS.md`, les bugs potentiels, la sécurité — voir la section Plugins du `README.md`)
 2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits — pas d'amend sur un commit déjà pushé sans raison explicite).
 3. Relire soi-même le diff final (`gh pr diff` ou l'interface GitHub) avant de merger.
 4. Merger :
-   ```bash
-   gh pr merge --squash   # ou la stratégie de merge retenue pour le repo
-   ```
+    ```bash
+    gh pr merge --squash   # ou la stratégie de merge retenue pour le repo
+    ```
 
 ---
 
 ## 8. Boucler : cocher la tâche dans Obsidian
 
 Une tâche n'est considérée **terminée** que lorsque :
+
 1. La PR est revue (étape 7) et mergée.
 2. La checkbox correspondante dans le Sprint Obsidian est cochée avec sa date :
-   ```markdown
-   - [x] Tâche faite ✅ 2026-07-13
-   ```
-   ```bash
-   obsidian task path="Projets/<Projet>/sprints/Sprint NN.md" line=<n> done
-   ```
+    ```markdown
+    - [x] Tâche faite ✅ 2026-07-13
+    ```
+    ```bash
+    obsidian task path="Projets/<Projet>/sprints/Sprint NN.md" line=<n> done
+    ```
 
 Ne pas oublier cette dernière étape — c'est elle qui garde le vault Obsidian comme source de vérité à jour sur l'avancement réel du sprint (`progression` du frontmatter à ajuster en conséquence, et `statut: done` quand toutes les tâches du sprint sont traitées ou reportées au sprint suivant).
 
@@ -258,14 +268,14 @@ Ne pas oublier cette dernière étape — c'est elle qui garde le vault Obsidian
 
 ## Résumé express
 
-| Étape | Où | Action |
-|---|---|---|
-| 0 | Claude Code (MCP Excalidraw) | Schéma d'architecture/conception si la tâche le justifie *(optionnel)* |
-| 1 | Réunion → Vault Obsidian | Capturer les notes (`obsidian daily:append`/`create`), en extraire des tâches sous le bon sous-titre |
-| 2 | Vault Obsidian | Repérer une tâche `- [ ]` dans le sprint courant |
-| 3 | Claude Code | Contexte (`AGENTS.md`), plugins (Context7, Obsidian skills), skills et agents mobilisés selon le besoin |
-| 4 | Repo de code | Créer une branche, implémenter, tester |
-| 5 | Repo de code | Commit (manuel ou via prompt Claude, Conventional Commits, anglais, sans `Co-Authored-By`) + push |
-| 6 | GitHub (`gh` CLI) | `gh pr create` |
-| 7 | Repo de code / GitHub | Revue solo dev (`/code-review`) puis `gh pr merge` |
-| 8 | Vault Obsidian | Cocher la tâche `- [x] ... ✅ date`, mettre à jour `progression`/`statut` |
+| Étape | Où                           | Action                                                                                                  |
+| ----- | ---------------------------- | ------------------------------------------------------------------------------------------------------- |
+| 0     | Claude Code (MCP Excalidraw) | Schéma d'architecture/conception si la tâche le justifie _(optionnel)_                                  |
+| 1     | Réunion → Vault Obsidian     | Capturer les notes (`obsidian daily:append`/`create`), en extraire des tâches sous le bon sous-titre    |
+| 2     | Vault Obsidian               | Repérer une tâche `- [ ]` dans le sprint courant                                                        |
+| 3     | Claude Code                  | Contexte (`AGENTS.md`), plugins (Context7, Obsidian skills), skills et agents mobilisés selon le besoin |
+| 4     | Repo de code                 | Préparer si complexe (`/prep`→`/prep-check`→plan), créer une branche, implémenter, tester                |
+| 5     | Repo de code                 | Commit (manuel ou via prompt Claude, Conventional Commits, anglais, sans `Co-Authored-By`) + push       |
+| 6     | GitHub (`gh` CLI)            | `gh pr create`                                                                                          |
+| 7     | Repo de code / GitHub        | Revue solo dev (`/code-review`) puis `gh pr merge`                                                      |
+| 8     | Vault Obsidian               | Cocher la tâche `- [x] ... ✅ date`, mettre à jour `progression`/`statut`                               |

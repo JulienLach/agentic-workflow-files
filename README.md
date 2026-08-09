@@ -62,7 +62,10 @@ agentic-workflow-files/
         ├── refactor.md              ← /refactor      : refacto sécurisé
         ├── add-entity.md            ← /add-entity    : création d'entité full-stack
         ├── write-tests.md           ← /write-tests   : rédaction de tests Vitest
-        └── security-audit.md        ← /security-audit: audit sécurité OWASP
+        ├── security-audit.md        ← /security-audit: audit sécurité OWASP
+        ├── prep.md                  ← /prep          : préparation d'une tâche complexe avant le plan
+        ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
+        └── ai-news.md                ← /ai-news        : briefing IA quotidien
 ```
 
 ---
@@ -115,7 +118,7 @@ git remote add origin https://github.com/<ton-nom-utilisateur>/mon-projet.git
 
 ### Prérequis
 
-- [Claude Code CLI](https://docs.anthropic.com/fr/docs/claude-code) installé
+- [Claude Code CLI](https://code.claude.com/docs) installé
 - MCP Context7 configuré (voir ci-dessous)
 
 ### Skills vs MCP vs Plugins — quelle différence ?
@@ -342,6 +345,9 @@ Application de gestion des congés pour PME. Utilisateurs : RH (admin) et employ
 | `/add-entity`     | Création d'une entité full-stack avec checklist complète                             |
 | `/write-tests`    | Rédaction de tests unitaires et d'intégration Vitest                                 |
 | `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données               |
+| `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan     |
+| `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                          |
+| `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation               |
 
 ### Utilisation
 
@@ -353,6 +359,8 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 /add-entity une entité "department" avec nom, description et un responsable (FK vers users)
 /write-tests backend/services/user.services.ts
 /security-audit backend/routes/auth.routes.ts
+/prep Ajouter un système de notifications temps réel pour les demandes de congé
+/prep-check Ajouter un système de notifications temps réel pour les demandes de congé
 ```
 
 ---
