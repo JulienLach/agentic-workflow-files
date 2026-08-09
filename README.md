@@ -10,7 +10,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 
 - [Stack cible](#stack-cible)
 - [Contenu](#contenu)
-- [Pourquoi `AGENTS.md` plutôt que `CLAUDE.md` ?](#pourquoi-agentsmd-plutôt-que-claudemd)
+- [`CLAUDE.md` vs `AGENTS.md`](#claudemd-vs-agentsmd)
 - [Installation](#installation)
   - [Option 1 — Copier les fichiers dans un projet existant](#option-1--copier-les-fichiers-dans-un-projet-existant)
   - [Option 2 — Utiliser comme base d'un nouveau projet](#option-2--utiliser-comme-base-dun-nouveau-projet)
@@ -18,6 +18,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
   - [Prérequis](#prérequis)
   - [Skills vs MCP vs Plugins — quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
   - [Plugins](#plugins)
+  - [`skills.sh` — installer des skills externes via CLI](#skillssh--installer-des-skills-externes-via-cli)
   - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
   - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
   - [Obsidian skills — gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
@@ -45,6 +46,7 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 ```
 agentic-workflow-files/
 ├── AGENTS.md                        ← Instructions transversales (standard agents.md)
+├── CLAUDE.md                        ← Import `@AGENTS.md` — requis pour que Claude Code charge AGENTS.md
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
 ├── design/
@@ -65,17 +67,14 @@ agentic-workflow-files/
 
 ---
 
-## Pourquoi `AGENTS.md` plutôt que `CLAUDE.md` ?
+## `CLAUDE.md` vs `AGENTS.md`
 
-Ce repo utilisait auparavant un `CLAUDE.md`, la convention propre à Claude Code. Il est désormais remplacé par [`AGENTS.md`](https://agents.md/), un standard ouvert, indépendant d'Anthropic, adopté par plusieurs outils agentiques (Claude Code, Cursor, Codex CLI, Jules, Amp, etc.).
-
-Intérêt du changement :
-
-- **Un seul fichier pour tous les outils** : plus besoin de dupliquer les mêmes instructions (stack, commandes, conventions) dans un fichier différent par outil si tu alternes entre plusieurs assistants IA sur ce repo.
-- **Compatibilité Claude Code conservée** : Claude Code lit nativement un `AGENTS.md` s'il est présent, donc rien n'est perdu côté fonctionnalités.
-- **Format libre** : `AGENTS.md` est du Markdown simple, sans structure imposée — le contenu de ce repo (stack, architecture, patterns, workflow git) reste identique, seul le nom du fichier change.
-
-> Si un jour tu as besoin d'instructions **strictement spécifiques à Claude Code** (hooks, comportements propres à l'outil) en plus des instructions génériques, tu peux ajouter un `CLAUDE.md` minimal en complément — Claude Code combine alors les deux. Ce n'est pas nécessaire pour l'instant.
+- **Que Claude Code** → `CLAUDE.md`.
+- **Autre outil** (Cursor, Codex CLI...) ou plusieurs outils → [`AGENTS.md`](https://agents.md/).
+- **Les deux** → `CLAUDE.md` qui importe `AGENTS.md` (c'est le cas ici, Claude Code ne lit pas `AGENTS.md` tout seul) :
+  ```markdown
+  @AGENTS.md
+  ```
 
 ---
 
@@ -89,6 +88,9 @@ git clone https://github.com/JulienLach/agentic-workflow-files.git
 
 # Copier l'AGENTS.md à la racine de ton projet
 cp agentic-workflow-files/AGENTS.md mon-projet/AGENTS.md
+
+# Copier le CLAUDE.md (import @AGENTS.md) — sans lui, Claude Code ne lit rien de tout ça
+cp agentic-workflow-files/CLAUDE.md mon-projet/CLAUDE.md
 
 # Copier la config Claude Code
 cp -r agentic-workflow-files/.claude mon-projet/.claude
@@ -135,61 +137,53 @@ Claude Code propose trois mécanismes d'extension complémentaires :
 
 #### Code Review
 
-Le plugin officiel Anthropic pour la revue de PR. Il lance **5 agents spécialisés en parallèle** :
-
-- Vérification conformité `AGENTS.md`
-- Détection de bugs
-- Analyse du contexte git (historique, commits liés)
-- Revue des commentaires PR précédents
-- Vérification des commentaires de code
-
-Chaque finding reçoit un **score de confiance (0–100)** — seuls les problèmes à plus de 80 de confiance sont remontés, ce qui réduit drastiquement les faux positifs.
-
-**Installation :**
+Plugin officiel Anthropic : 5 agents en parallèle (conformité `AGENTS.md`, bugs, contexte git, commentaires PR/code), findings filtrés à >80 de confiance.
 
 ```bash
 claude plugin install https://claude.com/plugins/code-review
+/code-review   # sur une branche avec une PR ouverte
 ```
 
-**Utilisation** (sur une branche avec une PR ouverte) :
-
-```bash
-/code-review
-```
-
-> **Note :** Ce plugin utilise la même commande `/code-review` que le skill inclus dans ce repo. Si tu installes le plugin officiel, **supprime ou renomme** le skill `code-review.md` pour éviter le conflit.
+> Même commande que le skill `code-review.md` de ce repo — si tu installes le plugin, supprime ou renomme le skill.
 
 ---
 
 #### Superpowers
 
-Le couteau suisse de Claude Code — 20+ skills battle-tested couvrant tout le cycle de développement. 350k+ installs, maintenu par Jesse Vincent.
-
-**Installation :**
+20+ skills battle-tested couvrant tout le cycle de dev. 350k+ installs, maintenu par Jesse Vincent.
 
 ```bash
 claude plugin install https://claude.com/plugins/superpowers
 ```
 
-**Commandes disponibles :**
+| Commande | Description |
+| --- | --- |
+| `/brainstorming` | Clarifier le besoin avant de coder |
+| `/execute-plan` | Implémenter un plan par batches, revue à chaque checkpoint |
+| `/debugging` | Débogage en 4 phases, revue archi auto après 3 échecs |
+| `/skill-authoring` | Créer/tester de nouveaux skills (TDD) |
 
-| Commande           | Description                                                                            |
-| ------------------ | -------------------------------------------------------------------------------------- |
-| `/brainstorming`   | Session Socratique pour explorer et affiner les besoins **avant** de coder             |
-| `/execute-plan`    | Implémente un plan par batches avec un agent de revue intégré à chaque checkpoint      |
-| `/debugging`       | Débogage en 4 phases avec revue architecturale automatique après 3 tentatives échouées |
-| `/skill-authoring` | Crée et teste de nouveaux skills Claude Code en appliquant les principes TDD           |
+> Déclenchement auto : le skill méta `using-superpowers` (hook `SessionStart`) active `systematic-debugging` sans commande explicite dès qu'un bug/test cassé apparaît — à ne pas confondre avec le skill `/debug` de ce repo, complémentaire.
 
-**Pourquoi l'utiliser avec cette stack :**
+---
 
-- `/brainstorming` avant toute nouvelle feature pour clarifier le besoin avant de toucher au code
-- `/execute-plan` pour les implémentations complexes (nouvelle entité, refacto) avec validation continue
-- `/debugging` en complément du skill `/debug` de ce repo pour les bugs récalcitrants
-- `/skill-authoring` pour créer tes propres skills personnalisés au projet
+### `skills.sh` — installer des skills externes via CLI
 
-> **Déclenchement automatique — pas besoin de taper `/debugging` :** Superpowers embarque un skill méta, `using-superpowers`, chargé à chaque session (hook `SessionStart`). Sa règle : avant toute réponse, vérifier si un skill de la liste s'applique à la situation, et l'utiliser sans que ce soit négociable. `systematic-debugging` (le skill derrière `/debugging`) a pour description *"Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes"* — dès qu'un bug ou un test qui échoue est décrit, ce skill peut donc s'activer tout seul, sans commande explicite.
->
-> **Où ça s'intègre dans `WORKFLOW.md` :** à l'étape 4 (Implémentation), au moment de *"Vérifier (tests, lint, exécution locale) avant de committer"*. Exemple : sur un test qui échoue sans raison apparente, avant de proposer un correctif à l'aveugle, le skill s'invoque et suit sa méthode en 4 phases — localisation → hypothèses testables → correction → prévention (test de non-régression) — la même philosophie que le skill `/debug` de ce repo. Différence : si 3 tentatives de correction échouent d'affilée, une **revue architecturale automatique** se déclenche en plus. D'où la fréquence rare de son apparition : il ne s'active vraiment que sur les bugs qui résistent, pas sur un fix trivial.
+Registre/CLI dédié aux skills seuls (pas de MCP/hooks embarqués comme un plugin), open source, maintenu par Vercel Labs, sans install globale (`npx`).
+
+```bash
+npx skills add <owner>/<repo>   # écrit le SKILL.md dans .claude/skills/
+```
+
+| Commande | Rôle |
+| --- | --- |
+| `npx skills list` | Skills installés dans le projet |
+| `npx skills find [terme]` | Recherche dans le registre public |
+| `npx skills update [skill]` | Mise à jour |
+| `npx skills remove [skill]` | Désinstallation |
+| `npx skills init [nom]` | Nouveau `SKILL.md` depuis un template |
+
+Options : `-g` (global, `~/.claude/skills/`) · `-a <agent>` (cible un harness précis) · `-y` (skip confirmations).
 
 ---
 
@@ -218,21 +212,15 @@ claude mcp remove <nom>
 
 ### Context7 — documentation des librairies en temps réel
 
-**Context7** est le MCP indispensable pour cette stack. Il fournit à Claude la documentation à jour de toutes les librairies (Express, React, Zod, Vitest, pg, etc.) directement pendant la conversation, sans avoir à copier-coller de la doc.
-
-**Installation (une seule fois, globalement) :**
+Doc à jour des librairies (Express, React, Zod, Vitest, pg...) directement en conversation.
 
 ```bash
 claude mcp add context7 -- npx -y @upstash/context7-mcp
 ```
 
-**Utilisation :** Claude l'utilise automatiquement quand il a besoin de documentation. Tu peux aussi lui demander explicitement :
+Utilisé automatiquement par Claude, ou explicitement : `Utilise context7 pour...`.
 
-```
-Utilise context7 pour me montrer comment configurer les middlewares dans Express 5
-```
-
-**Permissions :** Le fichier `.claude/settings.json` inclus dans ce repo autorise déjà Context7 sans confirmation à chaque appel :
+**Permissions :** `.claude/settings.json` autorise déjà Context7 sans confirmation :
 
 ```json
 {
@@ -248,31 +236,21 @@ Utilise context7 pour me montrer comment configurer les middlewares dans Express
 
 ### Obsidian skills — gestion des notes de projet
 
-Pas de MCP Obsidian ici : la gestion du vault passe uniquement par le plugin de skills **[obsidian-skills de kepano](https://github.com/kepano/obsidian-skills)**, pas par un serveur MCP. Ce plugin fournit les skills `obsidian:*` qui permettent à Claude de lire, créer et modifier des notes, gérer les propriétés/Bases/Canvas, et extraire du contenu web propre — directement depuis une session Claude Code.
-
-**Installation (une seule fois, globalement) :**
+Pas de MCP Obsidian : la gestion du vault passe par le plugin **[obsidian-skills de kepano](https://github.com/kepano/obsidian-skills)**.
 
 ```bash
 claude plugin install https://github.com/kepano/obsidian-skills
 ```
 
-**Skills fournies par ce plugin :**
-
 | Skill | Usage |
 | --- | --- |
-| `obsidian:obsidian-cli` | Lire/créer/rechercher des notes et tâches via le CLI natif `obsidian` |
-| `obsidian:obsidian-markdown` | Wikilinks, embeds, callouts, propriétés (frontmatter) — syntaxe Obsidian Flavored Markdown |
-| `obsidian:obsidian-bases` | Créer/éditer des fichiers `.base` (vues type base de données) |
-| `obsidian:json-canvas` | Créer/éditer des fichiers `.canvas` (mind maps, flowcharts) |
-| `obsidian:defuddle` | Extraire du contenu web propre en Markdown (remplace `WebFetch` pour une URL à lire) |
+| `obsidian:obsidian-cli` | Lire/créer/rechercher notes et tâches via le CLI `obsidian` |
+| `obsidian:obsidian-markdown` | Wikilinks, embeds, callouts, frontmatter |
+| `obsidian:obsidian-bases` | Fichiers `.base` (vues type BDD) |
+| `obsidian:json-canvas` | Fichiers `.canvas` (mind maps, flowcharts) |
+| `obsidian:defuddle` | Extraction web → Markdown propre |
 
-**Cas d'usage :**
-
-- Créer une note de décision d'architecture directement depuis Claude Code
-- Rechercher dans tes notes de projet sans quitter le terminal
-- Mettre à jour un backlog ou un journal de bord en cours de session
-
-> Ces skills utilisent le **[CLI natif `obsidian`](https://help.obsidian.md/cli)** (commande shell `obsidian ...`, binaire dans `~/.local/bin/obsidian`), qui communique directement avec l'app Obsidian ouverte via un socket local. Il faut donc qu'Obsidian soit **lancé** pour que le CLI fonctionne — à défaut, Claude peut toujours lire/écrire les fichiers du vault directement (`Read`/`Edit`/`Write`).
+> Utilise le [CLI natif `obsidian`](https://help.obsidian.md/cli) via socket local — l'app doit être **lancée**. Sinon, Claude lit/écrit le vault directement (`Read`/`Edit`/`Write`).
 
 ---
 
@@ -305,31 +283,25 @@ Instructions système de l'agent (rôle, expertise, méthode de travail, règles
 
 ## Design — maquette client avant le code
 
-Avant d'écrire la moindre ligne de code métier sur une nouvelle application, remplir les deux templates du dossier [`design/`](./design) pour cadrer visuellement le projet avec le client :
+Avant le code, remplir les deux templates du dossier [`design/`](./design) pour cadrer le projet avec le client :
 
 | Fichier | Contenu |
 | --- | --- |
-| [`design/design.md`](./design/design.md) | Charte graphique (Brand Guide) : identité de marque, logo, palette de couleurs, typographie, iconographie, composants UI, accessibilité |
-| [`design/instructions-maquette.md`](./design/instructions-maquette.md) | Instructions de maquettage : contexte/objectif, périmètre des écrans, structure/navigation, détail écran par écran, règles UX, modèle de données, livrables attendus |
-
-**Usage :**
+| [`design/design.md`](./design/design.md) | Charte graphique : identité, palette, typo, composants UI |
+| [`design/instructions-maquette.md`](./design/instructions-maquette.md) | Maquettage : écrans, navigation, règles UX, modèle de données |
 
 ```bash
 cp agentic-workflow-files/design/design.md mon-projet/design.md
 cp agentic-workflow-files/design/instructions-maquette.md mon-projet/instructions-maquette.md
 ```
 
-1. Remplir les deux fichiers (placeholders `{{...}}`) avec les informations du client et du projet.
-2. Donner les deux fichiers en contexte à Claude pour générer le prototype / la maquette client — avant de démarrer le développement.
-3. Une fois la maquette validée par le client, elle sert de référence visuelle pour l'implémentation (étape 4 du [`WORKFLOW.md`](./WORKFLOW.md)).
-
-> Cette étape se place **avant** le cycle Obsidian → Code → PR décrit ci-dessous — c'est la phase de cadrage visuel qui précède la création des tâches de sprint.
+Remplir (placeholders `{{...}}`) → donner en contexte à Claude pour générer la maquette → une fois validée par le client, elle sert de référence pour l'implémentation (étape 4 du [`WORKFLOW.md`](./WORKFLOW.md)).
 
 ---
 
 ## Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 
-Voir [`WORKFLOW.md`](./WORKFLOW.md) pour le détail du cycle complet : capture des tâches depuis un point dev/une recette client via les **Obsidian skills** (voir encadré ci-dessus), suivi des tâches dans le vault (sprints, checklists), implémentation dans le repo de code, commit/push, ouverture de PR avec `gh` CLI (y compris le contournement pour les environnements sandboxés sans `gh` ni credentials Git préinstallés), revue de la PR en solo dev (`/code-review`), puis retour cocher la tâche dans Obsidian une fois faite.
+Voir [`WORKFLOW.md`](./WORKFLOW.md) : capture des tâches (Obsidian skills) → suivi sprint dans le vault → implémentation → commit/push → PR (`gh`) → revue (`/code-review`) → tâche cochée dans Obsidian.
 
 ---
 
@@ -387,4 +359,4 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 
 ## Concepts IA — glossaire et fondamentaux
 
-Voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) : un doc de référence pour comprendre le vocabulaire et les concepts qu'on croise partout autour des LLM et des agents IA — harness, tokens, paramètres, fenêtre de contexte, RAG, MCP, comment choisir un modèle selon le besoin — avec des outils concrets (Claude Code, OpenCode, Cursor, etc.) pour illustrer chaque concept.
+Voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) : glossaire LLM/agents IA (harness, tokens, contexte, RAG, MCP, choix de modèle) avec exemples concrets.

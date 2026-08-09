@@ -53,7 +53,12 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Fine-tuning vs prompting vs RAG — quand utiliser quoi](#fine-tuning-vs-prompting-vs-rag--quand-utiliser-quoi)
    - [Mémoire d'agent](#mémoire-dagent)
 8. [Panorama des outils](#8-panorama-des-outils)
-9. [Glossaire condensé](#9-glossaire-condensé)
+9. [Architecture de fichiers pour agents IA](#9-architecture-de-fichiers-pour-agents-ia)
+   - [Le fichier d'instructions racine : CLAUDE.md et AGENTS.md](#le-fichier-dinstructions-racine--claudemd-et-agentsmd)
+   - [Le dossier de config du harness : .claude/ et .opencode/](#le-dossier-de-config-du-harness--claude-et-opencode)
+   - [Portée : projet, sous-dossier, utilisateur, organisation](#portée--projet-sous-dossier-utilisateur-organisation)
+   - [Bonnes pratiques](#bonnes-pratiques)
+10. [Glossaire condensé](#10-glossaire-condensé)
 
 ---
 
@@ -407,7 +412,85 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 ---
 
-## 9. Glossaire condensé
+## 9. Architecture de fichiers pour agents IA
+
+Au-delà des concepts (section 2) et des patterns (section 3), une question très concrète revient dès qu'on met en place un repo pensé pour les agents IA : **où mettre quoi**. Cette organisation n'est pas arbitraire — elle découle directement de la façon dont le harness (section 2) construit le system prompt (section 6) et gère le prompt caching (section 1) à chaque session.
+
+### Le fichier d'instructions racine : CLAUDE.md et AGENTS.md
+
+Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un repo porte des noms différents selon l'outil :
+
+- **`CLAUDE.md`** : le nom historique propre à Claude Code.
+- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée — juste du Markdown avec des titres et des listes — formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot, Aider, Zed, Windsurf...).
+
+**Où le placer :** à la **racine du repo**, toujours — c'est l'endroit où tous les harness le cherchent par défaut, sans configuration supplémentaire.
+
+- **Claude Code ne lit pas `AGENTS.md` seul** — il ne charge que `CLAUDE.md` ([doc officielle](https://code.claude.com/docs/en/memory#agents-md)). Fix : un `CLAUDE.md` qui importe l'autre (`@AGENTS.md`), ou un symlink `ln -s AGENTS.md CLAUDE.md`.
+
+**Contenu typique** (ce n'est pas une doc générale du projet — ça, c'est le rôle du `README.md`) :
+
+| Section | Exemple |
+| --- | --- |
+| Stack et structure | Framework, langage, organisation des dossiers |
+| Commandes | Build, test, lint, commandes de dev courantes |
+| Conventions | Style de code, conventions de commit, règles de nommage |
+| Contraintes | Ce que l'agent ne doit jamais faire (ex. ne pas toucher à telle zone, ne pas committer sans confirmation) |
+
+> Comme ce fichier est injecté à **chaque** session et reste stable d'un appel à l'autre, il bénéficie à plein du prompt caching (section 1) — le garder court et stable coûte moins cher et va plus vite à traiter que d'y déverser toute la documentation du projet, qui a davantage sa place en RAG (section 7) ou en fichiers chargés à la demande.
+
+### Le dossier de config du harness : .claude/ et .opencode/
+
+À côté du fichier d'instructions, chaque harness range sa configuration structurée dans un dossier caché dédié — à la racine du repo pour la partie projet, et dans le profil utilisateur pour la partie globale.
+
+**Claude Code — `.claude/` (projet) :**
+
+| Chemin | Rôle | Committé ? |
+| --- | --- | --- |
+| `.claude/settings.json` | Config partagée avec l'équipe : permissions d'outils, hooks | Oui |
+| `.claude/settings.local.json` | Overrides personnels (souvent générés par les prompts d'autorisation) | Non — à gitignorer |
+| `.claude/agents/*.md` | Subagents (section 2) : un fichier par agent, frontmatter `name` / `description` / `model` / `color` | Oui |
+| `.claude/skills/*.md` (ou `skills/<nom>/SKILL.md`) | Skills projet (section 2), invocables via `/nom` | Oui |
+| `.claude/commands/*.md` | Slash commands custom | Oui |
+| `.mcp.json` (à la racine, hors `.claude/`) | Serveurs MCP (section 2) scopés au projet | Oui, sauf secrets en dur |
+
+Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent comme un champ `hooks` dans `settings.json`, qui associe un événement (avant/après un appel d'outil, début/fin de session...) à une commande shell.
+
+**Claude Code — `~/.claude/` (utilisateur, global) :** même logique de structure (`settings.json`, `agents/`, `commands/`, plugins installés) mais appliquée à **toutes** les sessions, tous projets confondus — pour des préférences personnelles plutôt que des règles d'équipe.
+
+**OpenCode — `.opencode/` (projet) :** structure équivalente mais nommée différemment — `.opencode/agent/` (au singulier), où le chemin devient l'id de l'agent (`.opencode/agent/team/reviewer.md` → agent `team/reviewer`), `.opencode/command/`, et `opencode.json` pour la config générale (modèles, outils, MCP). Contrairement à Claude Code, OpenCode ne connaît que `AGENTS.md` — si un `CLAUDE.md` traîne aussi dans le repo, seul `AGENTS.md` est pris en compte. Le pendant global est `~/.config/opencode/`.
+
+| | Claude Code | OpenCode |
+| --- | --- | --- |
+| Fichier d'instructions racine | `CLAUDE.md` (+ `AGENTS.md` supporté) | `AGENTS.md` uniquement |
+| Dossier config projet | `.claude/` | `.opencode/` |
+| Subagents | `.claude/agents/*.md` | `.opencode/agent/**/*.md` |
+| Config générale | `.claude/settings.json` | `opencode.json` |
+| Dossier config global | `~/.claude/` | `~/.config/opencode/` |
+
+### Portée : projet, sous-dossier, utilisateur, organisation
+
+Un fichier d'instructions n'a pas une seule portée possible — plusieurs coexistent, du plus large au plus spécifique :
+
+| Portée | Emplacement | Chargé quand |
+| --- | --- | --- |
+| Organisation | Fichier managé côté entreprise (politique commune) | Toujours, avant tout le reste |
+| Utilisateur (global) | `~/.claude/CLAUDE.md` | Toujours, toutes sessions, tous projets |
+| Projet (racine) | `./CLAUDE.md` ou `./AGENTS.md` | À l'ouverture de session dans ce repo |
+| Sous-dossier (monorepo) | `./frontend/CLAUDE.md`, `./infra/CLAUDE.md`... | À la demande, seulement quand l'agent lit/édite un fichier de ce sous-dossier |
+| Local, non partagé | `./CLAUDE.local.md` (gitignoré) | À l'ouverture de session, notes perso non versionnées |
+
+Claude Code remonte l'arborescence depuis le fichier courant et **concatène** ce qu'il trouve à chaque niveau — c'est ce qui permet, dans un monorepo, de garder des règles Terraform dans `/infra/CLAUDE.md` sans polluer le contexte quand on travaille sur `/frontend/` : une application concrète du context engineering (section 6).
+
+### Bonnes pratiques
+
+- **Un seul fichier d'instructions racine.** Privilégier `AGENTS.md` pour la portabilité multi-outils ; si un outil legacy exige `CLAUDE.md`, importer ou symlinker plutôt que dupliquer — deux fichiers qui divergent au fil des mises à jour sont pires que l'absence de fichier.
+- **Committer la config partagée, gitignorer le perso.** `.claude/settings.json`, `agents/`, `skills/` sont pensés pour l'équipe ; `settings.local.json` et tout fichier contenant un token/clé (ex. l'URL d'un endpoint MCP avec un token en clair, section 4) ne doivent jamais être committés.
+- **Garder le fichier racine court.** Il est relu à chaque session et pèse sur le prompt caching (section 1) — la documentation volumineuse a davantage sa place en fichiers séparés référencés, voire en RAG (section 7), que collée dans `AGENTS.md`.
+- **Sous-dossiers seulement si le contexte diverge vraiment.** Un monorepo avec un vrai frontend et une vraie infra justifie des `CLAUDE.md` locaux ; un repo simple n'en a pas besoin — la complexité doit suivre un besoin réel, pas être ajoutée par précaution.
+
+---
+
+## 10. Glossaire condensé
 
 | Terme | Définition courte |
 | --- | --- |
@@ -459,3 +542,5 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **RAG** | Injection dynamique d'information externe pertinente dans le contexte, au moment de la requête |
 | **Guardrails** | Garde-fous (techniques ou de prompt) qui limitent les sorties indésirables d'un modèle |
 | **Latency / throughput** | Temps de réponse d'une requête / nombre de requêtes traitées par unité de temps |
+| **CLAUDE.md / AGENTS.md** | Fichier d'instructions persistant à la racine d'un repo, lu comme system prompt par le harness ; `AGENTS.md` est le standard ouvert multi-outils, `CLAUDE.md` le nom historique côté Claude Code |
+| **.claude/ / .opencode/** | Dossier de configuration du harness dans un projet : subagents, skills, commands, settings — la contrepartie projet du dossier global (`~/.claude/`, `~/.config/opencode/`) |
