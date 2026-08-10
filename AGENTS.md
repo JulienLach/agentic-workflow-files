@@ -119,6 +119,37 @@ frontend/src/
 
 ---
 
+## Principes POO (Programmation Orientée Objet)
+
+Règles de base à respecter dans toutes les classes (`backend/data/`, mais aussi côté frontend si des classes sont utilisées).
+
+### Constructeur
+
+- Le constructeur sert **uniquement** à initialiser l'état de l'objet (assigner les propriétés)
+- Jamais d'appel réseau, de requête SQL, ou de logique métier dans un constructeur
+- Si la création d'un objet nécessite une opération asynchrone (ex: aller chercher des données en DB), utiliser une **méthode statique factory** (ex: `static async fromId(id: number)`) plutôt que de complexifier le constructeur
+
+### Encapsulation
+
+- Propriétés `private` par défaut ; ne les rendre `public`/accessibles que si un autre module en a réellement besoin
+- Exposer l'état via des getters plutôt que d'exposer les propriétés internes brutes
+- Une classe ne doit pas exposer de détails qui permettent à l'extérieur de la mettre dans un état incohérent
+
+### Répartition des responsabilités
+
+- **Data model (`backend/data/`)** : représente une entité et son état. Peut contenir des méthodes simples liées à l'objet lui-même (ex: `isExpired()`, `getFullName()`). Ne contient **pas** de règles métier complexes ni d'orchestration entre plusieurs entités
+- **Service (`backend/services/`)** : contient la **règle métier** — validations métier, orchestration entre plusieurs data models, décisions ("un utilisateur peut-il faire X ?"). C'est la couche qui sait *pourquoi*, pas seulement *comment*
+- **Route** : ne contient **aucune** logique métier — elle appelle le service et retourne la réponse HTTP
+
+### Autres règles simples
+
+- Une classe = une responsabilité (cf. SOLID, section suivante)
+- Préférer la **composition** à l'héritage : injecter une dépendance plutôt que d'hériter d'une classe pour réutiliser son comportement
+- Éviter les hiérarchies d'héritage de plus de 1 niveau
+- Nommer les classes avec un nom (substantif) et les méthodes avec un verbe (`createUser`, pas `userCreation`)
+
+---
+
 ## Qualité du code
 
 ### Principes fondamentaux
