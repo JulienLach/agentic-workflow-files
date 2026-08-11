@@ -65,6 +65,15 @@ Noms de mois en anglais : january, february, march, april, may, june, july, augu
 - Recherche: `humanoid robot AI announcement [mois] [annee]`
 - Sources: IEEE Spectrum, TechCrunch, The Verge
 
+**Harness open source & agentic workflows**
+- Recherche: `open source AI coding agent harness [mois] [annee]`
+- Recherche: `opencode OR aider OR OpenHands OR "claude code" agentic release [mois] [annee]`
+- Recherche: `AI agent workflow pattern benchmark [mois] [annee]`
+- Recherche: `multi-agent orchestration framework release [mois] [annee]`
+- Sources: github.com/sst/opencode, github.com/All-Hands-AI/OpenHands, github.com/Aider-AI/aider,
+  github trending (topics: ai-agents, agentic-coding, llm-agents), Simon Willison's blog,
+  latent.space, LangGraph blog, r/LocalLLaMA, Hacker News, terminal-bench.com, SWE-bench.com
+
 ---
 
 ## ETAPE 3 — VERIFICATION STRICTE DES DATES (CRITIQUE)
@@ -138,6 +147,33 @@ OPEN SOURCE
 [Nouveaux modeles open-weight, releases notables]
 • [Modele] ([organisation]) - Architecture: [details]. Licence: [MIT/Apache/autre].
   Benchmarks: [chiffres cles]. Disponible sur: [Ollama/HuggingFace/etc.]
+• ...
+
+================================================================
+HARNESS OPEN SOURCE & AGENTIC WORKFLOWS
+-----------------------------------------
+[Nouveaux harness/CLI agentiques open source (concurrents ou alternatives a
+ Claude Code : opencode, aider, OpenHands, SWE-agent, Continue, etc.),
+ releases notables, changements de licence, forks importants, et patterns
+ de workflow agentique qui montrent de bons resultats en pratique]
+
+--- HARNESS & CLI AGENTIQUES ---
+• [NEW?] [Nom] ([mainteneur/organisation]) - Licence: [MIT/Apache/autre]
+  [1-2 phrases: ce que ca fait, en quoi ca differe des harness existants
+  (multi-modele, sandboxing, sub-agents, TUI vs IDE, etc.)]
+  Repo: [URL github] -- [etoiles/traction si notable]
+
+• ...
+
+--- WORKFLOWS AGENTIQUES QUI FONCTIONNENT ---
+[Patterns/architectures rapportes efficaces : plan-then-execute, sub-agents
+ paralleles, verification loops, RAG+agent, memoire persistante, etc.
+ Prioriser les retours avec resultats chiffres (benchmark, taux de succes,
+ gain de temps) plutot que les opinions non etayees]
+• [Pattern/technique] - [Source/Acteur], [date] -- [URL]
+  [2-3 phrases: en quoi consiste le workflow, sur quel type de tache il a
+  ete teste, resultats concrets si disponibles.]
+
 • ...
 
 ================================================================
