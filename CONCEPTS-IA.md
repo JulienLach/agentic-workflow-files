@@ -4,6 +4,8 @@ Un document de référence pour comprendre le vocabulaire, les concepts et les o
 
 Chaque section combine **le concept** et **des outils concrets** qui l'illustrent, pour ancrer la théorie dans des choses que tu utilises déjà (notamment via ce repo).
 
+> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) — ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 15 août 2026.
+
 ---
 
 ## Table des matières
@@ -20,6 +22,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Le "Harness"](#le-harness)
    - [La boucle agentique (agentic loop)](#la-boucle-agentique-agentic-loop)
    - [Tool use / function calling](#tool-use--function-calling)
+   - [Computer use / agents navigateur](#computer-use--agents-navigateur)
    - [MCP (Model Context Protocol)](#mcp-model-context-protocol)
    - [Skills, plugins et subagents](#skills-plugins-et-subagents)
    - [MCP vs Skill — quand choisir quoi](#mcp-vs-skill--quand-choisir-quoi)
@@ -148,11 +151,20 @@ Ce qui distingue un **agent** d'un simple chatbot : le cycle **observer → plan
 
 La capacité du modèle à décider, au milieu de sa génération, d'**appeler un outil** avec des arguments structurés (ex. `Read(file_path="...")`) plutôt que de répondre uniquement en texte. C'est le mécanisme technique de base qui rend l'agentique possible — le modèle "choisit" quel outil utiliser et avec quels paramètres, le harness exécute l'appel et renvoie le résultat au modèle.
 
+### Computer use / agents navigateur
+
+Une variante du tool use ci-dessus : plutôt que d'appeler des outils structurés à arguments typés, le modèle pilote directement une interface graphique — navigateur ou système d'exploitation — via des captures d'écran et des actions bas niveau (clic à des coordonnées, saisie clavier, scroll). L'agent "voit" l'écran et agit dessus comme le ferait un humain, ce qui permet d'automatiser des interfaces qui n'exposent aucune API.
+
+- Dans ce repo : le skill `claude-in-chrome` (pilote une session Chrome réelle, existante) et le MCP `playwright` (lance un navigateur headless scriptable) sont deux implémentations concrètes de ce pattern.
+- Compromis par rapport au tool use classique : plus lent et plus coûteux (chaque action nécessite une capture d'écran + une décision du modèle), mais fonctionne sur n'importe quelle interface, même sans API exposée.
+
 ### MCP (Model Context Protocol)
 
 Standard ouvert créé par Anthropic pour connecter un LLM à des sources de données et outils externes de façon **uniforme**, plutôt que de coder une intégration spécifique par outil et par fournisseur de modèle — souvent résumé comme *"l'USB-C des agents IA"*. Un **serveur MCP** expose des outils/ressources que n'importe quel harness compatible peut utiliser.
 
 - Exemple dans ce repo : **Context7** (documentation de librairies à jour, servie via MCP).
+- **Le protocole continue d'évoluer vite** : la spec du 28 juillet 2026 a rendu le cœur du protocole **stateless** (un serveur MCP distant peut tourner derrière un simple load balancer round-robin), ajouté un **framework d'Extensions** (`MCP Apps` pour des UI servies par le serveur, `Tasks` pour du travail longue durée), et durci l'auth (alignement OAuth 2.0/OIDC, dépréciation de la dynamic client registration au profit des Client ID Metadata Documents).
+- Le transport **HTTP+SSE** (mentionné section 4) est officiellement en dépréciation depuis cette même spec, au profit d'un transport HTTP stateless — encore supporté ~1 an, mais à ne plus considérer comme le standard pour un nouveau projet.
 
 ### Skills, plugins et subagents
 
@@ -262,7 +274,8 @@ Un **endpoint**, c'est une URL précise à laquelle on envoie une requête pour 
 - **Endpoint de modèle (API)** : l'URL que le harness appelle pour envoyer un prompt et récupérer une réponse. Un même fournisseur expose souvent plusieurs endpoints selon la fonction : chat/génération, embeddings, batch (traitement asynchrone en masse, moins cher), fine-tuning.
 - **Endpoint auto-hébergé / déployé** : quand un modèle est déployé sur ta propre infra (cloud ML type SageMaker/Vertex AI, ou en local avec **Ollama**), il expose son propre endpoint, distinct de celui du fournisseur d'origine.
 - **Endpoint compatible OpenAI** : beaucoup de fournisseurs exposent un endpoint qui respecte le même format que l'API OpenAI, pour permettre de changer de modèle/fournisseur juste en changeant l'URL et la clé, sans réécrire le code.
-- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint — en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP/SSE** — auquel le harness se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** — leur nom, leur description, les arguments qu'ils acceptent — que le harness rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harness et un outil venu d'un serveur MCP.
+- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint — en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP** — auquel le harness se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** — leur nom, leur description, les arguments qu'ils acceptent — que le harness rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harness et un outil venu d'un serveur MCP.
+  > Le transport historique **HTTP+SSE** est en dépréciation depuis la spec MCP de juillet 2026, remplacé par un transport HTTP stateless (voir section 2, "MCP") — à ne plus utiliser comme référence pour un nouveau déploiement.
 - **Streaming vs non-streaming** : un endpoint peut renvoyer la réponse complète d'un coup, ou la **streamer** token par token au fur et à mesure de la génération.
 
 Un endpoint est généralement protégé par une **authentification** (clé API, token), soumis à des **rate limits** (nombre de requêtes/tokens max par minute), et a sa propre latence — des critères qui comptent dans le choix d'un fournisseur ou d'un déploiement.
@@ -404,7 +417,9 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **IDE avec agent intégré** | Cursor, Windsurf, GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Devin, Claude Code (mode cloud/remote), Jules (Google) |
 | **Protocoles / standards** | MCP (Model Context Protocol), function calling / tool use |
-| **Orchestration multi-agents** | LangChain, LlamaIndex, CrewAI, AutoGen |
+| **Orchestration multi-agents** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, AutoGen |
+| **AI Gateway / routing multi-fournisseurs** | LiteLLM, OpenRouter, Portkey |
+| **Agents navigateur / computer use** | Playwright (MCP), Claude in Chrome, computer use (API) |
 | **Bases vectorielles (RAG)** | Pinecone, Weaviate, Chroma, pgvector |
 | **Exécution locale** | Ollama, LM Studio |
 | **Observabilité / évaluation** | LangSmith, Langfuse, evals maison |
@@ -519,7 +534,9 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 | **Planning (agentique)** | Pattern de décomposition d'un objectif en sous-tâches avant exécution |
 | **Workflow (vs agent)** | Système dont le chemin d'exécution est fixé à l'avance dans le code, par opposition à un agent qui décide dynamiquement de son parcours |
 | **Tool use / function calling** | Capacité du modèle à appeler un outil avec des arguments structurés |
-| **MCP** | Standard ouvert pour connecter un LLM à des outils/données externes de façon uniforme |
+| **Computer use** | Variante du tool use où le modèle pilote une interface graphique (navigateur, OS) via captures d'écran et actions bas niveau, plutôt que des outils à arguments typés |
+| **MCP** | Standard ouvert pour connecter un LLM à des outils/données externes de façon uniforme ; depuis juillet 2026, cœur du protocole stateless + framework d'Extensions (`MCP Apps`, `Tasks`) |
+| **AI Gateway** | Couche centralisée de routage/policy entre une app et plusieurs fournisseurs de modèles (ex. LiteLLM, OpenRouter) — un seul point pour changer de modèle/fournisseur sans réécrire le code appelant |
 | **Endpoint** | URL précise à laquelle on envoie une requête pour parler à un service (API modèle, serveur MCP, déploiement local...) |
 | **Rate limit** | Nombre maximum de requêtes/tokens qu'un endpoint accepte par unité de temps |
 | **Transformer** | Architecture de réseau de neurones basée sur l'attention, utilisée par la quasi-totalité des LLM |
