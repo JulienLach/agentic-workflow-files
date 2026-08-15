@@ -66,7 +66,8 @@ agentic-workflow-files/
         ├── prep.md                  ← /prep          : préparation d'une tâche complexe avant le plan
         ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
         ├── roast.md                  ← /roast          : revue de code sans complaisance, façon senior
-        └── ai-news.md                ← /ai-news        : briefing IA quotidien
+        ├── ai-news.md                ← /ai-news        : briefing IA quotidien
+        └── learn.md                  ← /learn          : cours express de 10 min sur un sujet dev précis
 ```
 
 ---
@@ -350,6 +351,7 @@ Application de gestion des congés pour PME. Utilisateurs : RH (admin) et employ
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                          |
 | `/roast`          | Revue de code sans complaisance, façon senior — au-delà de la checklist `/code-review` |
 | `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation               |
+| `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice    |
 
 ### Utilisation
 
@@ -364,6 +366,7 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 /prep Ajouter un système de notifications temps réel pour les demandes de congé
 /prep-check Ajouter un système de notifications temps réel pour les demandes de congé
 /roast backend/services/leaveRequest.services.ts
+/learn les principes SOLID
 ```
 
 ---
