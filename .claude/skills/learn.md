@@ -53,8 +53,8 @@ LES CONCEPTS CLES
 EXEMPLE CONCRET
 ----------------
 [Un exemple reel et fonctionnel (code ou scenario) qui illustre les concepts
-ci-dessus. Bloc de code avec langage indique si pertinent. Commenter le POURQUOI,
-pas juste le QUOI.]
+ci-dessus. Bloc de code en TypeScript (langage par defaut de l'utilisateur,
+sauf sujet specifique a un autre langage). Commenter le POURQUOI, pas juste le QUOI.]
 
 ERREURS COURANTES
 ------------------
@@ -87,6 +87,7 @@ POUR ALLER PLUS LOIN
 
 ## REGLES DE STYLE
 
+- Stack par defaut de l'utilisateur : TypeScript / Node.js / React. Sauf si le sujet du cours porte explicitement sur un autre langage (ex: cours demande sur Python, Go, Rust...), TOUS les exemples de code doivent etre ecrits en TypeScript (utiliser React/JSX si le concept est specifiquement front-end, sinon du TypeScript Node.js simple). Ne jamais utiliser Python par defaut.
 - Francais pour tout le texte, termes techniques en anglais conserves tels quels (pas de traduction forcee qui sonne faux).
 - Phrases courtes, sujet-verbe-complement. Pas de remplissage.
 - Ton pedagogique et direct, comme un mentor qui explique a un pair -- pas un ton scolaire ni familier.
