@@ -12,17 +12,17 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 - [Contenu](#contenu)
 - [`CLAUDE.md` vs `AGENTS.md`](#claudemd-vs-agentsmd)
 - [Installation](#installation)
-  - [Option 1 — Copier les fichiers dans un projet existant](#option-1--copier-les-fichiers-dans-un-projet-existant)
-  - [Option 2 — Utiliser comme base d'un nouveau projet](#option-2--utiliser-comme-base-dun-nouveau-projet)
+    - [Option 1 — Copier les fichiers dans un projet existant](#option-1--copier-les-fichiers-dans-un-projet-existant)
+    - [Option 2 — Utiliser comme base d'un nouveau projet](#option-2--utiliser-comme-base-dun-nouveau-projet)
 - [Configuration](#configuration)
-  - [Prérequis](#prérequis)
-  - [Skills vs MCP vs Plugins — quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
-  - [Plugins](#plugins)
-  - [`skills.sh` — installer des skills externes via CLI](#skillssh--installer-des-skills-externes-via-cli)
-  - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
-  - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
-  - [Obsidian skills — gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
-  - [Agents personnalisés](#agents-personnalisés)
+    - [Prérequis](#prérequis)
+    - [Skills vs MCP vs Plugins — quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
+    - [Plugins](#plugins)
+    - [`skills.sh` — installer des skills externes via CLI](#skillssh--installer-des-skills-externes-via-cli)
+    - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
+    - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
+    - [Obsidian skills — gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
+    - [Agents personnalisés](#agents-personnalisés)
 - [Design — maquette client avant le code](#design--maquette-client-avant-le-code)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
@@ -65,9 +65,9 @@ agentic-workflow-files/
         ├── security-audit.md        ← /security-audit: audit sécurité OWASP
         ├── prep.md                  ← /prep          : préparation d'une tâche complexe avant le plan
         ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
-        ├── roast.md                  ← /roast          : revue de code sans complaisance, façon senior
-        ├── ai-news.md                ← /ai-news        : briefing IA quotidien
-        └── learn.md                  ← /learn          : cours express de 10 min sur un sujet dev précis
+        ├── roast.md                 ← /roast          : revue de code sans complaisance, façon senior
+        ├── ai-news.md               ← /ai-news        : briefing IA quotidien
+        └── learn.md                 ← /learn          : cours express de 10 min sur un sujet dev précis
 ```
 
 ---
@@ -77,9 +77,9 @@ agentic-workflow-files/
 - **Que Claude Code** → `CLAUDE.md`.
 - **Autre outil** (Cursor, Codex CLI...) ou plusieurs outils → [`AGENTS.md`](https://agents.md/).
 - **Les deux** → `CLAUDE.md` qui importe `AGENTS.md` (c'est le cas ici, Claude Code ne lit pas `AGENTS.md` tout seul) :
-  ```markdown
-  @AGENTS.md
-  ```
+    ```markdown
+    @AGENTS.md
+    ```
 
 ---
 
@@ -125,14 +125,12 @@ git remote add origin https://github.com/<ton-nom-utilisateur>/mon-projet.git
 
 ### Skills vs MCP vs Plugins — quelle différence ?
 
-Claude Code propose trois mécanismes d'extension complémentaires :
+Pour ce que sont ces mécanismes conceptuellement, voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#skills-plugins-et-subagents) et [`MCP vs Skill — quand choisir quoi`](./CONCEPTS-IA.md#mcp-vs-skill--quand-choisir-quoi). Ici, juste l'essentiel pratique pour ce repo :
 
-|                         | **Skills**                            | **MCP**                               | **Plugins**                             | **Agents**                                    |
-| ----------------------- | ------------------------------------- | ------------------------------------- | ---------------------------------------- | ---------------------------------------------- |
-| **Qu'est-ce que c'est** | Fichiers `.md` dans `.claude/skills/` | Serveurs externes connectés à Claude  | Bundles complets (skills + MCP + hooks)  | Fichiers `.md` dans `.claude/agents/`          |
-| **Invoquer**            | `/nom-du-skill`                       | Automatique ou à la demande           | `/nom-du-plugin:commande`                | Automatique ou via l'outil `Agent`             |
-| **Installer**           | Copier le fichier `.md`               | `claude mcp add`                      | `claude plugin install`                  | Copier le fichier `.md`                        |
-| **Usage**               | Prompts guidés réutilisables          | Accès outils externes (API, DB, docs) | Features complètes packagées             | Subagent avec rôle, ton et outils dédiés       |
+|               | **Skills**              | **MCP**                     | **Plugins**               | **Agents**                         |
+| ------------- | ----------------------- | --------------------------- | ------------------------- | ---------------------------------- |
+| **Invoquer**  | `/nom-du-skill`         | Automatique ou à la demande | `/nom-du-plugin:commande` | Automatique ou via l'outil `Agent` |
+| **Installer** | Copier le fichier `.md` | `claude mcp add`            | `claude plugin install`   | Copier le fichier `.md`            |
 
 > Ce repo fournit des **skills**, un **MCP** (Context7) et un **agent custom** (`obsidian-expert`). Les plugins officiels Anthropic s'installent séparément.
 
@@ -161,12 +159,12 @@ claude plugin install https://claude.com/plugins/code-review
 claude plugin install https://claude.com/plugins/superpowers
 ```
 
-| Commande | Description |
-| --- | --- |
-| `/brainstorming` | Clarifier le besoin avant de coder |
-| `/execute-plan` | Implémenter un plan par batches, revue à chaque checkpoint |
-| `/debugging` | Débogage en 4 phases, revue archi auto après 3 échecs |
-| `/skill-authoring` | Créer/tester de nouveaux skills (TDD) |
+| Commande           | Description                                                |
+| ------------------ | ---------------------------------------------------------- |
+| `/brainstorming`   | Clarifier le besoin avant de coder                         |
+| `/execute-plan`    | Implémenter un plan par batches, revue à chaque checkpoint |
+| `/debugging`       | Débogage en 4 phases, revue archi auto après 3 échecs      |
+| `/skill-authoring` | Créer/tester de nouveaux skills (TDD)                      |
 
 > Déclenchement auto : le skill méta `using-superpowers` (hook `SessionStart`) active `systematic-debugging` sans commande explicite dès qu'un bug/test cassé apparaît — à ne pas confondre avec le skill `/debug` de ce repo, complémentaire.
 
@@ -180,13 +178,13 @@ Registre/CLI dédié aux skills seuls (pas de MCP/hooks embarqués comme un plug
 npx skills add <owner>/<repo>   # écrit le SKILL.md dans .claude/skills/
 ```
 
-| Commande | Rôle |
-| --- | --- |
-| `npx skills list` | Skills installés dans le projet |
-| `npx skills find [terme]` | Recherche dans le registre public |
-| `npx skills update [skill]` | Mise à jour |
-| `npx skills remove [skill]` | Désinstallation |
-| `npx skills init [nom]` | Nouveau `SKILL.md` depuis un template |
+| Commande                    | Rôle                                  |
+| --------------------------- | ------------------------------------- |
+| `npx skills list`           | Skills installés dans le projet       |
+| `npx skills find [terme]`   | Recherche dans le registre public     |
+| `npx skills update [skill]` | Mise à jour                           |
+| `npx skills remove [skill]` | Désinstallation                       |
+| `npx skills init [nom]`     | Nouveau `SKILL.md` depuis un template |
 
 Options : `-g` (global, `~/.claude/skills/`) · `-a <agent>` (cible un harness précis) · `-y` (skip confirmations).
 
@@ -194,7 +192,7 @@ Options : `-g` (global, `~/.claude/skills/`) · `-a <agent>` (cible un harness p
 
 ### MCP (Model Context Protocol) — outils externes
 
-Les MCP connectent Claude Code à des services externes (APIs, bases de données, documentation, etc.). Ils s'installent via CLI et peuvent être configurés **globalement** (tous tes projets) ou **par projet** (dans `.claude/`).
+Concept détaillé dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#mcp-model-context-protocol). Côté pratique : un MCP s'installe via CLI et peut être configuré **globalement** (tous tes projets) ou **par projet** (dans `.claude/`).
 
 #### Installer un MCP globalement
 
@@ -247,13 +245,13 @@ Pas de MCP Obsidian : la gestion du vault passe par le plugin **[obsidian-skills
 claude plugin install https://github.com/kepano/obsidian-skills
 ```
 
-| Skill | Usage |
-| --- | --- |
-| `obsidian:obsidian-cli` | Lire/créer/rechercher notes et tâches via le CLI `obsidian` |
-| `obsidian:obsidian-markdown` | Wikilinks, embeds, callouts, frontmatter |
-| `obsidian:obsidian-bases` | Fichiers `.base` (vues type BDD) |
-| `obsidian:json-canvas` | Fichiers `.canvas` (mind maps, flowcharts) |
-| `obsidian:defuddle` | Extraction web → Markdown propre |
+| Skill                        | Usage                                                       |
+| ---------------------------- | ----------------------------------------------------------- |
+| `obsidian:obsidian-cli`      | Lire/créer/rechercher notes et tâches via le CLI `obsidian` |
+| `obsidian:obsidian-markdown` | Wikilinks, embeds, callouts, frontmatter                    |
+| `obsidian:obsidian-bases`    | Fichiers `.base` (vues type BDD)                            |
+| `obsidian:json-canvas`       | Fichiers `.canvas` (mind maps, flowcharts)                  |
+| `obsidian:defuddle`          | Extraction web → Markdown propre                            |
 
 > Utilise le [CLI natif `obsidian`](https://help.obsidian.md/cli) via socket local — l'app doit être **lancée**. Sinon, Claude lit/écrit le vault directement (`Read`/`Edit`/`Write`).
 
@@ -261,28 +259,13 @@ claude plugin install https://github.com/kepano/obsidian-skills
 
 ### Agents personnalisés
 
-Un **agent** est un fichier `.md` dans `.claude/agents/` qui définit un subagent avec son propre rôle, ton, modèle et outils — invocable explicitement (outil `Agent`) ou automatiquement quand une tâche correspond à sa description.
+Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#skills-plugins-et-subagents). Ce repo inclut :
 
-Ce repo inclut :
-
-| Agent | Rôle |
-| --- | --- |
+| Agent             | Rôle                                                                                                           |
+| ----------------- | -------------------------------------------------------------------------------------------------------------- |
 | `obsidian-expert` | Expert Obsidian : notes structurées, plugins (Dataview, Templater, Tasks...), templates, organisation du vault |
 
-**Structure d'un fichier agent :**
-
-```markdown
----
-name: "nom-de-l-agent"
-description: "Quand utiliser cet agent, avec des exemples de déclenchement"
-model: sonnet
-color: purple
----
-
-Instructions système de l'agent (rôle, expertise, méthode de travail, règles).
-```
-
-> Le champ `memory: project` dans le frontmatter active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale.
+> Le champ `memory: project` dans le frontmatter (utilisé par `obsidian-expert`) active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale — une particularité Claude Code non couverte dans le glossaire général.
 
 ---
 
@@ -290,9 +273,9 @@ Instructions système de l'agent (rôle, expertise, méthode de travail, règles
 
 Avant le code, remplir les deux templates du dossier [`design/`](./design) pour cadrer le projet avec le client :
 
-| Fichier | Contenu |
-| --- | --- |
-| [`design/design.md`](./design/design.md) | Charte graphique : identité, palette, typo, composants UI |
+| Fichier                                                                | Contenu                                                       |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------- |
+| [`design/design.md`](./design/design.md)                               | Charte graphique : identité, palette, typo, composants UI     |
 | [`design/instructions-maquette.md`](./design/instructions-maquette.md) | Maquettage : écrans, navigation, règles UX, modèle de données |
 
 ```bash
@@ -339,19 +322,19 @@ Application de gestion des congés pour PME. Utilisateurs : RH (admin) et employ
 
 ## Skills disponibles
 
-| Commande          | Description                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------ |
-| `/code-review`    | Revue de code : sécurité, qualité, architecture, performance                         |
-| `/debug`          | Débogage structuré : localisation → hypothèses → correction → prévention             |
-| `/refactor`       | Refacto sécurisé : plan avant action, vérification que le comportement ne change pas |
-| `/add-entity`     | Création d'une entité full-stack avec checklist complète                             |
-| `/write-tests`    | Rédaction de tests unitaires et d'intégration Vitest                                 |
-| `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données               |
-| `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan     |
-| `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                          |
+| Commande          | Description                                                                            |
+| ----------------- | -------------------------------------------------------------------------------------- |
+| `/code-review`    | Revue de code : sécurité, qualité, architecture, performance                           |
+| `/debug`          | Débogage structuré : localisation → hypothèses → correction → prévention               |
+| `/refactor`       | Refacto sécurisé : plan avant action, vérification que le comportement ne change pas   |
+| `/add-entity`     | Création d'une entité full-stack avec checklist complète                               |
+| `/write-tests`    | Rédaction de tests unitaires et d'intégration Vitest                                   |
+| `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données                 |
+| `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan       |
+| `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                            |
 | `/roast`          | Revue de code sans complaisance, façon senior — au-delà de la checklist `/code-review` |
-| `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation               |
-| `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice    |
+| `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation                 |
+| `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice      |
 
 ### Utilisation
 
