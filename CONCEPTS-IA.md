@@ -4,7 +4,7 @@ Un document de référence pour comprendre le vocabulaire, les concepts et les o
 
 Chaque section combine **le concept** et **des outils concrets** qui l'illustrent, pour ancrer la théorie dans des choses que tu utilises déjà (notamment via ce repo).
 
-> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) — ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 15 août 2026.
+> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) — ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 5 septembre 2026.
 
 ---
 
@@ -18,6 +18,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Prompt caching — réduire coût et latence sur un contexte répété](#prompt-caching--réduire-coût-et-latence-sur-un-contexte-répété)
    - [Training vs inference](#training-vs-inference)
    - [Poids et quantization](#poids-et-quantization)
+   - [VRAM, RAM et SSD : où vivent les poids d'un modèle](#vram-ram-et-ssd--où-vivent-les-poids-dun-modèle)
 2. [Harness, agents et boucle agentique](#2-harness-agents-et-boucle-agentique)
    - [Le "Harness"](#le-harness)
    - [La boucle agentique (agentic loop)](#la-boucle-agentique-agentic-loop)
@@ -121,6 +122,24 @@ Beaucoup d'API de LLM (dont celle d'Anthropic) permettent de **mettre en cache**
 ### Poids et quantization
 
 Les **poids (weights)** sont les valeurs numériques des paramètres. La **quantization** consiste à réduire leur précision numérique (ex. de 16 bits à 8 ou 4 bits) pour que le modèle prenne moins de mémoire et tourne plus vite — au prix d'une petite perte de qualité. C'est la technique qui permet de faire tourner des modèles open-weights en local, sur une machine avec un GPU grand public (via des outils comme **Ollama** ou **LM Studio**).
+
+### VRAM, RAM et SSD : où vivent les poids d'un modèle
+
+Faire tourner un modèle en local, c'est décider où stocker ses poids : GPU (VRAM), mémoire système (RAM), ou disque (SSD). Ces trois emplacements n'ont ni le même prix, ni la même vitesse d'accès — et c'est ce compromis qui explique la plupart des discussions "combien de VRAM il faut pour ce modèle".
+
+- **VRAM (GPU)** : la plus rapide (~700 Go/s à plus de 1 To/s), mais chère et limitée en taille (8 à 24 Go sur une carte grand public). Historiquement, un modèle devait tenir entièrement en VRAM pour tourner à vitesse normale.
+- **RAM système (DDR4/DDR5)** : beaucoup moins chère et plus abondante, mais 10 à 20x plus lente pour dialoguer avec le GPU (~25-45 Go/s en DDR4, ~60-90 Go/s en DDR5).
+- **SSD (NVMe)** : quasi illimité, très bon marché, mais encore beaucoup plus lent (~5-7 Go/s).
+
+Sur un modèle **dense** (classique — tous les paramètres servent à calculer chaque token), tout doit rester en VRAM pour ne pas ralentir : la lenteur de la RAM/du SSD se ferait sentir à chaque token. D'où la règle simple "il faut X Go de VRAM pour ce modèle".
+
+Sur un modèle **MoE (Mixture of Experts, voir plus haut)**, ce n'est plus vrai : seule une petite fraction des paramètres ("experts actifs") sert à calculer un token donné. Le reste — le gros de la **connaissance** stockée dans le modèle — n'est sollicité que rarement. Les architectures récentes (ex. Qwen3-Next, et la tendance qui se dessine pour la génération suivante) exploitent ça : garder en VRAM uniquement la partie qui doit être recalculée à chaque token, et déporter le reste en RAM, voire sur SSD.
+
+- **Exemple concret** : un modèle MoE de 35 milliards de paramètres au total, avec seulement 3 à 5 milliards actifs par token, peut tourner avec par exemple 16 Go de VRAM (la partie active + le contexte) + 15-20 Go de RAM classique (le reste des experts, peu sollicités) — plutôt que d'exiger 35 Go de VRAM d'un bloc.
+- **Pourquoi ça ne ralentit pas** : comme seule une petite fraction des poids "voyage" de la RAM/du SSD vers le GPU à chaque token (pas la totalité du modèle), le débit nécessaire reste faible. Même de la DDR4 — nettement plus lente que la VRAM — suffit sans ralentissement perceptible. Un modèle dense n'a pas cette marge : tout doit transiter, donc seule la VRAM tient la cadence.
+- **Implication pratique** : cette tendance change l'équation matérielle de l'IA locale — au lieu d'acheter toujours plus de VRAM (cher), on peut miser sur de la RAM bon marché pour faire tourner des modèles MoE plus gros/plus intelligents sur un GPU modeste (voire le même niveau d'intelligence qu'un GPU deux fois plus gros). Si les labs poussent cette architecture à grande échelle, la demande se déplace du GPU vers la RAM — un facteur à surveiller sur le marché des composants.
+
+> Nuance coût : à date, faire tourner un gros modèle en local reste souvent moins rentable qu'une API cloud au tarif GPU actuel, surtout pour un usage ponctuel ou lourd. L'intérêt de l'offloading RAM/SSD est justement de baisser le ticket d'entrée matériel (VRAM) nécessaire, ce qui rend le local plus accessible sans attendre une baisse du prix des GPU.
 
 ---
 
@@ -519,6 +538,7 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 | **Fine-tuning** | Ré-entraînement partiel d'un modèle sur des données spécifiques |
 | **Quantization** | Réduction de la précision numérique des poids pour gagner en vitesse/mémoire |
 | **MoE (Mixture of Experts)** | Architecture où seule une partie des paramètres est activée par requête |
+| **Offloading (VRAM/RAM/SSD)** | Répartir les poids d'un modèle entre GPU (rapide, cher, limité) et RAM/SSD (lent, bon marché, abondant) — viable pour un MoE car seuls les experts actifs doivent transiter vite |
 | **RLHF** | Reinforcement Learning from Human Feedback — technique de post-training qui aligne le modèle sur les préférences humaines |
 | **Hallucination** | Réponse générée avec assurance mais factuellement fausse |
 | **Temperature / top-p** | Paramètres qui contrôlent le degré d'aléatoire/créativité de la génération |
