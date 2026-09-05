@@ -62,7 +62,8 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Le dossier de config du harness : .claude/ et .opencode/](#le-dossier-de-config-du-harness--claude-et-opencode)
    - [Portée : projet, sous-dossier, utilisateur, organisation](#portée--projet-sous-dossier-utilisateur-organisation)
    - [Bonnes pratiques](#bonnes-pratiques)
-10. [Glossaire condensé](#10-glossaire-condensé)
+10. [Références incontournables : le workflow IA au quotidien](#10-références-incontournables--le-workflow-ia-au-quotidien)
+11. [Glossaire condensé](#11-glossaire-condensé)
 
 ---
 
@@ -524,7 +525,28 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 
 ---
 
-## 10. Glossaire condensé
+## 10. Références incontournables : le workflow IA au quotidien
+
+Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travaille avec des LLM — à avoir en favoris. Contrairement au panorama d'outils (section 8, plus large), cette liste se limite à ce qui s'utilise concrètement au quotidien : trouver un modèle, l'appeler, le comparer, le faire tourner.
+
+| Ressource | Lien | Utilité dans le workflow |
+| --- | --- | --- |
+| **Hugging Face** | huggingface.co | Le hub de modèles/datasets open-weights (Qwen, Llama, DeepSeek...) + Spaces (démos en ligne) + Inference API. Le point de départ pour trouver et tester un modèle avant de l'utiliser en local ou via API. |
+| **OpenRouter** | openrouter.ai | Une seule clé API (format compatible OpenAI) pour appeler des dizaines de fournisseurs/modèles, propriétaires et open-weights. Comparateur de prix/latence par modèle intégré, fallback automatique si un fournisseur est indisponible — évite de multiplier les comptes et clés API pour tester différents modèles. |
+| **Ollama** | ollama.com | Exécution de modèles open-weights en local en une commande (`ollama run qwen3`) ; `ollama.com/library` pour parcourir le catalogue de modèles prêts à l'emploi. |
+| **LM Studio** | lmstudio.ai | Équivalent d'Ollama avec interface graphique — pratique pour tester des modèles locaux sans terminal. |
+| **Artificial Analysis** | artificialanalysis.ai | Comparateur indépendant de perf/prix/latence entre fournisseurs et modèles (frontier et open-weights) — pour choisir sur des critères objectifs plutôt que sur la réputation. |
+| **llm-stats.com** | llm-stats.com | Équivalent d'Artificial Analysis, avec en plus un flux de nouveautés modèles tenu à jour (`llm-stats.com/ai-news`). |
+| **LMArena** | lmarena.ai | Classement par préférence humaine en aveugle (deux réponses comparées, l'utilisateur vote pour la meilleure) — complète les benchmarks académiques (section 5) par une mesure d'usage réel. |
+| **MCP — doc officielle** | modelcontextprotocol.io | Spec officielle du protocole MCP (section 2) — pour trouver un serveur MCP existant ou comprendre le protocole avant d'en coder un. |
+| **Docs officielles fournisseurs** | docs.anthropic.com / platform.openai.com/docs / ai.google.dev | Première source pour tout détail précis d'API (pricing exact, limites, nouveaux paramètres) — toujours préférer à un article tiers qui peut dater vite. |
+| **Veille communautaire** | r/LocalLLaMA · simonwillison.net · latent.space | Suivi qualitatif de l'IA locale, des patterns agentiques et des retours d'expérience terrain, en complément du briefing `ai-news`. |
+
+> **OpenRouter en particulier** mérite d'être dans les favoris dès qu'on développe avec des LLM : c'est le moyen le plus rapide de comparer deux modèles sur une vraie tâche (même code, juste l'URL/modèle qui change) sans devoir ouvrir un compte chez chaque fournisseur.
+
+---
+
+## 11. Glossaire condensé
 
 | Terme | Définition courte |
 | --- | --- |
