@@ -522,6 +522,15 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 - **Committer la config partagée, gitignorer le perso.** `.claude/settings.json`, `agents/`, `skills/` sont pensés pour l'équipe ; `settings.local.json` et tout fichier contenant un token/clé (ex. l'URL d'un endpoint MCP avec un token en clair, section 4) ne doivent jamais être committés.
 - **Garder le fichier racine court.** Il est relu à chaque session et pèse sur le prompt caching (section 1) — la documentation volumineuse a davantage sa place en fichiers séparés référencés, voire en RAG (section 7), que collée dans `AGENTS.md`.
 - **Sous-dossiers seulement si le contexte diverge vraiment.** Un monorepo avec un vrai frontend et une vraie infra justifie des `CLAUDE.md` locaux ; un repo simple n'en a pas besoin — la complexité doit suivre un besoin réel, pas être ajoutée par précaution.
+- **Centraliser en global ce qui n'est pas spécifique à un projet.** Agents, skills, commandes et plugins/MCP personnels (pas des règles d'équipe) devraient vivre une seule fois dans `~/.claude/` plutôt que d'être dupliqués dans chaque repo — c'est le scope **utilisateur** du tableau ci-dessus, chargé automatiquement à chaque session, tous projets confondus. Chaque nouveau projet n'a alors besoin que d'un `CLAUDE.md`/`AGENTS.md` minimal propre à son contexte (stack, conventions, contraintes) : tout le reste de l'outillage suit déjà, sans rien reconfigurer. En cas de nom identique en projet et en global (ex. un agent `obsidian-expert` dans les deux), la version **projet** prend le dessus — pratique pour surcharger ponctuellement un agent global sur un repo précis sans toucher à la config personnelle.
+- **Un dossier canonique + des symlinks pour être agnostique du harness.** Le tableau plus haut montre que chaque outil range sa config global sous un nom différent (`~/.claude/` pour Claude Code, `~/.config/opencode/` pour OpenCode...). Plutôt que de dupliquer un agent ou un skill dans chacun, garder une seule copie source dans un dossier neutre (ex. `~/agents/`, souvent versionné dans un repo dotfiles) et faire pointer chaque harness dessus par symlink :
+
+  ```bash
+  ln -s ~/agents/obsidian-expert.md ~/.claude/agents/obsidian-expert.md
+  ln -s ~/agents/obsidian-expert.md ~/.config/opencode/agent/obsidian-expert.md
+  ```
+
+  Le contenu n'est édité qu'à un seul endroit et reste disponible identiquement, que ce soit Claude Code ou OpenCode qui tourne — sans copier-coller à synchroniser à la main à chaque changement. Seule limite : le frontmatter (`name`/`description`/`model`/`color` côté Claude Code, structure un peu différente côté OpenCode) n'est pas forcément 100 % interchangeable champ pour champ selon l'outil — mais le corps de l'instruction, lui, reste commun.
 
 ---
 
