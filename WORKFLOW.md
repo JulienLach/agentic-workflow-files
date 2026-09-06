@@ -26,7 +26,8 @@ Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des s
 │                         Claude Code (hub central)                       │
 │                                                                          │
 │  AGENTS.md/CLAUDE.md ──▶ context window   Plugins ──▶ Context7          │
-│                                             └───▶ Obsidian skills        │
+│                                             ├───▶ Obsidian skills        │
+│                                             └───▶ Playwright (MCP)       │
 │  MCP Excalidraw ──▶ Conception / Architecture                           │
 │                                                                          │
 │  Skills ──▶ /prep · /prep-check · /code-review · /debug · /refactor …   │
@@ -121,7 +122,7 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / A
 Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatre briques :
 
 - **Fichiers de contexte** (`AGENTS.md` du repo concerné) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
-- **Plugins** → `Context7` (doc à jour des librairies) et `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble).
+- **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable — voir étape 4 pour la vérification des changements UI).
 - **Skills** (`.claude/skills/*.md` de ce repo) → invoqués à la demande selon le besoin :
 
     | Catégorie       | Skills                                         |
@@ -140,16 +141,25 @@ Deux **modes d'interaction** viennent s'ajouter par-dessus — ce ne sont pas de
 - **Mode agentique standard** — c'est le fonctionnement par défaut de Claude Code : que le mode Auto soit activé ou non, Claude exécute la tâche de bout en bout (recherche, édition, tests, commits) à partir de ta demande, sans configuration particulière.
 - **Mode pédagogique** — sur demande explicite dans le prompt (« explique-moi », « guide-moi », « je veux comprendre par moi-même »), Claude oriente vers la solution par indices et explications plutôt que de l'implémenter directement.
 
+### Hygiène de contexte
+
+Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et les performances de Claude se dégradent quand il est chargé — c'est la ressource à gérer en priorité, avant même le choix du modèle :
+
+- **`/clear` entre deux tâches sans rapport.** Ne pas enchaîner une tâche sur une autre dans la même conversation « pour gagner du temps » — le contexte pollué par la tâche précédente dégrade la suivante.
+- **Après 2 corrections ratées sur le même point, `/clear` plutôt qu'insister.** Une session avec des tentatives échouées accumulées performe moins bien qu'une session neuve avec un prompt initial qui intègre ce qu'on vient d'apprendre.
+- **Subagents pour la recherche/exploration**, pas seulement pour la revue (`/code-review`). « Utilise un subagent pour investiguer comment X gère Y » garde les dizaines de fichiers lus hors du contexte principal, qui reste focalisé sur l'implémentation.
+- **`/compact <instructions>`** pour un compactage ciblé (ex. `/compact garde la liste des fichiers modifiés et les commandes de test`) plutôt que de laisser l'auto-compaction générique décider seule sur une tâche longue.
+
 ---
 
 ## 4. Implémentation dans le repo de code
 
 1. **Si la tâche est complexe** (feature non triviale, besoin flou, risque de casser la prod) : préparer avant de coder plutôt que de foncer sur un plan incomplet.
     ```
-    /prep <tâche>         # doc, remise en question, angles morts (prod/edge cases/sécu), archi de base
-    /prep-check <tâche>   # vérifie que /prep est complet avant d'entrer en mode plan
+    /prep <tâche>         # doc, remise en question, angles morts (prod/edge cases/sécu), archi de base → écrit dans SPEC.md
+    /prep-check <tâche>   # vérifie que SPEC.md est complet avant d'entrer en mode plan
     ```
-    Une fois `/prep-check` au vert, entrer en mode plan (agent `Plan`, section 3). Pour une tâche simple, passer directement à l'étape suivante.
+    Une fois `/prep-check` au vert, entrer en mode plan (agent `Plan`, section 3) : le plan se construit à partir de `SPEC.md`, pas de la mémoire de la conversation — utile aussi pour repartir sur une session neuve rien que pour l'implémentation (section « Hygiène de contexte » ci-dessus). Pour une tâche simple, passer directement à l'étape suivante.
 
 2. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` :
 
@@ -165,7 +175,7 @@ Deux **modes d'interaction** viennent s'ajouter par-dessus — ce ne sont pas de
     ```
 
 3. Implémenter en suivant le `AGENTS.md` du repo concerné (stack, conventions, tests).
-4. Vérifier (tests, lint, exécution locale) avant de committer.
+4. Vérifier avant de committer : tests, lint, exécution locale — et pour tout changement **UI/frontend**, passage réel dans un navigateur via le **MCP Playwright** (parcours nominal + cas limites, pas seulement la compilation/les tests unitaires qui ne garantissent pas le comportement visuel).
 
 ---
 
@@ -200,7 +210,7 @@ git commit -m "feat(auth): add password reset via email"
 git push -u origin feat/nom-de-la-feature
 ```
 
-> **Envie d'une vraie automatisation ?** Un **hook** Claude Code (`PostToolUse` sur `Edit`/`Write`, ou `Stop` en fin de session) pourrait déclencher un lint ou un rappel de commit automatiquement — mais ce n'est pas configuré ici. Voir le skill `update-config` si tu veux en mettre un en place.
+> **Envie d'une vraie automatisation ?** La section « Hooks recommandés » de `AGENTS.md` documente un hook `PostToolUse` prêt à copier (typecheck backend + lint frontend après chaque edit) — déterministe, contrairement à une règle `AGENTS.md` que Claude peut zapper si le contexte est chargé. Un `Stop` en fin de session (rappel de commit) reste à faire au cas par cas. Voir le skill `update-config` pour la mise en place.
 
 ---
 

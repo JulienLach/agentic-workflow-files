@@ -532,6 +532,18 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 
   Le contenu n'est édité qu'à un seul endroit et reste disponible identiquement, que ce soit Claude Code ou OpenCode qui tourne — sans copier-coller à synchroniser à la main à chaque changement. Seule limite : le frontmatter (`name`/`description`/`model`/`color` côté Claude Code, structure un peu différente côté OpenCode) n'est pas forcément 100 % interchangeable champ pour champ selon l'outil — mais le corps de l'instruction, lui, reste commun.
 
+- **Un MCP en scope utilisateur, agnostique du harness : le symlink ne marche pas.** Contrairement aux agents/skills (point précédent), un serveur MCP déclaré en scope **utilisateur** ne peut **pas** être partagé par un simple symlink entre Claude Code et OpenCode — deux obstacles cumulés, pas juste un frontmatter qui diverge :
+  - **Le fichier conteneur n'est pas dédié côté Claude Code.** Le scope projet a un fichier propre (`.mcp.json`, uniquement des serveurs MCP — symlinkable sans problème). Mais le scope utilisateur (`claude mcp add --scope user ...`) écrit dans la clé `mcpServers` de `~/.claude.json`, un **gros fichier d'état** qui mélange aussi session state, cache, analytics, préférences UI. Symlinker ce fichier entier vers la config OpenCode n'a aucun sens ; symlinker juste une clé JSON à l'intérieur d'un fichier n'est pas possible nativement (contrairement à un fichier markdown entier). Le format est d'ailleurs jugé assez confus pour avoir sa propre issue GitHub ([anthropics/claude-code#37165](https://github.com/anthropics/claude-code/issues/37165)), et `--scope user` a un historique de bugs sur la disponibilité effective inter-projets ([anthropics/claude-code#32939](https://github.com/anthropics/claude-code/issues/32939)) — à vérifier avec `claude mcp list` après coup plutôt qu'à supposer que ça marche.
+  - **Le schéma JSON diverge, même pour le même serveur.** Claude Code (`mcpServers`) : `command` (string) + `args` (array) séparés, `env` pour les variables. OpenCode (`opencode.json`, clé `mcp`) : `type: "local"` ou `"remote"` obligatoire, `command` en **un seul array** combinant binaire et arguments, `environment` (pas `env`) pour les variables. Un même serveur playwright s'écrit donc différemment dans chaque fichier :
+    ```json
+    // Claude Code — ~/.claude.json, clé "mcpServers"
+    "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@latest"] }
+
+    // OpenCode — opencode.json (ou ~/.config/opencode/opencode.json), clé "mcp"
+    "playwright": { "type": "local", "command": ["npx", "-y", "@playwright/mcp@latest"] }
+    ```
+  - **Verdict : pas de source unique symlinkée pour le scope utilisateur.** La solution pragmatique est de dupliquer volontairement le bloc de déclaration (deux blocs de 2-3 lignes, un par harness, versionnés côte à côte dans le repo dotfiles) plutôt que d'automatiser une génération à partir d'un format pivot — le gain n'en vaut pas la fragilité d'un script qui réécrirait `~/.claude.json`. Si le besoin est **par projet** plutôt que global, préférer `.mcp.json` (scope projet Claude Code) : fichier dédié, committable, donc un bien meilleur candidat au symlink vers l'équivalent projet d'OpenCode que le scope utilisateur.
+
 ---
 
 ## 10. Références incontournables : le workflow IA au quotidien

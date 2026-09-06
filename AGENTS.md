@@ -203,6 +203,44 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 
 ---
 
+## Hooks recommandés
+
+Le `AGENTS.md`/les instructions ci-dessus sont **conseillés** — Claude peut les zapper si le contexte est chargé. Pour ce qui doit arriver **à chaque fois sans exception** (typecheck backend, lint frontend), un hook `PostToolUse` est déterministe là où une instruction ne l'est pas.
+
+Exemple pour ce template (`.claude/settings.json`), à adapter au projet réel :
+
+```json
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "if": "Edit(backend/**/*.ts)|Write(backend/**/*.ts)",
+            "command": "cd backend && npx tsc --noEmit",
+            "timeout": 60
+          },
+          {
+            "type": "command",
+            "if": "Edit(frontend/**/*.ts)|Edit(frontend/**/*.tsx)|Write(frontend/**/*.ts)|Write(frontend/**/*.tsx)",
+            "command": "cd frontend && npm run lint",
+            "timeout": 60
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+- `matcher` filtre sur l'outil (`Edit`/`Write`), `if` filtre en plus sur le chemin du fichier touché — donc le typecheck backend ne se déclenche pas sur un edit frontend, et inversement.
+- Vérifier le comportement avec `/hooks` après mise en place (le code de sortie exact qui remonte l'échec à Claude peut varier selon la version — ne pas supposer que ça bloque sans l'avoir testé une fois).
+- Ne pas dupliquer dans un hook ce qu'un test d'intégration vérifie déjà mieux — le hook est là pour le "jamais oublié", pas pour remplacer la suite de tests.
+
+---
+
 ## Documentation avec Context7
 
 Toujours utiliser le MCP **Context7** pour consulter la documentation à jour des librairies et frameworks (Express, React, Zod, Vitest, pg, etc.) avant d'implémenter ou de répondre à une question sur une API spécifique.
