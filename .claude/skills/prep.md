@@ -38,6 +38,12 @@ Ce qui casse en prod sans jamais avoir été vu en dev — à couvrir explicitem
 
 Propose une architecture minimale et explique **pourquoi** (ton pédagogique, pas juste la solution) : quels fichiers, quels choix, quelles alternatives écartées et pourquoi.
 
+## 6. Écrire la synthèse dans SPEC.md
+
+Une fois les 5 points ci-dessus traités, écris-en la synthèse dans `SPEC.md` à la racine du repo (créé ou écrasé pour la tâche courante — ce n'est pas un fichier permanent comme `AGENTS.md`, juste la référence de la tâche en cours) : besoin reformulé, fichiers concernés, angles morts couverts (étape 4), architecture retenue et alternatives écartées (étape 5).
+
+C'est ce fichier, pas la conversation, qui sert de référence pendant l'implémentation — et qui permet de démarrer une session neuve rien que pour coder, sans avoir à re-expliquer tout le contexte de préparation.
+
 ## Ensuite
 
-Une fois ces 5 points traités, lance `/prep-check` pour vérifier que rien n'a été oublié avant d'entrer en mode plan. Le plan doit refléter les angles morts de l'étape 4, pas juste le chemin heureux.
+Une fois `SPEC.md` écrit, lance `/prep-check` pour vérifier que rien n'a été oublié avant d'entrer en mode plan. Le plan doit refléter les angles morts de l'étape 4, pas juste le chemin heureux.

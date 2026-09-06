@@ -1,7 +1,4 @@
----
-name: ai-news
-description: Synthese des actualites IA du jour — grandes entreprises, modeles locaux, economie, robotique, cybersecurite, regulation.
----
+Synthese des actualites IA du jour — grandes entreprises, modeles locaux, economie, robotique, cybersecurite, regulation.
 
 ---
 

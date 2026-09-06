@@ -7,6 +7,7 @@ Vérifie, avant d'entrer en mode plan, que chacun des points suivants a été r�
 
 Réponds point par point, par oui/non + preuve concrète (ce qui a été fait), jamais par supposition :
 
+- [ ] **SPEC.md** : le fichier existe à la racine et reflète bien la tâche courante (pas un reste d'une tâche précédente)
 - [ ] **Doc** : la doc des libs et le code existant pertinent ont été consultés — pas juste supposés connus
 - [ ] **Remise en question** : les hypothèses ambiguës ont été confirmées avec l'utilisateur, pas devinées
 - [ ] **Réflexion complète** : le problème a été réfléchi étape par étape jusqu'au bout, pas arrêté à la première solution qui marche

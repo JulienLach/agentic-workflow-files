@@ -1,5 +1,5 @@
 ---
-name: code-review
+name: stack-review
 description: Fait une revue de code approfondie. Utiliser quand l'utilisateur veut reviewer du code, vérifier la qualité, détecter des bugs ou des problèmes de sécurité.
 ---
 

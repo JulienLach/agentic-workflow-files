@@ -4,5 +4,68 @@
       "mcp__plugin_context7_context7__query-docs",
       "mcp__plugin_context7_context7__resolve-library-id"
     ]
-  }
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "/usr/bin/python \"/home/julien/.claude/plugins/marketplaces/claude-pulse/claude_status.py\""
+  },
+  "enabledPlugins": {
+    "claude-pulse@claude-pulse": true,
+    "context7@claude-plugins-official": true,
+    "obsidian@obsidian-skills": true,
+    "playwright@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true
+  },
+  "extraKnownMarketplaces": {
+    "claude-pulse": {
+      "source": {
+        "source": "github",
+        "repo": "NoobyGains/claude-pulse"
+      }
+    },
+    "obsidian-skills": {
+      "source": {
+        "source": "github",
+        "repo": "kepano/obsidian-skills"
+      }
+    }
+  },
+  "language": "french",
+  "effortLevel": "high",
+  "tui": "fullscreen",
+  "voice": {
+    "enabled": true,
+    "mode": "hold"
+  },
+  "theme": "dark",
+  "autoContinueAtUsageLimit": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: assume private unless the remote host and repo name indicate otherwise, or a visibility check in the transcript shows public",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: None configured",
+      "**Default / protected branches**: None configured",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo and its remote(s) only (no additional orgs configured) — as scoped by the Trusted repo and Repository visibility entries above",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar — note: this home directory contains sensitive-looking paths such as .claude/.credentials.json and Documents/Audit/.env",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (hyphen/underscore/dot-delimited — e.g. matches `prod-db`, not `producer`)",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: personal/hobby use — desktop administration (Sway/Wayland desktop, package management, Obsidian vault assistance) on a home-directory checkout with no tracked files and no git remotes",
+      "**Trusted repo**: The git repository the agent started in (/home/julien) — it has no tracked files and no configured remotes, so there is no verified remote scope; treat it as a local-only working directory",
+      "**Org-specific CLIs**: None configured",
+      "No 'routine under <user>/ prefix' qualifiers were found in the evidence"
+    ]
+  },
+  "voiceEnabled": true
 }
