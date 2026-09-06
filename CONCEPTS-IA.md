@@ -492,11 +492,11 @@ Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent
 
 **Claude Code — `~/.claude/` (utilisateur, global) :** même logique de structure (`settings.json`, `agents/`, `commands/`, plugins installés) mais appliquée à **toutes** les sessions, tous projets confondus — pour des préférences personnelles plutôt que des règles d'équipe.
 
-**OpenCode — `.opencode/` (projet) :** structure équivalente mais nommée différemment — `.opencode/agent/` (au singulier), où le chemin devient l'id de l'agent (`.opencode/agent/team/reviewer.md` → agent `team/reviewer`), `.opencode/command/`, et `opencode.json` pour la config générale (modèles, outils, MCP). Contrairement à Claude Code, OpenCode ne connaît que `AGENTS.md` — si un `CLAUDE.md` traîne aussi dans le repo, seul `AGENTS.md` est pris en compte. Le pendant global est `~/.config/opencode/`.
+**OpenCode — `.opencode/` (projet) :** structure équivalente mais nommée différemment — `.opencode/agent/` (au singulier), où le chemin devient l'id de l'agent (`.opencode/agent/team/reviewer.md` → agent `team/reviewer`), `.opencode/command/`, et `opencode.json` pour la config générale (modèles, outils, MCP). Contrairement à ce qu'on pourrait croire, OpenCode ne se limite pas à `AGENTS.md` : au niveau projet il cherche `AGENTS.md` en priorité, mais lit `CLAUDE.md` en repli si aucun `AGENTS.md` n'existe dans le dossier — si les deux existent, seul `AGENTS.md` est pris en compte ([doc officielle](https://opencode.ai/docs/rules/)). Global et projet se **combinent** (pas de remplacement). Le pendant global est `~/.config/opencode/`.
 
 | | Claude Code | OpenCode |
 | --- | --- | --- |
-| Fichier d'instructions racine | `CLAUDE.md` (+ `AGENTS.md` supporté) | `AGENTS.md` uniquement |
+| Fichier d'instructions racine | `CLAUDE.md` (+ `AGENTS.md` supporté) | `AGENTS.md`, repli sur `CLAUDE.md` si absent |
 | Dossier config projet | `.claude/` | `.opencode/` |
 | Subagents | `.claude/agents/*.md` | `.opencode/agent/**/*.md` |
 | Config générale | `.claude/settings.json` | `opencode.json` |
