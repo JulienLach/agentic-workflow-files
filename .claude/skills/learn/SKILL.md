@@ -1,4 +1,7 @@
-Cours express de 10 minutes sur un sujet precis de developpement (langage, framework, principe, outil) - doc officielle et sources fiables, pedagogique, avec exemples et mini-exercice.
+---
+name: learn
+description: Cours express de 10 minutes sur un sujet precis de developpement (langage, framework, principe, outil) - doc officielle et sources fiables, pedagogique, avec exemples et mini-exercice.
+---
 
 ---
 

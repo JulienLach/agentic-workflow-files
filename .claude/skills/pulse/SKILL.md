@@ -1,4 +1,7 @@
-Configure your Claude status bars - themes, colours, animations, peak hours, and more. $ARGUMENTS
+---
+name: pulse
+description: Configure your Claude status bars - themes, colours, animations, peak hours, and more.
+---
 
 ---
 

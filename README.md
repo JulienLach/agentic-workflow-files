@@ -52,10 +52,10 @@ agentic-workflow-files/
 │   ├── settings.json                ← Permissions MCP (Context7) + prefs
 │   ├── agents/
 │   │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
-│   ├── commands/                    ← /ai-news, /learn, /pulse (fichier plat, format legacy)
-│   └── skills/                      ← un sous-dossier par skill, `<nom>/SKILL.md` (format requis) :
+│   └── skills/                      ← un sous-dossier par skill, `<nom>/SKILL.md` (format standard, aucun fichier plat) :
 │                                       stack-review, debug, refactor, add-entity, write-tests,
-│                                       security-audit, prep, prep-check, roast, competitor-benchmark
+│                                       security-audit, prep, prep-check, roast, competitor-benchmark,
+│                                       ai-news, learn, pulse
 │                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
     └── AGENTS.md                    ← même contenu que .claude/AGENTS.md (symlinké entre les deux en réel)
