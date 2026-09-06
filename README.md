@@ -27,6 +27,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
 - [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet)
 - [Skills disponibles](#skills-disponibles)
 - [Concepts IA - glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
+- [Atelier - tester un nouveau modèle open-weight](#atelier---tester-un-nouveau-modèle-open-weight)
 
 ---
 
@@ -43,6 +44,7 @@ agentic-workflow-files/
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
 ├── STRUCTURE-AGNOSTIQUE.md          ← Schéma de la centralisation Claude Code / OpenCode
+├── TEST-MODELES.md                  ← Cheat-sheet : tester un nouveau modèle open-weight via OpenRouter + OpenCode
 ├── design/
 │   ├── design.md                    ← Charte graphique (Brand Guide) à remplir pour le client
 │   └── instructions-maquette.md     ← Instructions de maquettage (écrans, navigation, règles UX)
@@ -343,3 +345,9 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 ## Concepts IA - glossaire et fondamentaux
 
 Voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) : glossaire LLM/agents IA (harness, tokens, contexte, RAG, MCP, choix de modèle) avec exemples concrets.
+
+---
+
+## Atelier - tester un nouveau modèle open-weight
+
+Voir [`TEST-MODELES.md`](./TEST-MODELES.md) : méthode rapide pour tester un modèle open-weight qui vient de sortir (Kimi, Command R+, Qwen, DeepSeek...) avec OpenCode comme harnais - via OpenRouter (cloud, sans GPU) ou Ollama (local, avec GPU).
