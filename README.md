@@ -32,11 +32,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
 
 ## Stack cible
 
-- **Backend** : Node.js · Express · TypeScript · PostgreSQL (`pg`) · Zod · Vitest · Winston
-- **Frontend** : React · Vite · TypeScript · React Router · Zod
-- **Structure** : Monorepo `backend/` + `frontend/`
-- **Auth** : JWT (httpOnly cookie)
-- **MCP** : Context7 pour la documentation des librairies
+Node.js/Express/TypeScript/PostgreSQL + React/Vite, monorepo `backend/`+`frontend/`. Détail complet (commandes, architecture, conventions) dans [`.claude/AGENTS.md`](./.claude/AGENTS.md) — c'est la source de vérité, pas ce README.
 
 ---
 
@@ -56,37 +52,21 @@ agentic-workflow-files/
 │   ├── settings.json                ← Permissions MCP (Context7) + prefs
 │   ├── agents/
 │   │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
-│   ├── commands/
-│   │   ├── ai-news.md                ← /ai-news        : briefing IA quotidien
-│   │   ├── learn.md                  ← /learn          : cours express de 10 min sur un sujet dev précis
-│   │   └── pulse.md                  ← /pulse          : config des status bars (plugin claude-pulse)
-│   └── skills/
-│       ├── stack-review.md          ← /stack-review  : revue de code (sécu/qualité stack maison)
-│       ├── debug.md                 ← /debug         : débogage structuré
-│       ├── refactor.md              ← /refactor      : refacto sécurisé
-│       ├── add-entity.md            ← /add-entity    : création d'entité full-stack
-│       ├── write-tests.md           ← /write-tests   : rédaction de tests Vitest
-│       ├── security-audit.md        ← /security-audit: audit sécurité OWASP
-│       ├── prep.md                  ← /prep          : préparation d'une tâche complexe → SPEC.md
-│       ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
-│       ├── roast.md                 ← /roast          : revue de code sans complaisance, façon senior
-│       └── competitor-benchmark.md  ← /competitor-benchmark : benchmark d'une app concurrente vs le projet
+│   ├── commands/                    ← /ai-news, /learn, /pulse (voir Skills disponibles)
+│   └── skills/                      ← /stack-review, /debug, /refactor, /add-entity, /write-tests,
+│                                       /security-audit, /prep, /prep-check, /roast, /competitor-benchmark
+│                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
     └── AGENTS.md                    ← même contenu que .claude/AGENTS.md (symlinké entre les deux en réel)
 ```
 
-Chaque projet (`radar`, etc.) garde ensuite son **propre** `CLAUDE.md` à la racine, écrit à la main, avec uniquement ses détails spécifiques (entités, schéma DB, patterns métier) — pas ces guidelines générales, déjà chargées globalement.
+Chaque projet garde ensuite son propre `CLAUDE.md` — voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet).
 
 ---
 
 ## `CLAUDE.md` vs `AGENTS.md`
 
-- **Que Claude Code** → `CLAUDE.md`.
-- **Autre outil** (Cursor, Codex CLI...) ou plusieurs outils → [`AGENTS.md`](https://agents.md/).
-- **Les deux** → `CLAUDE.md` qui importe `AGENTS.md` (c'est le cas ici, Claude Code ne lit pas `AGENTS.md` tout seul) :
-    ```markdown
-    @AGENTS.md
-    ```
+Ce repo utilise les deux (`CLAUDE.md` → `@AGENTS.md`) pour rester lisible par Claude Code et par tout outil compatible [AGENTS.md](https://agents.md/) (OpenCode...). Explication complète (pourquoi, précédence, symlink vs import) dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#le-fichier-dinstructions-racine--claudemd-et-agentsmd).
 
 ---
 
@@ -109,7 +89,7 @@ Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/age
 
 ### Démarrer un nouveau projet de code
 
-Un nouveau projet n'a besoin que de son **propre** `CLAUDE.md` à la racine (créé à la main), avec uniquement ses détails spécifiques — stack si elle diverge du défaut, entités, schéma DB, variables d'env, patterns métier. Les guidelines générales (déjà dans `~/.claude/AGENTS.md`) n'ont pas à y être répétées.
+Un nouveau projet n'a besoin que de son propre `CLAUDE.md` — voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet) plus bas.
 
 ---
 

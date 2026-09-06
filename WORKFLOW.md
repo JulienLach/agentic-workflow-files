@@ -2,7 +2,7 @@
 
 Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**, avec **Claude Code** comme hub central (contexte, plugins, skills, agents), le **CLI Obsidian** et **`gh` CLI**.
 
-Il complète le `AGENTS.md` (conventions de code) et le `README.md` (setup des skills/MCP) de ce repo : ceux-ci décrivent _comment coder_, celui-ci décrit _comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi_.
+Il complète le `AGENTS.md` global (guidelines de dev communes) + le `CLAUDE.md` du projet (spécificités) et le `README.md` de ce repo (setup des skills/MCP) : ceux-ci décrivent _comment coder_, celui-ci décrit _comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi_.
 
 ---
 
@@ -121,16 +121,9 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / A
 
 Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatre briques :
 
-- **Fichiers de contexte** (`AGENTS.md` du repo concerné) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
+- **Fichiers de contexte** (`AGENTS.md` global + `CLAUDE.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
 - **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable — voir étape 4 pour la vérification des changements UI).
-- **Skills** (`.claude/skills/*.md` de ce repo) → invoqués à la demande selon le besoin :
-
-    | Catégorie       | Skills                                         |
-    | --------------- | ---------------------------------------------- |
-    | Préparation     | `/prep`, `/prep-check`                         |
-    | Review          | `/stack-review`                                |
-    | Débug           | `/debug`                                       |
-    | Qualité du code | `/refactor`, `/write-tests`, `/security-audit`, `/roast` |
+- **Skills** (`.claude/skills/*.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` — à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
 
 - **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
     - `Plan` — agent intégré à Claude Code pour concevoir des plans d'implémentation.
@@ -161,20 +154,13 @@ Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et l
     ```
     Une fois `/prep-check` au vert, entrer en mode plan (agent `Plan`, section 3) : le plan se construit à partir de `SPEC.md`, pas de la mémoire de la conversation — utile aussi pour repartir sur une session neuve rien que pour l'implémentation (section « Hygiène de contexte » ci-dessus). Pour une tâche simple, passer directement à l'étape suivante.
 
-2. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` :
-
-    | Préfixe                     | Usage                                   |
-    | --------------------------- | --------------------------------------- |
-    | `feat/nom-de-la-feature`    | Nouvelle fonctionnalité                 |
-    | `fix/description-du-bug`    | Correction de bug                       |
-    | `chore/tâche-technique`     | Tâche technique (deps, config, CI)      |
-    | `refactor/scope-du-refacto` | Refacto sans changement de comportement |
+2. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` (section Conventions Git) :
 
     ```bash
     git checkout -b feat/nom-de-la-feature
     ```
 
-3. Implémenter en suivant le `AGENTS.md` du repo concerné (stack, conventions, tests).
+3. Implémenter en suivant `AGENTS.md` (stack, conventions, tests) et le `CLAUDE.md` du projet (spécificités).
 4. Vérifier avant de committer : tests, lint, exécution locale — et pour tout changement **UI/frontend**, passage réel dans un navigateur via le **MCP Playwright** (parcours nominal + cas limites, pas seulement la compilation/les tests unitaires qui ne garantissent pas le comportement visuel).
 
 ---
@@ -186,23 +172,7 @@ Pas de hook configuré sur ce repo : le commit/changelog/push n'est **pas automa
 - **À la main** : tu tapes toi-même les commandes `git`/`gh`.
 - **Via prompt à Claude** : tu demandes « commit et push cette modif » et Claude exécute les mêmes commandes, en respectant les règles ci-dessous.
 
-Les règles de commit sont **celles définies dans `AGENTS.md`** — que ce soit toi ou Claude qui committe, ce sont les mêmes :
-
-- **Format (Conventional Commits)** : `type(scope): description courte`
-
-    | Type       | Usage                                   |
-    | ---------- | --------------------------------------- |
-    | `feat`     | Nouvelle fonctionnalité                 |
-    | `fix`      | Correction de bug                       |
-    | `refactor` | Refacto sans changement de comportement |
-    | `test`     | Ajout ou modification de tests          |
-    | `chore`    | Tâche technique (deps, config, CI)      |
-    | `docs`     | Documentation uniquement                |
-    | `perf`     | Amélioration de performance             |
-
-- **Message en anglais** (convention standard open source) — même si le reste des échanges avec Claude se fait en français.
-- **Une seule responsabilité par commit** — ne pas mélanger un `feat` et un `fix` dans le même commit.
-- **Jamais de ligne `Co-Authored-By: Claude`** dans le message — c'est le comportement par défaut de certains outils Git assistés par IA, il doit être explicitement désactivé ici.
+Les règles de commit sont **celles définies dans `AGENTS.md`** (section Conventions Git — format Conventional Commits, message en anglais, une responsabilité par commit, jamais de `Co-Authored-By: Claude`) — que ce soit toi ou Claude qui committe, ce sont les mêmes.
 
 ```bash
 git add <fichiers>
@@ -245,11 +215,7 @@ Avant de repartir de zéro sur un nouvel environnement, vérifier d'abord si `~/
 
 Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait la revue lui-même**, assisté par Claude Code, avant de merger. Ne pas sauter cette étape sous prétexte d'être seul sur le projet — c'est justement ce qui remplace la revue par les pairs.
 
-1. Lancer une revue automatisée sur la branche de la PR :
-    ```bash
-    /code-review
-    ```
-    (vérifie la conformité au `AGENTS.md`, les bugs potentiels, la sécurité — voir la section Plugins du `README.md`)
+1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code — bugs, cohérence, sécurité). Envie d'une revue multi-agents plus poussée (conformité `AGENTS.md`, contexte git, commentaires PR) ? Installer le [plugin officiel Anthropic](./README.md#plugins), pas installé par défaut.
 2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits — pas d'amend sur un commit déjà pushé sans raison explicite).
 3. Relire soi-même le diff final (`gh pr diff` ou l'interface GitHub) avant de merger.
 4. Merger :
