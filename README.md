@@ -245,6 +245,10 @@ Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-I
 
 > Le champ `memory: project` dans le frontmatter (utilisé par `obsidian-expert`) active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale - une particularité Claude Code non couverte dans le glossaire général.
 
+**Vs les skills `obsidian:*`** : les skills sont la mécanique (lire/écrire le vault via le CLI) ; l'agent est le jugement + la mémoire persistante propre au vault (conventions, structure) au-dessus, dans un contexte isolé.
+
+**Invoquer** : auto (Claude route si la tâche correspond) ou explicite - *"utilise l'agent obsidian-expert pour..."* force l'agent plutôt qu'un skill.
+
 ---
 
 ## Design - maquette client avant le code
