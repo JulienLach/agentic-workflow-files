@@ -1,12 +1,22 @@
-# AGENTS.md
+# AGENTS.md — scope utilisateur (global)
 
-Ce fichier fournit les instructions à Claude Code (claude.ai/code) et à tout autre outil agentique compatible avec le standard [AGENTS.md](https://agents.md/) pour travailler sur ce dépôt.
+Ce fichier fournit à Claude Code (et tout autre outil compatible [AGENTS.md](https://agents.md/)) les guidelines de développement **communes à tous mes projets** — stack par défaut, conventions, sécurité, qualité, git. Il est chargé automatiquement dans **toutes** les sessions, quel que soit le projet ouvert (via `~/.claude/CLAUDE.md` → `@AGENTS.md`).
 
-> **Note** : Ce fichier est un template transversal pour tous les projets TypeScript / Node.js / React / PostgreSQL. Remplis la section **[Contexte projet]** en bas avec les détails spécifiques à ton application pour donner à Claude le contexte nécessaire pour répondre précisément à tes questions et implémenter les fonctionnalités.
+Chaque projet a en plus son **propre** `CLAUDE.md`/`AGENTS.md` à la racine, écrit à la main, qui ne contient QUE les détails spécifiques à ce projet (entités, schéma DB, variables d'env, patterns métier) — pas ces guidelines générales, qui n'ont pas à être répétées par projet.
 
 ---
 
-## Stack technique
+## Mise à jour des skills/agents/commandes
+
+Les skills, agents et commandes transverses à tous les projets vivent dans `~/.claude/` (`skills/`, `agents/`, `commands/`, `settings.json`) — c'est la source de vérité, chargée automatiquement dans toutes les sessions, quel que soit le projet ouvert.
+
+- Si on demande de mettre à jour/corriger un skill, un agent ou une commande depuis une session ouverte dans un projet, éditer le fichier dans `~/.claude/`, pas une éventuelle copie locale dans `<projet>/.claude/`.
+- Vérifier qu'il n'existe pas de fichier de même nom en local au projet avant de conclure que l'édition globale suffit (un `.claude/` local prendrait le dessus sur le global).
+- Une copie de sauvegarde existe dans `~/Documents/agentic-workflow-files/.claude/` (clonée sur d'autres machines pour versioning) — ce n'est **pas** une source lue par le harnais, juste un backup. Si demandé, reporter le même changement là aussi (copie simple, pas de symlink entre les deux).
+
+---
+
+## Stack technique par défaut
 
 - **Backend** : Node.js, Express, TypeScript, PostgreSQL (`pg` raw SQL), Zod, Vitest, Winston
 - **Frontend** : React, Vite, TypeScript, React Router, Zod, Chart.js
@@ -44,7 +54,7 @@ npm run preview      # Prévisualisation du build
 ```bash
 cd frontend && npm install
 cd ../backend && npm install
-# Configurer PostgreSQL et créer le fichier .env (voir README.md)
+# Configurer PostgreSQL et créer le fichier .env (voir README.md du projet)
 ```
 
 ---
@@ -103,8 +113,8 @@ frontend/src/
 
 ### Protection IDOR
 
-- Les endpoints GET par ID vérifient toujours que la ressource appartient à l'utilisateur courant
-- Retourner 404 (pas 403) si la ressource n'appartient pas à l'utilisateur courant
+- Les endpoints GET par ID vérifient toujours que la ressource appartient à l'utilisateur/contexte courant
+- Retourner 404 (pas 403) si la ressource n'appartient pas à l'utilisateur/contexte courant
 
 ### Validation
 
@@ -185,7 +195,7 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 - **SQL injection** : toujours utiliser des requêtes paramétrées (`$1, $2, ...`)
 - **XSS** : tous les inputs passent par `sanitizeInputs` middleware (DOMPurify via jsdom)
 - **Auth** : `authenticateToken` présent sur toutes les routes protégées
-- **IDOR** : vérifier que la ressource appartient à l'utilisateur dans toutes les requêtes GET par ID
+- **IDOR** : vérifier que la ressource appartient à l'utilisateur/contexte dans toutes les requêtes GET par ID
 - **Données sensibles** : jamais de tokens, mots de passe, ou clés dans les logs ou réponses
 - **Mots de passe** : hachage scrypt via `utils/password.ts` (`hashPassword` / `verifyPassword`)
 - **Rate limiting** : sur `/login` via express-rate-limit
@@ -205,9 +215,9 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 
 ## Hooks recommandés
 
-Le `AGENTS.md`/les instructions ci-dessus sont **conseillés** — Claude peut les zapper si le contexte est chargé. Pour ce qui doit arriver **à chaque fois sans exception** (typecheck backend, lint frontend), un hook `PostToolUse` est déterministe là où une instruction ne l'est pas.
+Ces guidelines sont **conseillées** — Claude peut les zapper si le contexte est chargé. Pour ce qui doit arriver **à chaque fois sans exception** (typecheck backend, lint frontend), un hook `PostToolUse` (dans le `.claude/settings.json` **du projet**, pas ici) est déterministe là où une instruction ne l'est pas.
 
-Exemple pour ce template (`.claude/settings.json`), à adapter au projet réel :
+Exemple à adapter au projet réel :
 
 ```json
 {
@@ -235,9 +245,9 @@ Exemple pour ce template (`.claude/settings.json`), à adapter au projet réel :
 }
 ```
 
-- `matcher` filtre sur l'outil (`Edit`/`Write`), `if` filtre en plus sur le chemin du fichier touché — donc le typecheck backend ne se déclenche pas sur un edit frontend, et inversement.
-- Vérifier le comportement avec `/hooks` après mise en place (le code de sortie exact qui remonte l'échec à Claude peut varier selon la version — ne pas supposer que ça bloque sans l'avoir testé une fois).
-- Ne pas dupliquer dans un hook ce qu'un test d'intégration vérifie déjà mieux — le hook est là pour le "jamais oublié", pas pour remplacer la suite de tests.
+- `matcher` filtre sur l'outil (`Edit`/`Write`), `if` filtre en plus sur le chemin du fichier touché.
+- Vérifier le comportement avec `/hooks` après mise en place (le code de sortie exact qui remonte l'échec à Claude peut varier selon la version).
+- Ne pas dupliquer dans un hook ce qu'un test d'intégration vérifie déjà mieux.
 
 ---
 
@@ -314,26 +324,6 @@ refactor/scope-du-refacto
 
 ---
 
-## [Contexte projet]
+## Contexte projet
 
-> Remplace cette section par les informations spécifiques à ton projet.
-
-### Vue d'ensemble
-
-<!-- Décris le projet : domaine métier, logique métier utilisateurs cibles, fonctionnalité principale -->
-
-### Entités principales
-
-<!-- Liste les entités clés et leurs relations -->
-
-### Variables d'environnement
-
-<!-- Liste les variables .env requises -->
-
-### Commandes spécifiques
-
-<!-- Commandes de build, migration -->
-
-### Patterns spécifiques
-
-<!-- Règles métier, conventions ou décisions d'architecture propres à ce projet -->
+Ce fichier est global — il ne contient volontairement **aucun détail de projet spécifique** (entités, schéma DB, business rules). Ces détails vivent dans le `CLAUDE.md`/`AGENTS.md` à la racine du projet en cours, écrit à la main pour ce projet précis.

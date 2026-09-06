@@ -2,7 +2,7 @@
 
 Ressources Claude Code transversales pour les projets **TypeScript / Node.js / React / PostgreSQL**.
 
-Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour accélérer le développement sur toute la stack.
+Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en scope utilisateur (`~/.claude/`, `~/.config/opencode/`) — guidelines de dev communes, skills, agents, commandes. La vraie source de vérité vit dans ces dossiers globaux ; ce repo n'est lu par aucun harnais, il sert à versionner/cloner cette config sur d'autres machines. Voir [`STRUCTURE-AGNOSTIQUE.md`](./STRUCTURE-AGNOSTIQUE.md) pour le schéma complet.
 
 ---
 
@@ -45,31 +45,35 @@ Ce repo contient un `AGENTS.md` complet et des skills prêts à l'emploi pour ac
 
 ```
 agentic-workflow-files/
-├── AGENTS.md                        ← Instructions transversales (standard agents.md)
-├── CLAUDE.md                        ← Import `@AGENTS.md` — requis pour que Claude Code charge AGENTS.md
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
+├── STRUCTURE-AGNOSTIQUE.md          ← Schéma de la centralisation Claude Code / OpenCode
 ├── design/
 │   ├── design.md                    ← Charte graphique (Brand Guide) à remplir pour le client
 │   └── instructions-maquette.md     ← Instructions de maquettage (écrans, navigation, règles UX)
-└── .claude/
-    ├── settings.json                ← Permissions MCP (Context7)
-    ├── agents/
-    │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
-    └── skills/
-        ├── code-review.md           ← /code-review  : revue de code
-        ├── debug.md                 ← /debug         : débogage structuré
-        ├── refactor.md              ← /refactor      : refacto sécurisé
-        ├── add-entity.md            ← /add-entity    : création d'entité full-stack
-        ├── write-tests.md           ← /write-tests   : rédaction de tests Vitest
-        ├── security-audit.md        ← /security-audit: audit sécurité OWASP
-        ├── prep.md                  ← /prep          : préparation d'une tâche complexe avant le plan
-        ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
-        ├── roast.md                 ← /roast          : revue de code sans complaisance, façon senior
-        ├── ai-news.md               ← /ai-news        : briefing IA quotidien
-        ├── competitor-benchmark.md  ← /competitor-benchmark : benchmark d'une app concurrente vs le projet
-        └── learn.md                 ← /learn          : cours express de 10 min sur un sujet dev précis
+├── .claude/                         ← backup de ~/.claude/ (scope utilisateur Claude Code)
+│   ├── AGENTS.md                    ← Guidelines de dev communes à tous les projets (stack, conventions, sécurité, git)
+│   ├── CLAUDE.md                    ← Import `@AGENTS.md`
+│   ├── settings.json                ← Permissions MCP (Context7) + prefs
+│   ├── agents/
+│   │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
+│   ├── commands/                    ← ai-news, learn, pulse
+│   └── skills/
+│       ├── stack-review.md          ← /stack-review  : revue de code (sécu/qualité stack maison)
+│       ├── debug.md                 ← /debug         : débogage structuré
+│       ├── refactor.md              ← /refactor      : refacto sécurisé
+│       ├── add-entity.md            ← /add-entity    : création d'entité full-stack
+│       ├── write-tests.md           ← /write-tests   : rédaction de tests Vitest
+│       ├── security-audit.md        ← /security-audit: audit sécurité OWASP
+│       ├── prep.md                  ← /prep          : préparation d'une tâche complexe → SPEC.md
+│       ├── prep-check.md            ← /prep-check    : vérif de la prep avant d'entrer en mode plan
+│       ├── roast.md                 ← /roast          : revue de code sans complaisance, façon senior
+│       └── competitor-benchmark.md  ← /competitor-benchmark : benchmark d'une app concurrente vs le projet
+└── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
+    └── AGENTS.md                    ← même contenu que .claude/AGENTS.md (symlinké entre les deux en réel)
 ```
+
+Chaque projet (`radar`, etc.) garde ensuite son **propre** `CLAUDE.md` à la racine, écrit à la main, avec uniquement ses détails spécifiques (entités, schéma DB, patterns métier) — pas ces guidelines générales, déjà chargées globalement.
 
 ---
 
@@ -86,34 +90,24 @@ agentic-workflow-files/
 
 ## Installation
 
-### Option 1 — Copier les fichiers dans un projet existant
+Ce repo se clone une fois par machine, pour restaurer la config **scope utilisateur** (pas pour être copié dans chaque projet de code) :
 
 ```bash
-# Cloner ce repo
 git clone https://github.com/JulienLach/agentic-workflow-files.git
 
-# Copier l'AGENTS.md à la racine de ton projet
-cp agentic-workflow-files/AGENTS.md mon-projet/AGENTS.md
+# Restaurer la config Claude Code (scope utilisateur)
+cp -r agentic-workflow-files/.claude/* ~/.claude/
 
-# Copier le CLAUDE.md (import @AGENTS.md) — sans lui, Claude Code ne lit rien de tout ça
-cp agentic-workflow-files/CLAUDE.md mon-projet/CLAUDE.md
-
-# Copier la config Claude Code
-cp -r agentic-workflow-files/.claude mon-projet/.claude
-
-# Optionnel : copier le guide de workflow Sprint Obsidian → Code → PR
-cp agentic-workflow-files/WORKFLOW.md mon-projet/WORKFLOW.md
+# Restaurer la config OpenCode (scope utilisateur) — symlink, pas une copie
+mkdir -p ~/.config/opencode
+ln -sf ~/.claude/AGENTS.md ~/.config/opencode/AGENTS.md
 ```
 
-### Option 2 — Utiliser comme base d'un nouveau projet
+Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/agents/commandes sont disponibles automatiquement dans **tous** tes projets, sans rien copier dedans.
 
-```bash
-git clone https://github.com/JulienLach/agentic-workflow-files.git mon-projet
-cd mon-projet
-# Supprimer l'origine et rattacher à ton propre repo
-git remote remove origin
-git remote add origin https://github.com/<ton-nom-utilisateur>/mon-projet.git
-```
+### Démarrer un nouveau projet de code
+
+Un nouveau projet n'a besoin que de son **propre** `CLAUDE.md` à la racine (créé à la main), avec uniquement ses détails spécifiques — stack si elle diverge du défaut, entités, schéma DB, variables d'env, patterns métier. Les guidelines générales (déjà dans `~/.claude/AGENTS.md`) n'ont pas à y être répétées.
 
 ---
 
@@ -294,30 +288,32 @@ Voir [`WORKFLOW.md`](./WORKFLOW.md) : capture des tâches (Obsidian skills) → 
 
 ---
 
-## Personnaliser AGENTS.md pour le projet
+## Écrire le CLAUDE.md d'un projet
 
-Le `AGENTS.md` contient une section `## [Contexte projet]` en bas du fichier. Remplir avec les informations spécifiques de l'application :
+`~/.claude/AGENTS.md` (global) ne contient volontairement aucun détail de projet. Chaque projet a son propre `CLAUDE.md` à la racine, à écrire à la main, avec ce type de structure :
 
 ```markdown
-## [Contexte projet]
+# CLAUDE.md
 
-### Vue d'ensemble
+## Vue d'ensemble
 
 Application de gestion des congés pour PME. Utilisateurs : RH (admin) et employés.
 
-### Entités principales
+## Entités principales
 
 - users, leave_requests, leave_types, departments
 
-### Variables d'environnement
+## Variables d'environnement
 
 - DATABASE_URL, JWT_SECRET, SMTP_HOST, PORT
 
-### Patterns spécifiques
+## Patterns spécifiques
 
 - Les demandes de congé sont scopées par département (id_department)
 - Workflow d'approbation : pending → approved / rejected
 ```
+
+Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à être répétées ici — elles sont déjà chargées via `~/.claude/AGENTS.md`.
 
 ---
 
