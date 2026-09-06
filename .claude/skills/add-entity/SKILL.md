@@ -22,7 +22,7 @@ Avant de coder, clarifie :
 - La migration doit être **idempotente** (`CREATE TABLE IF NOT EXISTS`, `ADD COLUMN IF NOT EXISTS`)
 - Penser aux index sur les colonnes fréquemment filtrées (clés étrangères, colonnes de filtrage)
 
-## 3. Backend — dans cet ordre
+## 3. Backend - dans cet ordre
 
 ### `backend/data/EntityName.ts`
 - Classe avec méthodes statiques correspondant aux opérations CRUD
@@ -45,7 +45,7 @@ Avant de coder, clarifie :
 ### `backend/server.ts`
 - Enregistrer la nouvelle route : `app.use('/entity-name', entityNameRouter)`
 
-## 4. Frontend — dans cet ordre
+## 4. Frontend - dans cet ordre
 
 ### `frontend/src/services/api.ts`
 - Ajouter toutes les fonctions d'appel API pour cette entité
@@ -63,8 +63,8 @@ Avant de coder, clarifie :
 - Gestion des états : loading, error, success
 
 ### `frontend/src/pages/EntityNamePage/`
-- `EntityNameListPage.tsx` — liste avec recherche/filtre si pertinent
-- `EntityNameDetailPage.tsx` — détail et actions (optionnel selon le besoin)
+- `EntityNameListPage.tsx` - liste avec recherche/filtre si pertinent
+- `EntityNameDetailPage.tsx` - détail et actions (optionnel selon le besoin)
 
 ### `frontend/src/App.tsx`
 - Ajouter les routes React Router pour les nouvelles pages

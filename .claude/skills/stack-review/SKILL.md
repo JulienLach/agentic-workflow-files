@@ -23,7 +23,7 @@ Analyse le code selon ces axes dans cet ordre :
 - Pas de code mort ou commenté
 - Nommage clair et cohérent avec le reste du projet
 - Pas de `console.log` oubliés (utiliser le logger configuré côté backend)
-- Pas de nombres magiques — constantes nommées
+- Pas de nombres magiques - constantes nommées
 - Async/await utilisé correctement (pas de `.then()` imbriqués inutiles)
 
 ## 3. Cohérence avec l'architecture

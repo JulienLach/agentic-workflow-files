@@ -37,7 +37,7 @@ Trace le flux d'exécution selon l'architecture :
 ## 4. Correction
 
 - Propose la **correction minimale** qui résout le problème sans effet de bord
-- Explique **pourquoi** ça corrige le bug (ton pédagogique — comprendre, pas juste corriger)
+- Explique **pourquoi** ça corrige le bug (ton pédagogique - comprendre, pas juste corriger)
 - Si la correction touche des données ou une migration SQL, signaler clairement le risque et prévoir un rollback
 - Ne pas refactorer du code hors du périmètre du bug
 

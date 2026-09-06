@@ -57,7 +57,7 @@ Analyse méthodiquement chaque vecteur d'attaque ci-dessous, structuré selon l'
 - Le middleware `authenticateToken` est-il appliqué sur toutes les routes protégées ?
 - Le JWT est-il vérifié (signature + expiration) à chaque requête ?
 - Les tokens sont-ils stockés de façon sécurisée (httpOnly cookie côté client) ?
-- Le cookie JWT a-t-il l'attribut `SameSite` (Strict/Lax) ? Sans lui, un cookie httpOnly reste vulnérable au CSRF — le navigateur l'envoie automatiquement sur une requête cross-site.
+- Le cookie JWT a-t-il l'attribut `SameSite` (Strict/Lax) ? Sans lui, un cookie httpOnly reste vulnérable au CSRF - le navigateur l'envoie automatiquement sur une requête cross-site.
 - Le rate limiting est-il en place sur `/login` pour empêcher le brute-force ?
 - Les tokens expirés/révoqués sont-ils correctement rejetés ?
 
@@ -73,11 +73,11 @@ Analyse méthodiquement chaque vecteur d'attaque ci-dessous, structuré selon l'
 - Les logs contiennent-ils assez de contexte (timestamp, user_id, route) pour investiguer un incident, sans jamais inclure de données personnelles ou de secrets ?
 - Existe-t-il un moyen de détecter une activité anormale (plusieurs échecs de login, pic de 403) ?
 
-## 10. Server-Side Request Forgery — SSRF (A10)
+## 10. Server-Side Request Forgery - SSRF (A10)
 
 - L'application effectue-t-elle des requêtes sortantes basées sur une URL fournie par l'utilisateur (webhook, proxy d'image, fetch de lien) ?
 - Si oui, la destination est-elle validée par whitelist (pas de résolution vers `localhost`, IP privées, métadonnées cloud) ?
-- Ne s'applique que si l'app a ce type de fonctionnalité — l'indiquer explicitement si absent plutôt que de l'ignorer silencieusement.
+- Ne s'applique que si l'app a ce type de fonctionnalité - l'indiquer explicitement si absent plutôt que de l'ignorer silencieusement.
 
 ## Format de réponse
 

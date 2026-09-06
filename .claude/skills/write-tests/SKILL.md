@@ -22,7 +22,7 @@ Avant d'écrire les tests, identifie :
 
 ### Tests d'intégration (routes, data models avec DB)
 - Tester le flux complet : requête HTTP → réponse
-- **Ne pas mocker la base de données** — tester contre une vraie DB de test
+- **Ne pas mocker la base de données** - tester contre une vraie DB de test
 - Nettoyer les données de test avant/après chaque test (`beforeEach` / `afterEach`)
 - Tester les codes HTTP retournés (200, 201, 400, 401, 403, 404, 500)
 

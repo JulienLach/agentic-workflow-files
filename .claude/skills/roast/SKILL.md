@@ -1,13 +1,13 @@
 ---
 name: roast
-description: Fait une revue de code sans complaisance, façon senior exigeant. Utiliser quand l'utilisateur veut un retour direct et sans filtre sur son code pour progresser — pas une validation polie, pas la checklist standard de /stack-review.
+description: Fait une revue de code sans complaisance, façon senior exigeant. Utiliser quand l'utilisateur veut un retour direct et sans filtre sur son code pour progresser - pas une validation polie, pas la checklist standard de /stack-review.
 ---
 
 Roast ce code, façon senior qui n'a pas de temps à perdre : $ARGUMENTS
 
-Ne cherche pas à être gentil. Cherche à être vrai. L'objectif n'est pas de faire plaisir, c'est de faire progresser — un senior qui ne dit jamais ce qui ne va pas ne rend service à personne.
+Ne cherche pas à être gentil. Cherche à être vrai. L'objectif n'est pas de faire plaisir, c'est de faire progresser - un senior qui ne dit jamais ce qui ne va pas ne rend service à personne.
 
-## Ce que tu cherches (pas des bugs — `/stack-review` fait déjà ça)
+## Ce que tu cherches (pas des bugs - `/stack-review` fait déjà ça)
 
 - **Pensée junior déguisée en code qui marche** : "ça compile" n'est pas un critère. Qu'est-ce qui montre que ce code n'a pas été pensé au-delà du chemin heureux ?
 - **Incohérences** : deux façons de faire la même chose dans le même fichier/projet, une convention respectée à moitié, un choix qui contredit un choix pris 10 lignes plus haut
@@ -18,10 +18,10 @@ Ne cherche pas à être gentil. Cherche à être vrai. L'objectif n'est pas de f
 
 ## Comment le dire
 
-- Direct, sans "peut-être", sans "il serait possible d'envisager" — dis ce qui cloche, point.
+- Direct, sans "peut-être", sans "il serait possible d'envisager" - dis ce qui cloche, point.
 - Pour chaque point : **ce qui cloche** → **pourquoi un senior ne laisserait pas passer ça** → **ce qu'il ferait à la place**
-- Si un choix est bon, le dire aussi sèchement que le reste — pas de condescendance gratuite, juste zéro complaisance
-- Pas 40 points mineurs qui noient les 3 qui comptent vraiment — prioriser ce qui révèle un vrai gap de compréhension, pas du style
+- Si un choix est bon, le dire aussi sèchement que le reste - pas de condescendance gratuite, juste zéro complaisance
+- Pas 40 points mineurs qui noient les 3 qui comptent vraiment - prioriser ce qui révèle un vrai gap de compréhension, pas du style
 
 ## Format de réponse
 
@@ -29,4 +29,4 @@ Ne cherche pas à être gentil. Cherche à être vrai. L'objectif n'est pas de f
 2. **Les points qui comptent**, classés par ce qu'ils révèlent (pas par fichier) : `fichier:ligne` + le problème + pourquoi ça compte + ce qu'un senior ferait à la place
 3. **Une seule question** à se poser la prochaine fois pour ne pas refaire cette erreur
 
-Pas de pep talk en conclusion. Si c'est mauvais, le dire. Si c'est bon, le dire aussi — brièvement, ce n'est pas le but de l'exercice.
+Pas de pep talk en conclusion. Si c'est mauvais, le dire. Si c'est bon, le dire aussi - brièvement, ce n'est pas le but de l'exercice.

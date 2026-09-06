@@ -5,7 +5,7 @@ description: Guide un refacto structuré et sécurisé. Utiliser quand l'utilisa
 
 Aide-moi à refactorer : $ARGUMENTS
 
-Procède dans cet ordre strict — ne touche jamais au code sans avoir complété les étapes précédentes.
+Procède dans cet ordre strict - ne touche jamais au code sans avoir complété les étapes précédentes.
 
 ## 1. Analyse du code existant
 
@@ -42,7 +42,7 @@ Attendre validation avant de continuer.
 
 - Appliquer le refacto **une étape à la fois**
 - Après chaque étape significative, vérifier que le code compile (`npm run build`)
-- Ne jamais mélanger refacto et correction de bug dans le même changement — si un bug est découvert en route, le signaler séparément
+- Ne jamais mélanger refacto et correction de bug dans le même changement - si un bug est découvert en route, le signaler séparément
 
 ## 5. Vérification finale
 

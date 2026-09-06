@@ -2,7 +2,7 @@
 
 Ressources Claude Code transversales pour les projets **TypeScript / Node.js / React / PostgreSQL**.
 
-Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en scope utilisateur (`~/.claude/`, `~/.config/opencode/`) — guidelines de dev communes, skills, agents, commandes. La vraie source de vérité vit dans ces dossiers globaux ; ce repo n'est lu par aucun harnais, il sert à versionner/cloner cette config sur d'autres machines. Voir [`STRUCTURE-AGNOSTIQUE.md`](./STRUCTURE-AGNOSTIQUE.md) pour le schéma complet.
+Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en scope utilisateur (`~/.claude/`, `~/.config/opencode/`) - guidelines de dev communes, skills, agents, commandes. La vraie source de vérité vit dans ces dossiers globaux ; ce repo n'est lu par aucun harnais, il sert à versionner/cloner cette config sur d'autres machines. Voir [`STRUCTURE-AGNOSTIQUE.md`](./STRUCTURE-AGNOSTIQUE.md) pour le schéma complet.
 
 ---
 
@@ -15,24 +15,24 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
     - [Démarrer un nouveau projet de code](#démarrer-un-nouveau-projet-de-code)
 - [Configuration](#configuration)
     - [Prérequis](#prérequis)
-    - [Skills vs MCP vs Plugins — quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
+    - [Skills vs MCP vs Plugins - quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
     - [Plugins](#plugins)
-    - [`skills.sh` — installer des skills externes via CLI](#skillssh--installer-des-skills-externes-via-cli)
-    - [MCP (Model Context Protocol) — outils externes](#mcp-model-context-protocol--outils-externes)
-    - [Context7 — documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
-    - [Obsidian skills — gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
+    - [`skills.sh` - installer des skills externes via CLI](#skillssh--installer-des-skills-externes-via-cli)
+    - [MCP (Model Context Protocol) - outils externes](#mcp-model-context-protocol--outils-externes)
+    - [Context7 - documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
+    - [Obsidian skills - gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
     - [Agents personnalisés](#agents-personnalisés)
-- [Design — maquette client avant le code](#design--maquette-client-avant-le-code)
+- [Design - maquette client avant le code](#design--maquette-client-avant-le-code)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet)
 - [Skills disponibles](#skills-disponibles)
-- [Concepts IA — glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
+- [Concepts IA - glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
 
 ---
 
 ## Stack cible
 
-Node.js/Express/TypeScript/PostgreSQL + React/Vite, monorepo `backend/`+`frontend/`. Détail complet (commandes, architecture, conventions) dans [`.claude/AGENTS.md`](./.claude/AGENTS.md) — c'est la source de vérité, pas ce README.
+Node.js/Express/TypeScript/PostgreSQL + React/Vite, monorepo `backend/`+`frontend/`. Détail complet (commandes, architecture, conventions) dans [`.claude/AGENTS.md`](./.claude/AGENTS.md) - c'est la source de vérité, pas ce README.
 
 ---
 
@@ -52,15 +52,16 @@ agentic-workflow-files/
 │   ├── settings.json                ← Permissions MCP (Context7) + prefs
 │   ├── agents/
 │   │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
-│   ├── commands/                    ← /ai-news, /learn, /pulse (voir Skills disponibles)
-│   └── skills/                      ← /stack-review, /debug, /refactor, /add-entity, /write-tests,
-│                                       /security-audit, /prep, /prep-check, /roast, /competitor-benchmark
+│   ├── commands/                    ← /ai-news, /learn, /pulse (fichier plat, format legacy)
+│   └── skills/                      ← un sous-dossier par skill, `<nom>/SKILL.md` (format requis) :
+│                                       stack-review, debug, refactor, add-entity, write-tests,
+│                                       security-audit, prep, prep-check, roast, competitor-benchmark
 │                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
     └── AGENTS.md                    ← même contenu que .claude/AGENTS.md (symlinké entre les deux en réel)
 ```
 
-Chaque projet garde ensuite son propre `CLAUDE.md` — voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet).
+Chaque projet garde ensuite son propre `CLAUDE.md` - voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet).
 
 ---
 
@@ -80,7 +81,7 @@ git clone https://github.com/JulienLach/agentic-workflow-files.git
 # Restaurer la config Claude Code (scope utilisateur)
 cp -r agentic-workflow-files/.claude/* ~/.claude/
 
-# Restaurer la config OpenCode (scope utilisateur) — symlink, pas une copie
+# Restaurer la config OpenCode (scope utilisateur) - symlink, pas une copie
 mkdir -p ~/.config/opencode
 ln -sf ~/.claude/AGENTS.md ~/.config/opencode/AGENTS.md
 ```
@@ -89,7 +90,7 @@ Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/age
 
 ### Démarrer un nouveau projet de code
 
-Un nouveau projet n'a besoin que de son propre `CLAUDE.md` — voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet) plus bas.
+Un nouveau projet n'a besoin que de son propre `CLAUDE.md` - voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet) plus bas.
 
 ---
 
@@ -100,9 +101,9 @@ Un nouveau projet n'a besoin que de son propre `CLAUDE.md` — voir [Écrire le 
 - [Claude Code CLI](https://code.claude.com/docs) installé
 - MCP Context7 configuré (voir ci-dessous)
 
-### Skills vs MCP vs Plugins — quelle différence ?
+### Skills vs MCP vs Plugins - quelle différence ?
 
-Pour ce que sont ces mécanismes conceptuellement, voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#skills-plugins-et-subagents) et [`MCP vs Skill — quand choisir quoi`](./CONCEPTS-IA.md#mcp-vs-skill--quand-choisir-quoi). Ici, juste l'essentiel pratique pour ce repo :
+Pour ce que sont ces mécanismes conceptuellement, voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#skills-plugins-et-subagents) et [`MCP vs Skill - quand choisir quoi`](./CONCEPTS-IA.md#mcp-vs-skill--quand-choisir-quoi). Ici, juste l'essentiel pratique pour ce repo :
 
 |               | **Skills**              | **MCP**                     | **Plugins**               | **Agents**                         |
 | ------------- | ----------------------- | --------------------------- | ------------------------- | ---------------------------------- |
@@ -124,7 +125,7 @@ claude plugin install https://claude.com/plugins/code-review
 /code-review   # sur une branche avec une PR ouverte
 ```
 
-> Le skill `stack-review.md` de ce repo a été renommé (depuis `code-review.md`) précisément pour ne pas entrer en collision avec ce plugin — les deux coexistent sans problème : `/code-review` (natif Claude Code / ce plugin, revue de diff générique) et `/stack-review` (checklist sécu/qualité propre à la stack de ce repo).
+> Le skill `stack-review.md` de ce repo a été renommé (depuis `code-review.md`) précisément pour ne pas entrer en collision avec ce plugin - les deux coexistent sans problème : `/code-review` (natif Claude Code / ce plugin, revue de diff générique) et `/stack-review` (checklist sécu/qualité propre à la stack de ce repo).
 
 ---
 
@@ -143,11 +144,11 @@ claude plugin install https://claude.com/plugins/superpowers
 | `/debugging`       | Débogage en 4 phases, revue archi auto après 3 échecs      |
 | `/skill-authoring` | Créer/tester de nouveaux skills (TDD)                      |
 
-> Déclenchement auto : le skill méta `using-superpowers` (hook `SessionStart`) active `systematic-debugging` sans commande explicite dès qu'un bug/test cassé apparaît — à ne pas confondre avec le skill `/debug` de ce repo, complémentaire.
+> Déclenchement auto : le skill méta `using-superpowers` (hook `SessionStart`) active `systematic-debugging` sans commande explicite dès qu'un bug/test cassé apparaît - à ne pas confondre avec le skill `/debug` de ce repo, complémentaire.
 
 ---
 
-### `skills.sh` — installer des skills externes via CLI
+### `skills.sh` - installer des skills externes via CLI
 
 Registre/CLI dédié aux skills seuls (pas de MCP/hooks embarqués comme un plugin), open source, maintenu par Vercel Labs, sans install globale (`npx`).
 
@@ -167,7 +168,7 @@ Options : `-g` (global, `~/.claude/skills/`) · `-a <agent>` (cible un harness p
 
 ---
 
-### MCP (Model Context Protocol) — outils externes
+### MCP (Model Context Protocol) - outils externes
 
 Concept détaillé dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#mcp-model-context-protocol). Côté pratique : un MCP s'installe via CLI et peut être configuré **globalement** (tous tes projets) ou **par projet** (dans `.claude/`).
 
@@ -190,7 +191,7 @@ claude mcp remove <nom>
 
 ---
 
-### Context7 — documentation des librairies en temps réel
+### Context7 - documentation des librairies en temps réel
 
 Doc à jour des librairies (Express, React, Zod, Vitest, pg...) directement en conversation.
 
@@ -214,7 +215,7 @@ Utilisé automatiquement par Claude, ou explicitement : `Utilise context7 pour..
 
 ---
 
-### Obsidian skills — gestion des notes de projet
+### Obsidian skills - gestion des notes de projet
 
 Pas de MCP Obsidian : la gestion du vault passe par le plugin **[obsidian-skills de kepano](https://github.com/kepano/obsidian-skills)**.
 
@@ -230,7 +231,7 @@ claude plugin install https://github.com/kepano/obsidian-skills
 | `obsidian:json-canvas`       | Fichiers `.canvas` (mind maps, flowcharts)                  |
 | `obsidian:defuddle`          | Extraction web → Markdown propre                            |
 
-> Utilise le [CLI natif `obsidian`](https://help.obsidian.md/cli) via socket local — l'app doit être **lancée**. Sinon, Claude lit/écrit le vault directement (`Read`/`Edit`/`Write`).
+> Utilise le [CLI natif `obsidian`](https://help.obsidian.md/cli) via socket local - l'app doit être **lancée**. Sinon, Claude lit/écrit le vault directement (`Read`/`Edit`/`Write`).
 
 ---
 
@@ -242,11 +243,11 @@ Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-I
 | ----------------- | -------------------------------------------------------------------------------------------------------------- |
 | `obsidian-expert` | Expert Obsidian : notes structurées, plugins (Dataview, Templater, Tasks...), templates, organisation du vault |
 
-> Le champ `memory: project` dans le frontmatter (utilisé par `obsidian-expert`) active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale — une particularité Claude Code non couverte dans le glossaire général.
+> Le champ `memory: project` dans le frontmatter (utilisé par `obsidian-expert`) active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale - une particularité Claude Code non couverte dans le glossaire général.
 
 ---
 
-## Design — maquette client avant le code
+## Design - maquette client avant le code
 
 Avant le code, remplir les deux templates du dossier [`design/`](./design) pour cadrer le projet avec le client :
 
@@ -295,7 +296,7 @@ Application de gestion des congés pour PME. Utilisateurs : RH (admin) et employ
 - Workflow d'approbation : pending → approved / rejected
 ```
 
-Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à être répétées ici — elles sont déjà chargées via `~/.claude/AGENTS.md`.
+Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à être répétées ici - elles sont déjà chargées via `~/.claude/AGENTS.md`.
 
 ---
 
@@ -303,7 +304,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 
 | Commande          | Description                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------- |
-| `/stack-review`   | Revue de code : sécurité, qualité, architecture, performance (checklist propre à ce repo — distinct du `/code-review` natif) |
+| `/stack-review`   | Revue de code : sécurité, qualité, architecture, performance (checklist propre à ce repo - distinct du `/code-review` natif) |
 | `/debug`          | Débogage structuré : localisation → hypothèses → correction → prévention               |
 | `/refactor`       | Refacto sécurisé : plan avant action, vérification que le comportement ne change pas   |
 | `/add-entity`     | Création d'une entité full-stack avec checklist complète                               |
@@ -311,7 +312,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 | `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données                 |
 | `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan       |
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                            |
-| `/roast`          | Revue de code sans complaisance, façon senior — au-delà de la checklist `/stack-review` |
+| `/roast`          | Revue de code sans complaisance, façon senior - au-delà de la checklist `/stack-review` |
 | `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation                 |
 | `/competitor-benchmark` | Benchmark d'une app concurrente (URL) : inventaire de ses features vs celles du projet |
 | `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice      |
@@ -335,6 +336,6 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 
 ---
 
-## Concepts IA — glossaire et fondamentaux
+## Concepts IA - glossaire et fondamentaux
 
 Voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) : glossaire LLM/agents IA (harness, tokens, contexte, RAG, MCP, choix de modèle) avec exemples concrets.

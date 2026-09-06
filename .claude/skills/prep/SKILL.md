@@ -19,30 +19,30 @@ Rassemble la doc pertinente avant de réfléchir à une solution :
 Ne prends pas la doc ou le besoin au premier degré. Pour chaque hypothèse :
 - Qu'est-ce qui est explicite vs déduit ?
 - Qu'est-ce qui pourrait être mal compris ou incomplet ?
-- Si un point reste ambigu, pose la question à l'utilisateur — ne pas avancer sur une supposition non confirmée.
+- Si un point reste ambigu, pose la question à l'utilisateur - ne pas avancer sur une supposition non confirmée.
 
 ## 3. Réflexion étape par étape
 
-Avant de proposer quoi que ce soit : réfléchis étape par étape (*think step-by-step*), jusqu'à avoir couvert le problème en entier. Ne t'arrête pas à la première solution qui marche — liste les options si plusieurs approches sont valables, et justifie celle retenue.
+Avant de proposer quoi que ce soit : réfléchis étape par étape (*think step-by-step*), jusqu'à avoir couvert le problème en entier. Ne t'arrête pas à la première solution qui marche - liste les options si plusieurs approches sont valables, et justifie celle retenue.
 
 ## 4. Angles morts (obligatoire)
 
-Ce qui casse en prod sans jamais avoir été vu en dev — à couvrir explicitement, même si l'utilisateur ne l'a pas demandé :
+Ce qui casse en prod sans jamais avoir été vu en dev - à couvrir explicitement, même si l'utilisateur ne l'a pas demandé :
 - **Prod** : comportement sous charge, concurrence, latence réseau
 - **Edge cases** : entrées vides/invalides/limites, erreurs partielles
 - **Limits** : rate limits, quotas, taille de données
 - **Sécurité** : auth, IDOR, injection, exposition de données
 - **Réversibilité** : si ça touche des données, comment on rollback
 
-## 5. Architecture de base — mode tuteur
+## 5. Architecture de base - mode tuteur
 
 Propose une architecture minimale et explique **pourquoi** (ton pédagogique, pas juste la solution) : quels fichiers, quels choix, quelles alternatives écartées et pourquoi.
 
 ## 6. Écrire la synthèse dans SPEC.md
 
-Une fois les 5 points ci-dessus traités, écris-en la synthèse dans `SPEC.md` à la racine du repo (créé ou écrasé pour la tâche courante — ce n'est pas un fichier permanent comme `AGENTS.md`, juste la référence de la tâche en cours) : besoin reformulé, fichiers concernés, angles morts couverts (étape 4), architecture retenue et alternatives écartées (étape 5).
+Une fois les 5 points ci-dessus traités, écris-en la synthèse dans `SPEC.md` à la racine du repo (créé ou écrasé pour la tâche courante - ce n'est pas un fichier permanent comme `AGENTS.md`, juste la référence de la tâche en cours) : besoin reformulé, fichiers concernés, angles morts couverts (étape 4), architecture retenue et alternatives écartées (étape 5).
 
-C'est ce fichier, pas la conversation, qui sert de référence pendant l'implémentation — et qui permet de démarrer une session neuve rien que pour coder, sans avoir à re-expliquer tout le contexte de préparation.
+C'est ce fichier, pas la conversation, qui sert de référence pendant l'implémentation - et qui permet de démarrer une session neuve rien que pour coder, sans avoir à re-expliquer tout le contexte de préparation.
 
 ## Ensuite
 
