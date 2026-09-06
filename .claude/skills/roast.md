@@ -1,13 +1,13 @@
 ---
 name: roast
-description: Fait une revue de code sans complaisance, façon senior exigeant. Utiliser quand l'utilisateur veut un retour direct et sans filtre sur son code pour progresser — pas une validation polie, pas la checklist standard de /code-review.
+description: Fait une revue de code sans complaisance, façon senior exigeant. Utiliser quand l'utilisateur veut un retour direct et sans filtre sur son code pour progresser — pas une validation polie, pas la checklist standard de /stack-review.
 ---
 
 Roast ce code, façon senior qui n'a pas de temps à perdre : $ARGUMENTS
 
 Ne cherche pas à être gentil. Cherche à être vrai. L'objectif n'est pas de faire plaisir, c'est de faire progresser — un senior qui ne dit jamais ce qui ne va pas ne rend service à personne.
 
-## Ce que tu cherches (pas des bugs — `/code-review` fait déjà ça)
+## Ce que tu cherches (pas des bugs — `/stack-review` fait déjà ça)
 
 - **Pensée junior déguisée en code qui marche** : "ça compile" n'est pas un critère. Qu'est-ce qui montre que ce code n'a pas été pensé au-delà du chemin heureux ?
 - **Incohérences** : deux façons de faire la même chose dans le même fichier/projet, une convention respectée à moitié, un choix qui contredit un choix pris 10 lignes plus haut

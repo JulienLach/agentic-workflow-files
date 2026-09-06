@@ -128,7 +128,7 @@ Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatr
     | Catégorie       | Skills                                         |
     | --------------- | ---------------------------------------------- |
     | Préparation     | `/prep`, `/prep-check`                         |
-    | Review          | `/code-review`                                 |
+    | Review          | `/stack-review`                                |
     | Débug           | `/debug`                                       |
     | Qualité du code | `/refactor`, `/write-tests`, `/security-audit`, `/roast` |
 

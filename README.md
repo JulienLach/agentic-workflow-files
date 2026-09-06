@@ -12,8 +12,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
 - [Contenu](#contenu)
 - [`CLAUDE.md` vs `AGENTS.md`](#claudemd-vs-agentsmd)
 - [Installation](#installation)
-    - [Option 1 — Copier les fichiers dans un projet existant](#option-1--copier-les-fichiers-dans-un-projet-existant)
-    - [Option 2 — Utiliser comme base d'un nouveau projet](#option-2--utiliser-comme-base-dun-nouveau-projet)
+    - [Démarrer un nouveau projet de code](#démarrer-un-nouveau-projet-de-code)
 - [Configuration](#configuration)
     - [Prérequis](#prérequis)
     - [Skills vs MCP vs Plugins — quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
@@ -25,7 +24,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
     - [Agents personnalisés](#agents-personnalisés)
 - [Design — maquette client avant le code](#design--maquette-client-avant-le-code)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
-- [Personnaliser AGENTS.md pour le projet](#personnaliser-agentsmd-pour-le-projet)
+- [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet)
 - [Skills disponibles](#skills-disponibles)
 - [Concepts IA — glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
 
@@ -57,7 +56,10 @@ agentic-workflow-files/
 │   ├── settings.json                ← Permissions MCP (Context7) + prefs
 │   ├── agents/
 │   │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
-│   ├── commands/                    ← ai-news, learn, pulse
+│   ├── commands/
+│   │   ├── ai-news.md                ← /ai-news        : briefing IA quotidien
+│   │   ├── learn.md                  ← /learn          : cours express de 10 min sur un sujet dev précis
+│   │   └── pulse.md                  ← /pulse          : config des status bars (plugin claude-pulse)
 │   └── skills/
 │       ├── stack-review.md          ← /stack-review  : revue de code (sécu/qualité stack maison)
 │       ├── debug.md                 ← /debug         : débogage structuré
@@ -142,7 +144,7 @@ claude plugin install https://claude.com/plugins/code-review
 /code-review   # sur une branche avec une PR ouverte
 ```
 
-> Même commande que le skill `code-review.md` de ce repo — si tu installes le plugin, supprime ou renomme le skill.
+> Le skill `stack-review.md` de ce repo a été renommé (depuis `code-review.md`) précisément pour ne pas entrer en collision avec ce plugin — les deux coexistent sans problème : `/code-review` (natif Claude Code / ce plugin, revue de diff générique) et `/stack-review` (checklist sécu/qualité propre à la stack de ce repo).
 
 ---
 
@@ -321,7 +323,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 
 | Commande          | Description                                                                            |
 | ----------------- | -------------------------------------------------------------------------------------- |
-| `/code-review`    | Revue de code : sécurité, qualité, architecture, performance                           |
+| `/stack-review`   | Revue de code : sécurité, qualité, architecture, performance (checklist propre à ce repo — distinct du `/code-review` natif) |
 | `/debug`          | Débogage structuré : localisation → hypothèses → correction → prévention               |
 | `/refactor`       | Refacto sécurisé : plan avant action, vérification que le comportement ne change pas   |
 | `/add-entity`     | Création d'une entité full-stack avec checklist complète                               |
@@ -329,7 +331,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 | `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données                 |
 | `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan       |
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                            |
-| `/roast`          | Revue de code sans complaisance, façon senior — au-delà de la checklist `/code-review` |
+| `/roast`          | Revue de code sans complaisance, façon senior — au-delà de la checklist `/stack-review` |
 | `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation                 |
 | `/competitor-benchmark` | Benchmark d'une app concurrente (URL) : inventaire de ses features vs celles du projet |
 | `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice      |
@@ -339,7 +341,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 
 ```
-/code-review backend/routes/user.routes.ts
+/stack-review backend/routes/user.routes.ts
 /debug La liste des utilisateurs ne se charge plus après le login
 /add-entity une entité "department" avec nom, description et un responsable (FK vers users)
 /write-tests backend/services/user.services.ts
