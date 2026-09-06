@@ -1,4 +1,4 @@
- # Brand Guide — {{Client}}
+ # Brand Guide - {{Client}}
 > À destination de {{IDE avec LLM}} pour la conception de la maquette de l'application web {{Nom de l'application}}
 
 ---
@@ -8,7 +8,7 @@
 **Nom complet :** {{Nom complet du client}}
 **Secteur :** {{Secteur d'activité}}
 **Positionnement :** {{Positionnement, valeurs clés}}
-**Tone of voice :** {{Ton éditorial — ex. sobre, professionnel, dynamique, accessible...}}
+**Tone of voice :** {{Ton éditorial - ex. sobre, professionnel, dynamique, accessible...}}
 
 ---
 
@@ -16,13 +16,13 @@
 
 **Fichier :** `{{nom-du-logo.png}}`
 
-{{Description du logo — formes, typographie, couleurs, particularités visuelles.}}
+{{Description du logo - formes, typographie, couleurs, particularités visuelles.}}
 
 ### Règles d'usage du logo
 
-- {{Règle 1 — ex. utiliser sur fond clair uniquement}}
-- {{Règle 2 — ex. ne pas déformer}}
-- {{Règle 3 — zone de protection}}
+- {{Règle 1 - ex. utiliser sur fond clair uniquement}}
+- {{Règle 2 - ex. ne pas déformer}}
+- {{Règle 3 - zone de protection}}
 - Version recommandée pour l'interface : {{position, hauteur max}}
 
 ---
@@ -54,17 +54,17 @@
 | Avertissement | `#000000` | {{Usage}} |
 | Info | `#000000` | {{Usage}} |
 
-> **Règle d'or :** {{Contrainte d'usage des couleurs fonctionnelles — ex. le vert et le rouge sont réservés au feedback métier.}}
+> **Règle d'or :** {{Contrainte d'usage des couleurs fonctionnelles - ex. le vert et le rouge sont réservés au feedback métier.}}
 
 ---
 
 ## 4. Typographie
 
-{{Contexte d'usage — ex. lisibilité sur grands écrans, usage atelier, grand public...}}
+{{Contexte d'usage - ex. lisibilité sur grands écrans, usage atelier, grand public...}}
 
 ### Police recommandée
 
-**{{Famille typographique}}** — {{Description et justification du choix}}
+**{{Famille typographique}}** - {{Description et justification du choix}}
 
 Fallback : `{{font-stack CSS}}`
 
@@ -72,12 +72,12 @@ Fallback : `{{font-stack CSS}}`
 
 | Niveau | Taille | Graisse | Usage |
 |---|---|---|---|
-| H1 — Titre de section | px | {{weight}} | {{Usage}} |
-| H2 — Titre de bloc | px | {{weight}} | {{Usage}} |
-| H3 — Sous-titre | px | {{weight}} | {{Usage}} |
-| Body — Texte courant | px | {{weight}} | {{Usage}} |
-| Small — Texte secondaire | px | {{weight}} | {{Usage}} |
-| Label — Libellés | px | {{weight}} | {{Usage}} |
+| H1 - Titre de section | px | {{weight}} | {{Usage}} |
+| H2 - Titre de bloc | px | {{weight}} | {{Usage}} |
+| H3 - Sous-titre | px | {{weight}} | {{Usage}} |
+| Body - Texte courant | px | {{weight}} | {{Usage}} |
+| Small - Texte secondaire | px | {{weight}} | {{Usage}} |
+| Label - Libellés | px | {{weight}} | {{Usage}} |
 
 ---
 
@@ -86,12 +86,12 @@ Fallback : `{{font-stack CSS}}`
 - Style : {{Outlined / Filled / Duotone...}}
 - Bibliothèque recommandée : {{Lucide / Phosphor / Heroicons...}}
 - Taille standard : {{px inline}}, {{px boutons}}, {{px titres}}
-- Couleur : {{règle de couleur — hérite du parent, couleur fixe...}}
+- Couleur : {{règle de couleur - hérite du parent, couleur fixe...}}
 
 Icônes fonctionnelles clés à prévoir :
-- `{{icon-name}}` — {{Usage}}
-- `{{icon-name}}` — {{Usage}}
-- `{{icon-name}}` — {{Usage}}
+- `{{icon-name}}` - {{Usage}}
+- `{{icon-name}}` - {{Usage}}
+- `{{icon-name}}` - {{Usage}}
 
 ---
 
@@ -99,7 +99,7 @@ Icônes fonctionnelles clés à prévoir :
 
 ### Esprit
 
-{{Description de l'esprit visuel global — épuré, moderne, industriel, chaleureux...}}
+{{Description de l'esprit visuel global - épuré, moderne, industriel, chaleureux...}}
 
 ### Rayon de bordure (border-radius)
 
@@ -120,11 +120,11 @@ Modal shadow: {{valeur CSS}}
 
 ### Fond de page
 
-{{Couleur de fond — hex + justification}}
+{{Couleur de fond - hex + justification}}
 
 ---
 
-## 7. Composants UI — Conventions
+## 7. Composants UI - Conventions
 
 ### Boutons
 
@@ -170,9 +170,9 @@ Taille minimale des zones cliquables : **{{px}} × {{px}} px**
 {{Schéma ASCII ou description de la layout}}
 ```
 
-- **Header** : {{description — hauteur, fond, contenu gauche/droite}}
-- **Sidebar** : {{description — largeur, fond, style de navigation}}
-- **Zone principale** : {{description — fond, padding}}
+- **Header** : {{description - hauteur, fond, contenu gauche/droite}}
+- **Sidebar** : {{description - largeur, fond, style de navigation}}
+- **Zone principale** : {{description - fond, padding}}
 
 ### Densité d'information
 

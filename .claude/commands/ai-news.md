@@ -1,14 +1,14 @@
-Synthese des actualites IA du jour — grandes entreprises, modeles locaux, economie, robotique, cybersecurite, regulation.
+Synthese des actualites IA du jour - grandes entreprises, modeles locaux, economie, robotique, cybersecurite, regulation.
 
 ---
 
 ## OBJECTIF
 
-Produire un briefing IA quotidien complet, en francais, structure par sections, avec contexte technique explique, sources verifiees <=48h. Format: dense mais lisible en 5 minutes. Pas d'emoji (incompatible avec le terminal de l'utilisateur) — utiliser des symboles texte: *, ->, [OK], [~], [!], --, •.
+Produire un briefing IA quotidien complet, en francais, structure par sections, avec contexte technique explique, sources verifiees <=48h. Format: dense mais lisible en 5 minutes. Pas d'emoji (incompatible avec le terminal de l'utilisateur) - utiliser des symboles texte: *, ->, [OK], [~], [!], --, •.
 
 ---
 
-## ETAPE 1 — VERIFIER LA DATE DU JOUR
+## ETAPE 1 - VERIFIER LA DATE DU JOUR
 
 Confirmer la date depuis le contexte systeme. Ne jamais l'improviser.
 - J = aujourd'hui | J-1 = hier → section principale
@@ -17,7 +17,7 @@ Confirmer la date depuis le contexte systeme. Ne jamais l'improviser.
 
 ---
 
-## ETAPE 2 — COLLECTE (lancer TOUT en parallele)
+## ETAPE 2 - COLLECTE (lancer TOUT en parallele)
 
 ### Source principale : BuildFastWithAI
 
@@ -73,7 +73,7 @@ Noms de mois en anglais : january, february, march, april, may, june, july, augu
 
 ---
 
-## ETAPE 3 — VERIFICATION STRICTE DES DATES (CRITIQUE)
+## ETAPE 3 - VERIFICATION STRICTE DES DATES (CRITIQUE)
 
 Pour chaque story :
 1. Verifier la date dans les metadonnees de l'article (URL avec date, balise datePublished, byline)
@@ -83,7 +83,7 @@ Pour chaque story :
 
 ---
 
-## ETAPE 4 — FORMAT DE SORTIE EXACT
+## ETAPE 4 - FORMAT DE SORTIE EXACT
 
 Produire dans ce format (pas d'emoji, texte brut + symboles ASCII) :
 
@@ -174,7 +174,7 @@ HARNESS OPEN SOURCE & AGENTIC WORKFLOWS
 • ...
 
 ================================================================
-COIN DEV — MODELES & OUTILS
+COIN DEV - MODELES & OUTILS
 ----------------------------
 
 Pour remplir cette section, consulter en parallele :
@@ -190,23 +190,23 @@ Marquer [NEW] si sorti dans les 7 derniers jours. Mettre a jour a chaque briefin
 | [NEW?] [nom]          | [editeur]  | $X.XX / $X.XX      | [codage / raisonnement / …] |
 | ...                   |            |                    |                            |
 
---- MODELES LOCAUX — PAR PALIER MATERIEL ---
+--- MODELES LOCAUX - PAR PALIER MATERIEL ---
 
 Inclure tous les modeles notables pour chaque palier. Mettre [NEW] si sorti cette semaine.
 Vitesse en tokens/seconde = estimation sur le materiel min indique.
 
-[PALIER 1 — PC GAMER / MAC M-SERIES] 8-24 Go VRAM ou RAM unifiee
+[PALIER 1 - PC GAMER / MAC M-SERIES] 8-24 Go VRAM ou RAM unifiee
 | Modele              | Params actifs | VRAM/RAM min | ~tok/s | Usage ideal              |
 |---------------------|---------------|--------------|--------|--------------------------|
 | [NEW?] [nom]        | [xB actifs]   | [x Go]       | ~[x]   | [chat / code / RAG / …]  |
 | ...                 |               |              |        |                          |
 
-[PALIER 2 — WORKSTATION / RTX 4090] 24-48 Go VRAM
+[PALIER 2 - WORKSTATION / RTX 4090] 24-48 Go VRAM
 | Modele              | Params actifs | VRAM/RAM min | ~tok/s | Usage ideal              |
 |---------------------|---------------|--------------|--------|--------------------------|
 | ...                 |               |              |        |                          |
 
-[PALIER 3 — DATACENTER / MULTI-GPU] 80 Go+ VRAM
+[PALIER 3 - DATACENTER / MULTI-GPU] 80 Go+ VRAM
 | Modele              | Params actifs | VRAM/RAM min | ~tok/s | Usage ideal              |
 |---------------------|---------------|--------------|--------|--------------------------|
 | ...                 |               |              |        |                          |
@@ -220,12 +220,12 @@ Vitesse en tokens/seconde = estimation sur le materiel min indique.
 • ...
 
 TIP DU JOUR:
-[1 commande ou astuce pratique concrete — ollama run X, snippet Python, appel API, etc.]
+[1 commande ou astuce pratique concrete - ollama run X, snippet Python, appel API, etc.]
 
 ================================================================
 CETTE SEMAINE (J-2 a J-5)
 --------------------------
-[Stories importantes mais hors fenetre 48h — dater chaque item precisement]
+[Stories importantes mais hors fenetre 48h - dater chaque item precisement]
 • [date] - [Acteur] - [1-2 phrases.]
 • ...
 

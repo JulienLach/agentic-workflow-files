@@ -1,18 +1,18 @@
-# AGENTS.md — scope utilisateur (global)
+# AGENTS.md - scope utilisateur (global)
 
-Ce fichier fournit à Claude Code (et tout autre outil compatible [AGENTS.md](https://agents.md/)) les guidelines de développement **communes à tous mes projets** — stack par défaut, conventions, sécurité, qualité, git. Il est chargé automatiquement dans **toutes** les sessions, quel que soit le projet ouvert (via `~/.claude/CLAUDE.md` → `@AGENTS.md`).
+Ce fichier fournit à Claude Code (et tout autre outil compatible [AGENTS.md](https://agents.md/)) les guidelines de développement **communes à tous mes projets** - stack par défaut, conventions, sécurité, qualité, git. Il est chargé automatiquement dans **toutes** les sessions, quel que soit le projet ouvert (via `~/.claude/CLAUDE.md` → `@AGENTS.md`).
 
-Chaque projet a en plus son **propre** `CLAUDE.md`/`AGENTS.md` à la racine, écrit à la main, qui ne contient QUE les détails spécifiques à ce projet (entités, schéma DB, variables d'env, patterns métier) — pas ces guidelines générales, qui n'ont pas à être répétées par projet.
+Chaque projet a en plus son **propre** `CLAUDE.md`/`AGENTS.md` à la racine, écrit à la main, qui ne contient QUE les détails spécifiques à ce projet (entités, schéma DB, variables d'env, patterns métier) - pas ces guidelines générales, qui n'ont pas à être répétées par projet.
 
 ---
 
 ## Mise à jour des skills/agents/commandes
 
-Les skills, agents et commandes transverses à tous les projets vivent dans `~/.claude/` (`skills/`, `agents/`, `commands/`, `settings.json`) — c'est la source de vérité, chargée automatiquement dans toutes les sessions, quel que soit le projet ouvert.
+Les skills, agents et commandes transverses à tous les projets vivent dans `~/.claude/` (`skills/`, `agents/`, `commands/`, `settings.json`) - c'est la source de vérité, chargée automatiquement dans toutes les sessions, quel que soit le projet ouvert.
 
 - Si on demande de mettre à jour/corriger un skill, un agent ou une commande depuis une session ouverte dans un projet, éditer le fichier dans `~/.claude/`, pas une éventuelle copie locale dans `<projet>/.claude/`.
 - Vérifier qu'il n'existe pas de fichier de même nom en local au projet avant de conclure que l'édition globale suffit (un `.claude/` local prendrait le dessus sur le global).
-- Une copie de sauvegarde existe dans `~/Documents/agentic-workflow-files/.claude/` (clonée sur d'autres machines pour versioning) — ce n'est **pas** une source lue par le harnais, juste un backup. Si demandé, reporter le même changement là aussi (copie simple, pas de symlink entre les deux).
+- Une copie de sauvegarde existe dans `~/Documents/agentic-workflow-files/.claude/` (clonée sur d'autres machines pour versioning) - ce n'est **pas** une source lue par le harnais, juste un backup. Si demandé, reporter le même changement là aussi (copie simple, pas de symlink entre les deux).
 
 ---
 
@@ -148,8 +148,8 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 ### Répartition des responsabilités
 
 - **Data model (`backend/data/`)** : représente une entité et son état. Peut contenir des méthodes simples liées à l'objet lui-même (ex: `isExpired()`, `getFullName()`). Ne contient **pas** de règles métier complexes ni d'orchestration entre plusieurs entités
-- **Service (`backend/services/`)** : contient la **règle métier** — validations métier, orchestration entre plusieurs data models, décisions ("un utilisateur peut-il faire X ?"). C'est la couche qui sait *pourquoi*, pas seulement *comment*
-- **Route** : ne contient **aucune** logique métier — elle appelle le service et retourne la réponse HTTP
+- **Service (`backend/services/`)** : contient la **règle métier** - validations métier, orchestration entre plusieurs data models, décisions ("un utilisateur peut-il faire X ?"). C'est la couche qui sait *pourquoi*, pas seulement *comment*
+- **Route** : ne contient **aucune** logique métier - elle appelle le service et retourne la réponse HTTP
 
 ### Autres règles simples
 
@@ -164,29 +164,29 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 
 ### Principes fondamentaux
 
-**DRY** — Ne pas dupliquer la logique. Extraire les patterns répétés en fonctions/composants réutilisables.
+**DRY** - Ne pas dupliquer la logique. Extraire les patterns répétés en fonctions/composants réutilisables.
 
-**KISS** — Code simple et lisible plutôt que code astucieux. Éviter la sur-ingénierie. Principe de moindre surprise.
+**KISS** - Code simple et lisible plutôt que code astucieux. Éviter la sur-ingénierie. Principe de moindre surprise.
 
 **SOLID** :
 
-- **S** — Une seule responsabilité par fonction/classe
-- **O** — Ouvert à l'extension, fermé à la modification
-- **L** — Les classes dérivées remplacent les classes de base
-- **I** — Interfaces spécifiques plutôt que générales
-- **D** — Dépendre des abstractions, pas des implémentations
+- **S** - Une seule responsabilité par fonction/classe
+- **O** - Ouvert à l'extension, fermé à la modification
+- **L** - Les classes dérivées remplacent les classes de base
+- **I** - Interfaces spécifiques plutôt que générales
+- **D** - Dépendre des abstractions, pas des implémentations
 
-**YAGNI** — N'implémenter que ce qui est nécessaire maintenant. Pas de fonctionnalités "au cas où".
+**YAGNI** - N'implémenter que ce qui est nécessaire maintenant. Pas de fonctionnalités "au cas où".
 
 ### Standards TypeScript
 
 - Mode strict activé dans `tsconfig.json`
 - Préférer `async/await` aux promesses chaînées
 - Fonctions courtes et ciblées (max ~20 lignes)
-- Pas de nombres magiques — utiliser des constantes nommées
+- Pas de nombres magiques - utiliser des constantes nommées
 - Nommage clair et cohérent avec le reste du projet
-- Pas de `console.log` oubliés côté backend — utiliser Winston (`utils/logger.ts`)
-- Pas de styles inline côté frontend — CSS classes ou fichiers de styles dédiés
+- Pas de `console.log` oubliés côté backend - utiliser Winston (`utils/logger.ts`)
+- Pas de styles inline côté frontend - CSS classes ou fichiers de styles dédiés
 
 ---
 
@@ -215,7 +215,7 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 
 ## Hooks recommandés
 
-Ces guidelines sont **conseillées** — Claude peut les zapper si le contexte est chargé. Pour ce qui doit arriver **à chaque fois sans exception** (typecheck backend, lint frontend), un hook `PostToolUse` (dans le `.claude/settings.json` **du projet**, pas ici) est déterministe là où une instruction ne l'est pas.
+Ces guidelines sont **conseillées** - Claude peut les zapper si le contexte est chargé. Pour ce qui doit arriver **à chaque fois sans exception** (typecheck backend, lint frontend), un hook `PostToolUse` (dans le `.claude/settings.json` **du projet**, pas ici) est déterministe là où une instruction ne l'est pas.
 
 Exemple à adapter au projet réel :
 
@@ -295,7 +295,7 @@ refactor/scope-du-refacto
 
 - Ne **jamais** ajouter de ligne `Co-Authored-By: Claude` dans les messages de commit
 - Messages de commit en anglais (convention standard open source)
-- Une seule responsabilité par commit — ne pas mélanger feat et fix
+- Une seule responsabilité par commit - ne pas mélanger feat et fix
 
 ---
 
@@ -309,7 +309,7 @@ refactor/scope-du-refacto
 
 ---
 
-## Workflow — Ajouter une nouvelle entité
+## Workflow - Ajouter une nouvelle entité
 
 1. Créer le modèle de données dans `backend/data/EntityName.ts`
 2. Créer le service dans `backend/services/entityName.services.ts`
@@ -326,4 +326,4 @@ refactor/scope-du-refacto
 
 ## Contexte projet
 
-Ce fichier est global — il ne contient volontairement **aucun détail de projet spécifique** (entités, schéma DB, business rules). Ces détails vivent dans le `CLAUDE.md`/`AGENTS.md` à la racine du projet en cours, écrit à la main pour ce projet précis.
+Ce fichier est global - il ne contient volontairement **aucun détail de projet spécifique** (entités, schéma DB, business rules). Ces détails vivent dans le `CLAUDE.md`/`AGENTS.md` à la racine du projet en cours, écrit à la main pour ce projet précis.

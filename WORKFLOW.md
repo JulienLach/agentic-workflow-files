@@ -1,4 +1,4 @@
-# Workflow IA — Obsidian → Claude Code → Code → PR GitHub
+# Workflow IA - Obsidian → Claude Code → Code → PR GitHub
 
 Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**, avec **Claude Code** comme hub central (contexte, plugins, skills, agents), le **CLI Obsidian** et **`gh` CLI**.
 
@@ -44,14 +44,14 @@ Il complète le `AGENTS.md` global (guidelines de dev communes) + le `CLAUDE.md`
 
 Le vault Obsidian et le repo de code sont deux répertoires distincts sur la même machine. Claude Code peut passer de l'un à l'autre de deux façons :
 
-- **Obsidian skills** (plugin `obsidian:*` — `obsidian-cli`, `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `defuddle`) : ce sont les skills que Claude invoque pour lire/écrire dans le vault, y compris via le binaire CLI (`obsidian ...`, dans `~/.local/bin/obsidian`) — nécessite qu'Obsidian soit **lancé** (communication via socket local).
-- **Lecture/écriture directe des fichiers** (`Read`, `Edit`, `Write`) via le chemin absolu du vault (`~/Documents/vault/...`) — toujours possible, même si Obsidian n'est pas lancé. Indispensable pour les insertions précises **sous un sous-titre donné**, que le CLI ne gère pas (`append`/`prepend` n'agissent que sur le début/la fin du fichier entier).
+- **Obsidian skills** (plugin `obsidian:*` - `obsidian-cli`, `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `defuddle`) : ce sont les skills que Claude invoque pour lire/écrire dans le vault, y compris via le binaire CLI (`obsidian ...`, dans `~/.local/bin/obsidian`) - nécessite qu'Obsidian soit **lancé** (communication via socket local).
+- **Lecture/écriture directe des fichiers** (`Read`, `Edit`, `Write`) via le chemin absolu du vault (`~/Documents/vault/...`) - toujours possible, même si Obsidian n'est pas lancé. Indispensable pour les insertions précises **sous un sous-titre donné**, que le CLI ne gère pas (`append`/`prepend` n'agissent que sur le début/la fin du fichier entier).
 
-> Ce workflow n'utilise pas de MCP Obsidian : les **Obsidian skills** ([kepano/obsidian-skills](https://github.com/kepano/obsidian-skills), voir `README.md`) sont un plugin de skills Claude Code qui enveloppe le CLI natif `obsidian` — c'est la seule brique utilisée ici pour interagir avec le vault.
+> Ce workflow n'utilise pas de MCP Obsidian : les **Obsidian skills** ([kepano/obsidian-skills](https://github.com/kepano/obsidian-skills), voir `README.md`) sont un plugin de skills Claude Code qui enveloppe le CLI natif `obsidian` - c'est la seule brique utilisée ici pour interagir avec le vault.
 
 ---
 
-## 0. Conception / Architecture — MCP Excalidraw (optionnel)
+## 0. Conception / Architecture - MCP Excalidraw (optionnel)
 
 Pour une tâche qui demande de clarifier une architecture ou un flux avant de coder (nouvelle entité complexe, refonte, intégration externe), passer par un schéma plutôt que d'improviser directement en code :
 
@@ -59,7 +59,7 @@ Pour une tâche qui demande de clarifier une architecture ou un flux avant de co
 2. Itérer sur le schéma jusqu'à ce que la structure soit claire (entités, flux de données, séquence d'appels).
 3. Une fois validée, la conception sert de base à l'étape 1 (capture de la tâche) ou directement à l'étape 4 (implémentation) si la tâche existe déjà dans le sprint.
 
-> Cette étape est **optionnelle** — à réserver aux tâches où un schéma apporte réellement de la clarté (architecture, refonte). Pour un bugfix ou une petite feature, passer directement à l'étape 1 ou 4.
+> Cette étape est **optionnelle** - à réserver aux tâches où un schéma apporte réellement de la clarté (architecture, refonte). Pour un bugfix ou une petite feature, passer directement à l'étape 1 ou 4.
 
 ---
 
@@ -81,7 +81,7 @@ Après une réunion (point dev interne, recette client), transformer les échang
     - insère les nouvelles lignes `- [ ] ...` **sous ce sous-titre précis**, via édition directe du fichier (le CLI `append` ajouterait à la fin du fichier entier, pas sous la bonne section).
 3. Vérifier le résultat (`obsidian read path="Projets/<Projet>/sprints/Sprint NN.md"`) avant de passer à l'implémentation.
 
-Les notes de réunion et les tâches ponctuelles alimentent aussi le **Backlog** du projet (`Index` → `Backlog`) — utile pour tout ce qui n'est pas encore priorisé dans un sprint actif ; l'`Index` d'un projet pointe également vers ses **Ressources** (docs, liens, comptes-rendus).
+Les notes de réunion et les tâches ponctuelles alimentent aussi le **Backlog** du projet (`Index` → `Backlog`) - utile pour tout ce qui n'est pas encore priorisé dans un sprint actif ; l'`Index` d'un projet pointe également vers ses **Ressources** (docs, liens, comptes-rendus).
 
 > Si `obsidian: command not found` : vérifier qu'Obsidian est ouvert et que `~/.local/bin` est dans le `PATH`. À défaut, revenir à la lecture/écriture directe des fichiers du vault (équivalente pour cet usage).
 
@@ -98,7 +98,7 @@ titre: Titre du sprint
 statut: active # planifié | active | done
 debut: 2026-06-18
 fin: 2026-07-31
-progression: 60 # % — mis à jour à la main
+progression: 60 # % - mis à jour à la main
 type: sprint
 tags: [project, sprint]
 ---
@@ -111,7 +111,7 @@ Les tâches suivent le format checklist du plugin **Tasks** :
 - [x] Tâche faite ✅ 2026-06-18
 ```
 
-Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / Axelor pour ET2I), les tâches sont regroupées sous des sous-titres (`#### App Audit`) — ça permet de retrouver rapidement à quoi correspond une tâche et de filtrer par sous-projet.
+Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / Axelor pour ET2I), les tâches sont regroupées sous des sous-titres (`#### App Audit`) - ça permet de retrouver rapidement à quoi correspond une tâche et de filtrer par sous-projet.
 
 **Pour demander une tâche à Claude Code** : « fais la tâche X du sprint N » → Claude ouvre `Sprint 0N.md`, repère la section correspondante et la ligne `- [ ]` associée.
 
@@ -122,23 +122,23 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / A
 Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatre briques :
 
 - **Fichiers de contexte** (`AGENTS.md` global + `CLAUDE.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
-- **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable — voir étape 4 pour la vérification des changements UI).
-- **Skills** (`.claude/skills/*.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` — à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
+- **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable - voir étape 4 pour la vérification des changements UI).
+- **Skills** (`.claude/skills/*.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` - à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
 
 - **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
-    - `Plan` — agent intégré à Claude Code pour concevoir des plans d'implémentation.
-    - `obsidian-expert` — agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
+    - `Plan` - agent intégré à Claude Code pour concevoir des plans d'implémentation.
+    - `obsidian-expert` - agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
 
-Deux **modes d'interaction** viennent s'ajouter par-dessus — ce ne sont pas des agents séparés, juste la façon dont la demande est formulée dans le prompt :
+Deux **modes d'interaction** viennent s'ajouter par-dessus - ce ne sont pas des agents séparés, juste la façon dont la demande est formulée dans le prompt :
 
-- **Mode agentique standard** — c'est le fonctionnement par défaut de Claude Code : que le mode Auto soit activé ou non, Claude exécute la tâche de bout en bout (recherche, édition, tests, commits) à partir de ta demande, sans configuration particulière.
-- **Mode pédagogique** — sur demande explicite dans le prompt (« explique-moi », « guide-moi », « je veux comprendre par moi-même »), Claude oriente vers la solution par indices et explications plutôt que de l'implémenter directement.
+- **Mode agentique standard** - c'est le fonctionnement par défaut de Claude Code : que le mode Auto soit activé ou non, Claude exécute la tâche de bout en bout (recherche, édition, tests, commits) à partir de ta demande, sans configuration particulière.
+- **Mode pédagogique** - sur demande explicite dans le prompt (« explique-moi », « guide-moi », « je veux comprendre par moi-même »), Claude oriente vers la solution par indices et explications plutôt que de l'implémenter directement.
 
 ### Hygiène de contexte
 
-Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et les performances de Claude se dégradent quand il est chargé — c'est la ressource à gérer en priorité, avant même le choix du modèle :
+Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et les performances de Claude se dégradent quand il est chargé - c'est la ressource à gérer en priorité, avant même le choix du modèle :
 
-- **`/clear` entre deux tâches sans rapport.** Ne pas enchaîner une tâche sur une autre dans la même conversation « pour gagner du temps » — le contexte pollué par la tâche précédente dégrade la suivante.
+- **`/clear` entre deux tâches sans rapport.** Ne pas enchaîner une tâche sur une autre dans la même conversation « pour gagner du temps » - le contexte pollué par la tâche précédente dégrade la suivante.
 - **Après 2 corrections ratées sur le même point, `/clear` plutôt qu'insister.** Une session avec des tentatives échouées accumulées performe moins bien qu'une session neuve avec un prompt initial qui intègre ce qu'on vient d'apprendre.
 - **Subagents pour la recherche/exploration**, pas seulement pour la revue (`/code-review`). « Utilise un subagent pour investiguer comment X gère Y » garde les dizaines de fichiers lus hors du contexte principal, qui reste focalisé sur l'implémentation.
 - **`/compact <instructions>`** pour un compactage ciblé (ex. `/compact garde la liste des fichiers modifiés et les commandes de test`) plutôt que de laisser l'auto-compaction générique décider seule sur une tâche longue.
@@ -152,7 +152,7 @@ Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et l
     /prep <tâche>         # doc, remise en question, angles morts (prod/edge cases/sécu), archi de base → écrit dans SPEC.md
     /prep-check <tâche>   # vérifie que SPEC.md est complet avant d'entrer en mode plan
     ```
-    Une fois `/prep-check` au vert, entrer en mode plan (agent `Plan`, section 3) : le plan se construit à partir de `SPEC.md`, pas de la mémoire de la conversation — utile aussi pour repartir sur une session neuve rien que pour l'implémentation (section « Hygiène de contexte » ci-dessus). Pour une tâche simple, passer directement à l'étape suivante.
+    Une fois `/prep-check` au vert, entrer en mode plan (agent `Plan`, section 3) : le plan se construit à partir de `SPEC.md`, pas de la mémoire de la conversation - utile aussi pour repartir sur une session neuve rien que pour l'implémentation (section « Hygiène de contexte » ci-dessus). Pour une tâche simple, passer directement à l'étape suivante.
 
 2. Se placer sur la branche principale de dev du repo (`develop` ou `main` selon le projet) et créer une branche dédiée, avec le nommage défini dans `AGENTS.md` (section Conventions Git) :
 
@@ -161,7 +161,7 @@ Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et l
     ```
 
 3. Implémenter en suivant `AGENTS.md` (stack, conventions, tests) et le `CLAUDE.md` du projet (spécificités).
-4. Vérifier avant de committer : tests, lint, exécution locale — et pour tout changement **UI/frontend**, passage réel dans un navigateur via le **MCP Playwright** (parcours nominal + cas limites, pas seulement la compilation/les tests unitaires qui ne garantissent pas le comportement visuel).
+4. Vérifier avant de committer : tests, lint, exécution locale - et pour tout changement **UI/frontend**, passage réel dans un navigateur via le **MCP Playwright** (parcours nominal + cas limites, pas seulement la compilation/les tests unitaires qui ne garantissent pas le comportement visuel).
 
 ---
 
@@ -172,7 +172,7 @@ Pas de hook configuré sur ce repo : le commit/changelog/push n'est **pas automa
 - **À la main** : tu tapes toi-même les commandes `git`/`gh`.
 - **Via prompt à Claude** : tu demandes « commit et push cette modif » et Claude exécute les mêmes commandes, en respectant les règles ci-dessous.
 
-Les règles de commit sont **celles définies dans `AGENTS.md`** (section Conventions Git — format Conventional Commits, message en anglais, une responsabilité par commit, jamais de `Co-Authored-By: Claude`) — que ce soit toi ou Claude qui committe, ce sont les mêmes.
+Les règles de commit sont **celles définies dans `AGENTS.md`** (section Conventions Git - format Conventional Commits, message en anglais, une responsabilité par commit, jamais de `Co-Authored-By: Claude`) - que ce soit toi ou Claude qui committe, ce sont les mêmes.
 
 ```bash
 git add <fichiers>
@@ -180,7 +180,7 @@ git commit -m "feat(auth): add password reset via email"
 git push -u origin feat/nom-de-la-feature
 ```
 
-> **Envie d'une vraie automatisation ?** La section « Hooks recommandés » de `AGENTS.md` documente un hook `PostToolUse` prêt à copier (typecheck backend + lint frontend après chaque edit) — déterministe, contrairement à une règle `AGENTS.md` que Claude peut zapper si le contexte est chargé. Un `Stop` en fin de session (rappel de commit) reste à faire au cas par cas. Voir le skill `update-config` pour la mise en place.
+> **Envie d'une vraie automatisation ?** La section « Hooks recommandés » de `AGENTS.md` documente un hook `PostToolUse` prêt à copier (typecheck backend + lint frontend après chaque edit) - déterministe, contrairement à une règle `AGENTS.md` que Claude peut zapper si le contexte est chargé. Un `Stop` en fin de session (rappel de commit) reste à faire au cas par cas. Voir le skill `update-config` pour la mise en place.
 
 ---
 
@@ -204,7 +204,7 @@ EOF
 Certains environnements d'exécution (sandbox Claude Code sans accès root) n'ont ni `gh` ni identifiants Git configurés. Contournement qui fonctionne sans `sudo` :
 
 1. Télécharger le binaire `gh` (release tarball sur `github.com/cli/cli/releases`), l'extraire, le copier dans `~/.local/bin/gh` (déjà dans le `PATH` en général, pas besoin de droits admin).
-2. **L'utilisateur** doit lancer lui-même `gh auth login` (flux interactif par device code dans un navigateur) — Claude Code ne peut pas le faire à sa place.
+2. **L'utilisateur** doit lancer lui-même `gh auth login` (flux interactif par device code dans un navigateur) - Claude Code ne peut pas le faire à sa place.
 3. Une fois authentifié : `gh auth setup-git`, pour que `git push`/`git pull` en HTTPS fonctionnent (sinon erreur `could not read Username`).
 
 Avant de repartir de zéro sur un nouvel environnement, vérifier d'abord si `~/.local/bin/gh` existe déjà et si `gh auth status` est valide.
@@ -213,10 +213,10 @@ Avant de repartir de zéro sur un nouvel environnement, vérifier d'abord si `~/
 
 ## 7. Revue de la PR (dev solo)
 
-Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait la revue lui-même**, assisté par Claude Code, avant de merger. Ne pas sauter cette étape sous prétexte d'être seul sur le projet — c'est justement ce qui remplace la revue par les pairs.
+Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait la revue lui-même**, assisté par Claude Code, avant de merger. Ne pas sauter cette étape sous prétexte d'être seul sur le projet - c'est justement ce qui remplace la revue par les pairs.
 
-1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code — bugs, cohérence, sécurité). Envie d'une revue multi-agents plus poussée (conformité `AGENTS.md`, contexte git, commentaires PR) ? Installer le [plugin officiel Anthropic](./README.md#plugins), pas installé par défaut.
-2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits — pas d'amend sur un commit déjà pushé sans raison explicite).
+1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code - bugs, cohérence, sécurité). Envie d'une revue multi-agents plus poussée (conformité `AGENTS.md`, contexte git, commentaires PR) ? Installer le [plugin officiel Anthropic](./README.md#plugins), pas installé par défaut.
+2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits - pas d'amend sur un commit déjà pushé sans raison explicite).
 3. Relire soi-même le diff final (`gh pr diff` ou l'interface GitHub) avant de merger.
 4. Merger :
     ```bash
@@ -238,7 +238,7 @@ Une tâche n'est considérée **terminée** que lorsque :
     obsidian task path="Projets/<Projet>/sprints/Sprint NN.md" line=<n> done
     ```
 
-Ne pas oublier cette dernière étape — c'est elle qui garde le vault Obsidian comme source de vérité à jour sur l'avancement réel du sprint (`progression` du frontmatter à ajuster en conséquence, et `statut: done` quand toutes les tâches du sprint sont traitées ou reportées au sprint suivant).
+Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian comme source de vérité à jour sur l'avancement réel du sprint (`progression` du frontmatter à ajuster en conséquence, et `statut: done` quand toutes les tâches du sprint sont traitées ou reportées au sprint suivant).
 
 ---
 

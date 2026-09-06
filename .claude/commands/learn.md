@@ -1,16 +1,16 @@
-Cours express de 10 minutes sur un sujet precis de developpement (langage, framework, principe, outil) — doc officielle et sources fiables, pedagogique, avec exemples et mini-exercice.
+Cours express de 10 minutes sur un sujet precis de developpement (langage, framework, principe, outil) - doc officielle et sources fiables, pedagogique, avec exemples et mini-exercice.
 
 ---
 
 ## OBJECTIF
 
-Produire un cours court et pedagogique sur le sujet donne en argument ($ARGUMENTS), lisible en environ 10 minutes (~1200-2000 mots), pour aider l'utilisateur (developpeur) a progresser sur un point precis. Francais, ton clair et encourageant, pas verbeux, pas de jargon gratuit. Pas d'emoji (incompatible avec le terminal de l'utilisateur) — utiliser des symboles texte: *, ->, [OK], [!], --, •.
+Produire un cours court et pedagogique sur le sujet donne en argument ($ARGUMENTS), lisible en environ 10 minutes (~1200-2000 mots), pour aider l'utilisateur (developpeur) a progresser sur un point precis. Francais, ton clair et encourageant, pas verbeux, pas de jargon gratuit. Pas d'emoji (incompatible avec le terminal de l'utilisateur) - utiliser des symboles texte: *, ->, [OK], [!], --, •.
 
 Si aucun sujet n'est fourni dans $ARGUMENTS, demander a l'utilisateur quel sujet precis il veut apprendre avant de continuer.
 
 ---
 
-## ETAPE 1 — CADRER LE SUJET
+## ETAPE 1 - CADRER LE SUJET
 
 - Reformuler le sujet en une question d'apprentissage precise (pas "l'architecture logicielle" en general, mais "quels sont les grands principes qui guident un decoupage en couches/modules").
 - Choisir un niveau d'entree: supposer que l'utilisateur sait coder mais decouvre ce sujet precis. Ne pas re-expliquer les bases de la programmation.
@@ -18,18 +18,18 @@ Si aucun sujet n'est fourni dans $ARGUMENTS, demander a l'utilisateur quel sujet
 
 ---
 
-## ETAPE 2 — COLLECTE DES SOURCES (lancer en parallele)
+## ETAPE 2 - COLLECTE DES SOURCES (lancer en parallele)
 
 Priorite stricte: documentation officielle > sources reconnues de la communaute > articles generalistes. Ne jamais fonder le cours sur un blog SEO de faible qualite.
 
 - Si le sujet concerne une librairie/framework/API precise (ex: React, Django, Kubernetes) : utiliser en priorite le MCP context7 (`resolve-library-id` puis `query-docs`) pour recuperer la documentation officielle a jour.
 - Sinon (concept, principe, paradigme, algorithmie) : WebSearch pour identifier 2-4 sources fiables, puis WebFetch (ou obsidian:defuddle si la page est longue et bruitee) pour en extraire le contenu exact.
-- Sources fiables typiques selon le domaine : documentation officielle du langage/framework, RFC/specs, MDN (web), refactoring.guru et martinfowler.com (design/architecture), livres de reference largement cites (Clean Architecture, Designing Data-Intensive Applications, GoF, etc. — citer l'ouvrage, pas une URL si pas d'URL fiable), OWASP (securite), man pages / doc CLI officielle (outils).
+- Sources fiables typiques selon le domaine : documentation officielle du langage/framework, RFC/specs, MDN (web), refactoring.guru et martinfowler.com (design/architecture), livres de reference largement cites (Clean Architecture, Designing Data-Intensive Applications, GoF, etc. - citer l'ouvrage, pas une URL si pas d'URL fiable), OWASP (securite), man pages / doc CLI officielle (outils).
 - Ne jamais inventer une source. Si une affirmation ne peut pas etre rattachee a une source verifiee, la formuler avec prudence ou l'omettre.
 
 ---
 
-## ETAPE 3 — FORMAT DE SORTIE EXACT
+## ETAPE 3 - FORMAT DE SORTIE EXACT
 
 ```
 Cours express - [Sujet] | ~10 min de lecture

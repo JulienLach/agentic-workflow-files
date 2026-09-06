@@ -1,18 +1,18 @@
-Configure your Claude status bars — themes, colours, animations, peak hours, and more. $ARGUMENTS
+Configure your Claude status bars - themes, colours, animations, peak hours, and more. $ARGUMENTS
 
 ---
 
 **Finding the script:** Before running any command below, you need the full path to `claude_status.py`. Do this ONCE at the start:
 
 1. Read `~/.claude/settings.json`. If `statusLine.command` contains `claude_status.py`, extract the full script path from that string.
-2. If not found, use the Glob tool to search for `**/claude_status.py` inside `~/.claude/plugins/` — pick the result containing `claude-pulse`.
+2. If not found, use the Glob tool to search for `**/claude_status.py` inside `~/.claude/plugins/` - pick the result containing `claude-pulse`.
 3. If neither works, tell the user: "Run `/claude-pulse:setup` first to install the status bar."
 
 Save the found path as SCRIPT_PATH. Use `python "SCRIPT_PATH"` for all commands below.
 
 ---
 
-## ROUTING — decide what to do based on $ARGUMENTS
+## ROUTING - decide what to do based on $ARGUMENTS
 
 ### Direct commands (skip the menu, run immediately):
 
@@ -21,11 +21,11 @@ If $ARGUMENTS matches a **theme name** (`default`, `ocean`, `sunset`, `mono`, `n
 -> Confirm: "Theme set to **<name>**. The status line will update on the next refresh."
 
 If $ARGUMENTS is `pick`, `picker`, or `pick-theme`:
--> This is the **live arrow-key theme picker**: one screen, scroll through all 10 themes, and the status-bar preview recolours live. It needs an interactive terminal, so the **user must launch it themselves** — you cannot drive the keypresses for them.
+-> This is the **live arrow-key theme picker**: one screen, scroll through all 10 themes, and the status-bar preview recolours live. It needs an interactive terminal, so the **user must launch it themselves** - you cannot drive the keypresses for them.
 -> Tell the user to type this in their prompt to launch it:
    `!python "SCRIPT_PATH" --pick-theme`
--> Explain the controls in one line: "↑/↓ (or j/k) to move · Enter to keep · Esc to cancel — your bar recolours live as you move."
--> Add the fallback note: "If you see a static coloured list instead of a moving cursor, this terminal isn't interactive here — just note the name you like and run `/pulse <name>`."
+-> Explain the controls in one line: "↑/↓ (or j/k) to move · Enter to keep · Esc to cancel - your bar recolours live as you move."
+-> Add the fallback note: "If you see a static coloured list instead of a moving cursor, this terminal isn't interactive here - just note the name you like and run `/pulse <name>`."
 
 If $ARGUMENTS is `config` or `settings`:
 -> Run `python "SCRIPT_PATH" --config` silently.
@@ -45,11 +45,11 @@ If $ARGUMENTS contains `hide <parts>` or `show <parts>` (with specific parts):
 If $ARGUMENTS matches `animate <mode>` (where mode is `off`, `rainbow`, `pulse`, `glow`, `shift`, `on`):
 -> Run `--animate <mode>` directly.
 -> Explain what the mode does:
-  - **off** — Static, no animation
-  - **rainbow** — Flowing rainbow gradient across the entire bar
-  - **pulse** — Bars cycle through vivid colours each refresh
-  - **glow** — Per-character gradient that shifts across the bar
-  - **shift** — Bright highlight slides across the bar
+  - **off** - Static, no animation
+  - **rainbow** - Flowing rainbow gradient across the entire bar
+  - **pulse** - Bars cycle through vivid colours each refresh
+  - **glow** - Per-character gradient that shifts across the bar
+  - **shift** - Bright highlight slides across the bar
 
 If $ARGUMENTS matches `text-color <name>` or `text-colour <name>`:
 -> Run `--text-color <name>` directly.
@@ -99,7 +99,7 @@ If $ARGUMENTS is `heatmap`:
 
 ### Interactive menu (when $ARGUMENTS is empty, `themes`, `theme`, or `menu`):
 
-**Step 0 — Quick tips:**
+**Step 0 - Quick tips:**
 
 > **Quick commands:** `/pulse show` preview all themes · `/pulse ocean` set a theme · `/pulse config` see settings · `/pulse update` check for updates · `/pulse focus start` start a focus timer
 
@@ -107,9 +107,9 @@ Run `python "SCRIPT_PATH" --config` silently to check for updates.
 
 **Step 1:** Run `python "SCRIPT_PATH" --themes-demo` and show the output.
 
-**Step 2:** Theme — offer the **live picker** first.
+**Step 2:** Theme - offer the **live picker** first.
 
-Say: "For the best experience, launch the live picker — type  `!python "SCRIPT_PATH" --pick-theme`  in your prompt. Arrow keys move through all 10 themes, your bar recolours live, Enter keeps it, Esc cancels. (If it shows a static list instead of a moving cursor, this terminal isn't interactive — use the quick picker below.)"
+Say: "For the best experience, launch the live picker - type  `!python "SCRIPT_PATH" --pick-theme`  in your prompt. Arrow keys move through all 10 themes, your bar recolours live, Enter keeps it, Esc cancels. (If it shows a static list instead of a moving cursor, this terminal isn't interactive - use the quick picker below.)"
 
 If the user would rather pick from a list right here (or the live picker isn't available in their terminal), use the paginated picker below.
 
@@ -119,28 +119,28 @@ Page 1:
 ```
 Question: "Pick a theme from the preview above"
 Options:
-  - "rainbow" — "Full-spectrum flowing colours"
-  - "default" — "Classic green → yellow → red"
-  - "ocean" — "Cool cyan → blue → magenta"
-  - "More themes..." — "See all 10 themes"
+  - "rainbow" - "Full-spectrum flowing colours"
+  - "default" - "Classic green → yellow → red"
+  - "ocean" - "Cool cyan → blue → magenta"
+  - "More themes..." - "See all 10 themes"
 ```
 
 Page 2 (if "More themes..."):
 ```
 Options:
-  - "frost" — "Icy blue → steel → white"
-  - "ember" — "Gold → hot orange → red"
-  - "candy" — "Pink → purple → cyan"
-  - "More themes..." — "See neon, sunset, pride, mono"
+  - "frost" - "Icy blue → steel → white"
+  - "ember" - "Gold → hot orange → red"
+  - "candy" - "Pink → purple → cyan"
+  - "More themes..." - "See neon, sunset, pride, mono"
 ```
 
 Page 3 (if "More themes..." again):
 ```
 Options:
-  - "neon" — "Vivid bright green → yellow → red"
-  - "sunset" — "Warm yellow → orange → red"
-  - "pride" — "Violet → green → pink"
-  - "mono" — "White → white → bright white"
+  - "neon" - "Vivid bright green → yellow → red"
+  - "sunset" - "Warm yellow → orange → red"
+  - "pride" - "Violet → green → pink"
+  - "mono" - "White → white → bright white"
 ```
 
 Apply with `--theme <name>`.
@@ -152,9 +152,9 @@ Theme-specific recommendations: ocean→cyan, sunset/ember→yellow, frost→cya
 ```
 Question: "What colour for labels and percentages?"
 Options:
-  - "<recommendation> (Recommended)" — "<reason>"
-  - "White" — "Neutral, works with any theme"
-  - "Auto" — "Best match for your theme"
+  - "<recommendation> (Recommended)" - "<reason>"
+  - "White" - "Neutral, works with any theme"
+  - "Auto" - "Best match for your theme"
 ```
 
 Apply with `--text-color <colour>`.
@@ -164,11 +164,11 @@ Apply with `--text-color <colour>`.
 ```
 Question: "Choose an animation style"
 Options:
-  - "Off (Recommended)" — "Static theme colours, clean and simple"
-  - "Rainbow" — "Flowing rainbow gradient"
-  - "Pulse" — "Bars cycle through vivid colours"
-  - "Glow" — "Gradient shifts across the bar"
-  - "Shift" — "Bright highlight slides across"
+  - "Off (Recommended)" - "Static theme colours, clean and simple"
+  - "Rainbow" - "Flowing rainbow gradient"
+  - "Pulse" - "Bars cycle through vivid colours"
+  - "Glow" - "Gradient shifts across the bar"
+  - "Shift" - "Bright highlight slides across"
 ```
 
 Apply with `--animate <mode>`.
@@ -178,9 +178,9 @@ Apply with `--animate <mode>`.
 ```
 Question: "How wide should the progress bars be?"
 Options:
-  - "Large (Recommended)" — "12 characters — detailed bars"
-  - "Medium" — "8 characters — balanced"
-  - "Small" — "4 characters — compact"
+  - "Large (Recommended)" - "12 characters - detailed bars"
+  - "Medium" - "8 characters - balanced"
+  - "Small" - "4 characters - compact"
 ```
 
 Apply with `--bar-size <size>`.
@@ -190,10 +190,10 @@ Apply with `--bar-size <size>`.
 ```
 Question: "What currency for the cost ticker?"
 Options:
-  - "$ (USD)" — "US Dollar (base currency)"
-  - "£ (GBP)" — "British Pound (auto-converted)"
-  - "€ (EUR)" — "Euro (auto-converted)"
-  - "Other" — "Type any symbol (¥, ₹, C$, kr, etc.)"
+  - "$ (USD)" - "US Dollar (base currency)"
+  - "£ (GBP)" - "British Pound (auto-converted)"
+  - "€ (EUR)" - "Euro (auto-converted)"
+  - "Other" - "Type any symbol (¥, ₹, C$, kr, etc.)"
 ```
 
 Apply with `--currency <symbol>`. Explain: the cost shows what this session would cost at API rates, converted to their currency via live exchange rate.
@@ -203,9 +203,9 @@ Apply with `--currency <symbol>`. Explain: the cost shows what this session woul
 ```
 Question: "Enable peak hours indicator? (Anthropic's 2x consumption window)"
 Options:
-  - "On — 1pm-7pm (Recommended)" — "Default window matching known peak times"
-  - "Custom" — "Set your own peak window"
-  - "Off" — "Don't show peak indicator"
+  - "On - 1pm-7pm (Recommended)" - "Default window matching known peak times"
+  - "Custom" - "Set your own peak window"
+  - "Off" - "Don't show peak indicator"
 ```
 
 If "Custom", ask for start and end time (HH:MM format). Apply with `--peak-hours <start>-<end>`.
@@ -217,8 +217,8 @@ If "Off", apply `--peak-hours off`.
 ```
 Question: "Clock format for timers?"
 Options:
-  - "12h" — "Fri 5pm"
-  - "24h" — "Fri 17:00"
+  - "12h" - "Fri 5pm"
+  - "24h" - "Fri 17:00"
 ```
 
 Apply with `--clock-format <12h|24h>`.
@@ -228,8 +228,8 @@ Apply with `--clock-format <12h|24h>`.
 ```
 Question: "Install the live heartbeat hook? (shows tool counter during active work)"
 Options:
-  - "Yes (Recommended)" — "Adds [/] 42 tools 5m to your status bar"
-  - "No" — "Skip — you can install later with /pulse hooks"
+  - "Yes (Recommended)" - "Adds [/] 42 tools 5m to your status bar"
+  - "No" - "Skip - you can install later with /pulse hooks"
 ```
 
 If "Yes", run `python "SCRIPT_PATH" --install-hooks`. Remind to restart Claude Code.
@@ -244,5 +244,5 @@ If hooks were installed: "Restart Claude Code to activate the live heartbeat."
 ## DISPLAY RULES
 
 - After any change, tell the user it will update on the next refresh.
-- When running `--config`, summarise — don't show raw ANSI.
+- When running `--config`, summarise - don't show raw ANSI.
 - Be brief and enthusiastic.

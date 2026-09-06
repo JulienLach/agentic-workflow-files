@@ -1,4 +1,4 @@
-# Instructions de maquettage — {{Nom de l'application}}
+# Instructions de maquettage - {{Nom de l'application}}
 > Document à destination de **{{IDE avec LLM}}** pour la conception des maquettes (wireframes haute-fidélité) de l'application web {{Nom de l'application}}
 >
 > Référence CDC : {{Référence CDC}}
@@ -8,24 +8,24 @@
 
 ## 1. Contexte et objectif du projet
 
-{{Nom du client}} est {{description du client — secteur, activité}}. L'application {{Nom de l'application}} a pour but de **{{objectif principal — ex. remplacer tel processus papier/Excel par une solution web}}**.
+{{Nom du client}} est {{description du client - secteur, activité}}. L'application {{Nom de l'application}} a pour but de **{{objectif principal - ex. remplacer tel processus papier/Excel par une solution web}}**.
 
 **Enjeux principaux à retranscrire dans les maquettes :**
-- {{Enjeu 1 — ex. interface pensée pour un usage spécifique}}
-- {{Enjeu 2 — ex. densité d'information / lisibilité}}
-- {{Enjeu 3 — ex. feedback métier immédiat}}
-- {{Enjeu 4 — ex. navigation guidée / séquentielle}}
-- {{Enjeu 5 — ex. traçabilité des actions}}
+- {{Enjeu 1 - ex. interface pensée pour un usage spécifique}}
+- {{Enjeu 2 - ex. densité d'information / lisibilité}}
+- {{Enjeu 3 - ex. feedback métier immédiat}}
+- {{Enjeu 4 - ex. navigation guidée / séquentielle}}
+- {{Enjeu 5 - ex. traçabilité des actions}}
 
 ---
 
 ## 2. Profils utilisateurs
 
-Lister les profils qui utiliseront l'application — chaque écran maquetté (section 3) doit être pensé en fonction du profil qui l'utilise.
+Lister les profils qui utiliseront l'application - chaque écran maquetté (section 3) doit être pensé en fonction du profil qui l'utilise.
 
 | Profil | Objectif principal | Niveau technique | Fréquence d'usage |
 |---|---|---|---|
-| {{Profil 1 — ex. Administrateur}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
+| {{Profil 1 - ex. Administrateur}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
 | {{Profil 2}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
 | {{Profil 3}} | {{Objectif}} | {{Novice / Intermédiaire / Expert}} | {{Quotidien / Hebdo / Ponctuel}} |
 
@@ -35,7 +35,7 @@ Lister les profils qui utiliseront l'application — chaque écran maquetté (se
 
 ## 3. Périmètre des écrans à maquetter
 
-### Priorité 1 — Écrans indispensables (V1)
+### Priorité 1 - Écrans indispensables (V1)
 
 | ID | Écran | Profil principal |
 |---|---|---|
@@ -45,7 +45,7 @@ Lister les profils qui utiliseront l'application — chaque écran maquetté (se
 | E04 | {{Écran}} | {{Profil}} |
 | E05 | {{Écran}} | {{Profil}} |
 
-### Priorité 2 — Écrans secondaires (V1)
+### Priorité 2 - Écrans secondaires (V1)
 
 | ID | Écran | Profil principal |
 |---|---|---|
@@ -79,7 +79,7 @@ Lister les profils qui utiliseront l'application — chaque écran maquetté (se
 └────────────┴──────────────────────────────────────────────────┘
 ```
 
-### Sidebar — Navigation principale
+### Sidebar - Navigation principale
 
 La sidebar affiche uniquement les rubriques accessibles selon le profil connecté :
 
@@ -94,9 +94,9 @@ La sidebar affiche uniquement les rubriques accessibles selon le profil connect�
 
 ## 5. Parcours utilisateur (user flows)
 
-Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (section 3) mais **comment on passe de l'un à l'autre**, pour que les maquettes reflètent un vrai parcours plutôt que des écrans isolés.
+Décrire les enchaînements d'écrans clés - pas juste la liste des écrans (section 3) mais **comment on passe de l'un à l'autre**, pour que les maquettes reflètent un vrai parcours plutôt que des écrans isolés.
 
-### Parcours principal — {{Nom du parcours, ex. "Créer une demande"}}
+### Parcours principal - {{Nom du parcours, ex. "Créer une demande"}}
 
 ```
 {{Écran de départ}} → {{Action, ex. clic "Créer"}} → {{Écran suivant}} → {{Action}} → {{Écran de confirmation}}
@@ -107,8 +107,8 @@ Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (
 
 ### Autres parcours à couvrir
 
-- {{Parcours 2 — ex. "Modifier un statut"}}
-- {{Parcours 3 — ex. "Rechercher et filtrer"}}
+- {{Parcours 2 - ex. "Modifier un statut"}}
+- {{Parcours 3 - ex. "Rechercher et filtrer"}}
 
 ---
 
@@ -116,7 +116,7 @@ Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (
 
 ---
 
-### E01 — {{Nom de l'écran}}
+### E01 - {{Nom de l'écran}}
 
 **Objectif :** {{Description courte de l'objectif de cet écran}}
 
@@ -129,7 +129,7 @@ Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (
 
 ---
 
-### E02 — {{Nom de l'écran}}
+### E02 - {{Nom de l'écran}}
 
 **Objectif :** {{Description courte}}
 
@@ -142,22 +142,22 @@ Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (
 
 ---
 
-### E03 — {{Nom de l'écran}}
+### E03 - {{Nom de l'écran}}
 
 **Objectif :** {{Description courte}}
 
 **Éléments :**
-- {{Élément 1 — ex. barre de recherche}}
-- {{Élément 2 — ex. filtres}}
-- {{Élément 3 — ex. tableau paginé}}
+- {{Élément 1 - ex. barre de recherche}}
+- {{Élément 2 - ex. filtres}}
+- {{Élément 3 - ex. tableau paginé}}
 
 ---
 
-### E04 — {{Nom de l'écran}}
+### E04 - {{Nom de l'écran}}
 
 **Objectif :** {{Description courte}}
 
-{{Description du layout si complexe — ex. deux colonnes, onglets, sidebar contextuelle}}
+{{Description du layout si complexe - ex. deux colonnes, onglets, sidebar contextuelle}}
 
 **Éléments :**
 - {{Élément 1}}
@@ -166,7 +166,7 @@ Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (
 
 ---
 
-### E05 — {{Nom de l'écran}}
+### E05 - {{Nom de l'écran}}
 
 **Objectif :** {{Description courte}}
 
@@ -180,17 +180,17 @@ Décrire les enchaînements d'écrans clés — pas juste la liste des écrans (
 
 ## 7. Règles UX transversales
 
-### {{Règle UX 1 — ex. Navigation séquentielle et blocages}}
+### {{Règle UX 1 - ex. Navigation séquentielle et blocages}}
 
 {{Description de la règle et de sa matérialisation visuelle attendue}}
 
-### {{Règle UX 2 — ex. Traçabilité}}
+### {{Règle UX 2 - ex. Traçabilité}}
 
 {{Description de la règle}}
 - {{Règle détaillée 1}}
 - {{Règle détaillée 2}}
 
-### {{Règle UX 3 — ex. Feedback en temps réel}}
+### {{Règle UX 3 - ex. Feedback en temps réel}}
 
 - {{Règle détaillée 1}}
 - {{Règle détaillée 2}}
@@ -237,9 +237,9 @@ Prévoir systématiquement les états suivants pour chaque composant interactif 
 - {{Champ 3}} : {{Valeur fictive}}
 
 **Utilisateurs fictifs :**
-- {{Prénom NOM}} — {{Profil}}
-- {{Prénom NOM}} — {{Profil}}
-- {{Prénom NOM}} — {{Profil}}
+- {{Prénom NOM}} - {{Profil}}
+- {{Prénom NOM}} - {{Profil}}
+- {{Prénom NOM}} - {{Profil}}
 
 ---
 
@@ -247,9 +247,9 @@ Prévoir systématiquement les états suivants pour chaque composant interactif 
 
 Les points suivants sont **en suspens**. Les maquettes peuvent les matérialiser avec des états "À définir" ou des placeholders :
 
-- **P01** — {{Point ouvert 1}}
-- **P02** — {{Point ouvert 2}}
-- **P03** — {{Point ouvert 3}}
+- **P01** - {{Point ouvert 1}}
+- **P02** - {{Point ouvert 2}}
+- **P03** - {{Point ouvert 3}}
 
 ---
 
@@ -267,13 +267,13 @@ Les points suivants sont **en suspens**. Les maquettes peuvent les matérialiser
 
 | Contrainte | Valeur |
 |---|---|
-| Navigateurs cibles | {{ex. Chrome, Brave — versions récentes}} |
+| Navigateurs cibles | {{ex. Chrome, Brave - versions récentes}} |
 | Résolution minimum | {{ex. 1280 × 768}} |
 | Résolution optimale | {{ex. 1920 × 1080}} |
 | Temps de chargement cible | {{ex. < 3 secondes}} |
 | Utilisateurs simultanés | {{ex. 50 minimum}} |
 | Formats d'export | {{ex. PDF, CSV}} |
-| Authentification | {{ex. Login / Mot de passe — pas de SSO en V1}} |
+| Authentification | {{ex. Login / Mot de passe - pas de SSO en V1}} |
 | Accessibilité | {{ex. WCAG AA minimum}} |
 | Mode dark | {{Oui / Non requis}} |
 | Mobile / tablette | {{Oui / Non requis en V1}} |
