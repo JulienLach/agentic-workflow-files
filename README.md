@@ -60,7 +60,8 @@ agentic-workflow-files/
 │                                       ai-news, learn, pulse
 │                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
-    └── AGENTS.md                    ← même contenu que .claude/AGENTS.md (symlinké entre les deux en réel)
+    ├── AGENTS.md                    ← symlink vers ../.claude/AGENTS.md (un seul fichier, agnostique du harnais)
+    └── opencode.json               ← config OpenCode : MCP Context7 (clé via {env:CONTEXT7_API_KEY}, pas dans le repo)
 ```
 
 Chaque projet garde ensuite son propre `CLAUDE.md` - voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet).
@@ -83,12 +84,18 @@ git clone https://github.com/JulienLach/agentic-workflow-files.git
 # Restaurer la config Claude Code (scope utilisateur)
 cp -r agentic-workflow-files/.claude/* ~/.claude/
 
-# Restaurer la config OpenCode (scope utilisateur) - symlink, pas une copie
+# Restaurer la config OpenCode (scope utilisateur)
 mkdir -p ~/.config/opencode
-ln -sf ~/.claude/AGENTS.md ~/.config/opencode/AGENTS.md
+ln -sf ~/.claude/AGENTS.md ~/.config/opencode/AGENTS.md          # symlink, pas une copie
+cp agentic-workflow-files/.opencode/opencode.json ~/.config/opencode/opencode.json
+
+# Clé API Context7 (commune aux deux harnais, jamais commitée) - dans ~/.zshrc :
+#   export CONTEXT7_API_KEY="ctx7sk-..."   # clé depuis https://context7.com/dashboard
 ```
 
 Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/agents/commandes sont disponibles automatiquement dans **tous** tes projets, sans rien copier dedans.
+
+`CONTEXT7_API_KEY` est lue depuis l'environnement du shell par les deux harnais : Claude Code via `${CONTEXT7_API_KEY}` dans le `.mcp.json` du plugin `context7`, OpenCode via `{env:CONTEXT7_API_KEY}` dans `opencode.json`. Sans elle, le serveur MCP Context7 renvoie `HTTP 401`.
 
 ### Démarrer un nouveau projet de code
 
