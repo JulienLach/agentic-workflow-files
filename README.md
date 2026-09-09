@@ -22,6 +22,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
     - [Context7 - documentation des librairies en temps réel](#context7--documentation-des-librairies-en-temps-réel)
     - [Obsidian skills - gestion des notes de projet](#obsidian-skills--gestion-des-notes-de-projet)
     - [Agents personnalisés](#agents-personnalisés)
+    - [Agent orchestrateur](#agent-orchestrateur)
 - [Design - maquette client avant le code](#design--maquette-client-avant-le-code)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet)
@@ -257,6 +258,32 @@ Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-I
 **Vs les skills `obsidian:*`** : les skills sont la mécanique (lire/écrire le vault via le CLI) ; l'agent est le jugement + la mémoire persistante propre au vault (conventions, structure) au-dessus, dans un contexte isolé.
 
 **Invoquer** : auto (Claude route si la tâche correspond) ou explicite - *"utilise l'agent obsidian-expert pour..."* force l'agent plutôt qu'un skill.
+
+### Agent orchestrateur
+
+Un agent peut en piloter d'autres : il reçoit une tâche large, la découpe, lance plusieurs subagents (éventuellement chacun sur un modèle différent), puis fusionne leurs retours en une seule réponse. C'est le pattern [Orchestrator-Workers](./CONCEPTS-IA.md#orchestrator-workers). À réserver à une orchestration **récurrente** - pour un besoin ponctuel, l'agent principal sait déjà orchestrer à la volée sans qu'on écrive de fichier.
+
+Exemple - un agent de revue approfondie qui délègue à trois workers spécialisés en parallèle :
+
+```markdown
+---
+name: "deep-review"
+description: "Revue de code approfondie multi-angles. Lance en parallèle une passe sécurité, une passe perf et une passe tests, puis synthétise. Utiliser avant un merge sensible."
+model: opus
+---
+
+Tu orchestres une revue de `$ARGUMENTS` (diff, PR ou fichier).
+
+1. Lance en parallèle, dans un seul message, trois subagents `general-purpose` :
+   - **sécurité** : OWASP, IDOR, injection, secrets, auth - renvoie une liste `fichier:ligne - problème`
+   - **perf** : requêtes N+1, boucles coûteuses, allocations inutiles, index manquants
+   - **tests** : cas limites non couverts, mocks trop larges, assertions faibles
+2. Attends leurs retours. Ne relance un worker que si son retour est vide ou hors sujet.
+3. Fusionne : déduplique, classe par sévérité, un seul bloc `fichier:ligne - problème - correctif`. Pas de blabla, pas de félicitations.
+```
+
+- Les workers tournent sur le modèle de l'orchestrateur par défaut ; leur passer un modèle plus léger (Haiku) via l'outil `Agent` réduit le coût - Opus pour l'orchestrateur qui synthétise, Haiku pour les workers qui lisent.
+- Un cran au-dessus (plusieurs harnais différents en parallèle, pas juste des subagents du même harness) : **Orca**, voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#8-panorama-des-outils).
 
 ---
 

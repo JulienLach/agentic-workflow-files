@@ -268,6 +268,12 @@ Un agent central (l'orchestrateur) découpe une tâche volumineuse et distribue 
 - Dans ce repo : `superpowers:subagent-driven-development` implémente directement ce pattern - l'agent principal utilise l'outil `Agent` (section 2) pour lancer des subagents (`Explore`, `general-purpose`...) sur des sous-tâches décidées au fil de l'eau, et protège son propre contexte en ne récupérant que leur synthèse finale plutôt que tous leurs résultats intermédiaires.
 - Côté frameworks dédiés : LangChain, CrewAI, AutoGen (section 8, "Orchestration multi-agents") formalisent ce pattern comme brique de base.
 
+Ce pattern se décline à **deux niveaux** selon ce qu'on orchestre :
+
+**Niveau 1 - un agent orchestrateur, à l'intérieur d'un seul harness.** L'agent principal, ou un subagent dédié écrit dans `.claude/agents/<nom>.md`, découpe la tâche et lance plusieurs subagents (chacun dans son contexte isolé) puis fusionne leurs retours. Chaque subagent peut tourner sur un **modèle différent** de l'orchestrateur : un petit modèle rapide et pas cher (Haiku) pour les workers de recherche/lecture, un gros modèle (Opus) pour l'orchestrateur qui planifie et synthétise. Utile quand la même orchestration revient souvent - pour un one-shot, l'agent principal sait déjà orchestrer à la volée, inutile d'écrire un fichier. Exemple concret d'agent orchestrateur dans le [`README.md`](./README.md#agent-orchestrateur).
+
+**Niveau 2 - un logiciel qui chapeaute plusieurs harnais.** Un cran au-dessus : au lieu de subagents du même harness, on fait collaborer plusieurs **harnais complets et différents** (Claude Code + Codex + OpenCode + Pi...), chacun avec son modèle et ses forces. Un logiciel dédié - une "ADE", agent development environment, comme **Orca** (Stably AI, MIT, gratuit, tu utilises tes propres abonnements) - lance chaque agent dans un **worktree git isolé**, route les tâches, affiche tout au même endroit et te prévient (ex. sur ton téléphone) quand un agent a besoin d'une décision. Le code ne transite pas par les serveurs d'Orca. Cf. section 8.
+
 ### Reflection et Evaluator-Optimizer
 
 L'agent relit et critique sa propre sortie avant de la considérer terminée, plutôt que de s'arrêter à la première génération - un cycle "génère → critique → corrige" répété jusqu'à un résultat satisfaisant. **Evaluator-Optimizer** en est la version la plus structurée : deux rôles explicitement **séparés** - un LLM **générateur** produit une solution, un LLM **évaluateur** distinct la juge et soit l'accepte, soit la rejette avec un feedback précis qui relance une nouvelle tentative du générateur, en boucle jusqu'à acceptation. Séparer les rôles (plutôt qu'un seul LLM qui se relit lui-même) réduit le risque de complaisance envers sa propre sortie.
@@ -437,7 +443,8 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **IDE avec agent intégré** | Cursor, Windsurf, GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Devin, Claude Code (mode cloud/remote), Jules (Google) |
 | **Protocoles / standards** | MCP (Model Context Protocol), function calling / tool use |
-| **Orchestration multi-agents** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, AutoGen |
+| **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, AutoGen |
+| **Chapeautage multi-harnais (ADE)** | Orca (Stably AI) - fait tourner Claude Code, Codex, OpenCode, Pi... côte à côte, chacun isolé dans son worktree git ; desktop + app mobile |
 | **AI Gateway / routing multi-fournisseurs** | LiteLLM, OpenRouter, Portkey |
 | **Agents navigateur / computer use** | Playwright (MCP), Claude in Chrome, computer use (API) |
 | **Bases vectorielles (RAG)** | Pinecone, Weaviate, Chroma, pgvector |
@@ -592,6 +599,8 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **Routing** | Dispatch d'une requête vers un LLM ou un chemin de traitement spécialisé parmi plusieurs, selon sa nature |
 | **Parallelization** | Exécution simultanée de plusieurs LLM sur des sous-tâches connues à l'avance (sectioning) ou sur la même tâche (voting), suivie d'une agrégation |
 | **Orchestrator-Workers** | Pattern où un agent central distribue dynamiquement des sous-tâches à des subagents spécialisés puis synthétise leurs résultats |
+| **Agent orchestrateur** | Agent (ou subagent dédié dans `.claude/agents/`) qui applique Orchestrator-Workers : découpe la tâche, lance plusieurs subagents - éventuellement sur des modèles différents - puis fusionne leurs retours |
+| **ADE / chapeautage multi-harnais** | Logiciel qui fait tourner et coordonne plusieurs harnais complets et différents (Claude Code, Codex, OpenCode, Pi...) en parallèle, chacun isolé dans son worktree git (ex. Orca) |
 | **Reflection** | Pattern où l'agent critique et corrige sa propre sortie avant de la considérer terminée |
 | **Evaluator-Optimizer** | Version structurée de reflection avec un LLM générateur et un LLM évaluateur séparés, en boucle accepter/rejeter-avec-feedback |
 | **Planning (agentique)** | Pattern de décomposition d'un objectif en sous-tâches avant exécution |
