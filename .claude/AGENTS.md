@@ -6,6 +6,19 @@ Chaque projet a en plus son **propre** `CLAUDE.md`/`AGENTS.md` à la racine, éc
 
 ---
 
+## Posture
+
+Agir comme un lead developer, pas comme un exécutant :
+
+- **Comprendre avant de coder** : reformuler le besoin, lire le code autour, repérer le périmètre réel. Si c'est ambigu ou contradictoire, poser la question avant d'implémenter.
+- **Diff minimal** : la plus petite modification qui résout le problème. Ne pas reformater, renommer ou "améliorer" du code hors périmètre. Suivre les conventions déjà présentes dans le fichier, pas les siennes.
+- **Pas de sur-ingénierie** : pas d'abstraction, de couche ou d'option "au cas où" (YAGNI). Résoudre le problème d'aujourd'hui.
+- **Dire ce qui ne va pas** : si l'approche demandée a un problème (sécurité, perf, dette, cas limite ignoré), le signaler avec l'alternative, même si ce n'est pas ce qui a été demandé.
+- **Vérifier avant d'affirmer** : ne jamais dire "c'est fait / ça marche" sans avoir lancé le typecheck, les tests ou l'app. Si une étape a été sautée ou qu'un test échoue, le dire clairement avec la sortie.
+- **Travailler par petits incréments** vérifiables plutôt qu'un gros changement d'un bloc.
+
+---
+
 ## Mise à jour des skills/agents/commandes
 
 Les skills, agents et commandes transverses à tous les projets vivent dans `~/.claude/` (`skills/`, `agents/`, `commands/`, `settings.json`) - c'est la source de vérité, chargée automatiquement dans toutes les sessions, quel que soit le projet ouvert.
@@ -213,11 +226,11 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 
 ---
 
-## Hooks recommandés
+## Hooks (à configurer par projet)
 
-Ces guidelines sont **conseillées** - Claude peut les zapper si le contexte est chargé. Pour ce qui doit arriver **à chaque fois sans exception** (typecheck backend, lint frontend), un hook `PostToolUse` (dans le `.claude/settings.json` **du projet**, pas ici) est déterministe là où une instruction ne l'est pas.
+Une consigne écrite dans un `.md` est "molle" : si le contexte est chargé, Claude peut l'oublier. Un **hook** est une commande que Claude Code lance **automatiquement** sur un évènement (ici : après chaque édition de fichier) - déterministe, jamais oubliée. Pour ce qui doit passer **à chaque fois** (typecheck, lint), un hook vaut mieux qu'une phrase.
 
-Exemple à adapter au projet réel :
+Les hooks vivent dans le `.claude/settings.json` **du projet** (jamais ici : ils dépendent de l'arborescence du projet). Set minimal recommandé - après une modif de code, typechecker le côté touché :
 
 ```json
 {
@@ -230,13 +243,13 @@ Exemple à adapter au projet réel :
             "type": "command",
             "if": "Edit(backend/**/*.ts)|Write(backend/**/*.ts)",
             "command": "cd backend && npx tsc --noEmit",
-            "timeout": 60
+            "timeout": 120
           },
           {
             "type": "command",
             "if": "Edit(frontend/**/*.ts)|Edit(frontend/**/*.tsx)|Write(frontend/**/*.ts)|Write(frontend/**/*.tsx)",
-            "command": "cd frontend && npm run lint",
-            "timeout": 60
+            "command": "cd frontend && npx tsc --noEmit && npm run lint",
+            "timeout": 120
           }
         ]
       }
@@ -245,9 +258,11 @@ Exemple à adapter au projet réel :
 }
 ```
 
-- `matcher` filtre sur l'outil (`Edit`/`Write`), `if` filtre en plus sur le chemin du fichier touché.
-- Vérifier le comportement avec `/hooks` après mise en place (le code de sortie exact qui remonte l'échec à Claude peut varier selon la version).
-- Ne pas dupliquer dans un hook ce qu'un test d'intégration vérifie déjà mieux.
+- `matcher` filtre sur l'outil (`Edit`/`Write`) ; `if` filtre en plus sur le chemin (syntaxe des règles de permission).
+- Le hook s'exécute depuis la racine du projet : adapter les `cd` et les commandes au projet réel (projet mono-package : enlever le `cd backend`/`cd frontend`).
+- Code de sortie **2** = l'erreur est renvoyée à Claude qui la corrige ; **0** = silencieux. Tester avec `/hooks`.
+- Trop lent à chaque édition ? Déplacer le même bloc sous l'évènement `Stop` (déclenché quand Claude a fini de répondre) au lieu de `PostToolUse`.
+- Ne pas mettre en hook ce qu'un test d'intégration couvre déjà mieux. La suite de tests complète reste manuelle ou en CI.
 
 ---
 
