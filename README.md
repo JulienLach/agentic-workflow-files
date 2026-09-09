@@ -252,6 +252,7 @@ Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-I
 | Agent             | Rôle                                                                                                           |
 | ----------------- | -------------------------------------------------------------------------------------------------------------- |
 | `obsidian-expert` | Expert Obsidian : notes structurées, plugins (Dataview, Templater, Tasks...), templates, organisation du vault |
+| `deep-review`     | Orchestrateur de revue de code : délègue 3 passes parallèles (sécurité, perf, tests) à des workers puis synthétise. Voir [Agent orchestrateur](#agent-orchestrateur). |
 
 > Le champ `memory: project` dans le frontmatter (utilisé par `obsidian-expert`) active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale - une particularité Claude Code non couverte dans le glossaire général.
 
@@ -263,26 +264,13 @@ Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-I
 
 Un agent peut en piloter d'autres : il reçoit une tâche large, la découpe, lance plusieurs subagents (éventuellement chacun sur un modèle différent), puis fusionne leurs retours en une seule réponse. C'est le pattern [Orchestrator-Workers](./CONCEPTS-IA.md#orchestrator-workers). À réserver à une orchestration **récurrente** - pour un besoin ponctuel, l'agent principal sait déjà orchestrer à la volée sans qu'on écrive de fichier.
 
-Exemple - un agent de revue approfondie qui délègue à trois workers spécialisés en parallèle :
+Ce repo fournit **`deep-review`** ([`.claude/agents/deep-review.md`](./.claude/agents/deep-review.md)) : sur un diff / une PR / un fichier, il lance **trois workers `general-purpose` en parallèle** (sécurité OWASP, performance, couverture de tests), attend leurs retours, puis rend une seule liste `chemin:ligne - problème - correctif` classée par sévérité. Invoquer : *"deep-review sur cette PR"*, ou avant un merge sensible.
 
-```markdown
----
-name: "deep-review"
-description: "Revue de code approfondie multi-angles. Lance en parallèle une passe sécurité, une passe perf et une passe tests, puis synthétise. Utiliser avant un merge sensible."
-model: opus
----
+Points clés de ce genre d'agent :
 
-Tu orchestres une revue de `$ARGUMENTS` (diff, PR ou fichier).
-
-1. Lance en parallèle, dans un seul message, trois subagents `general-purpose` :
-   - **sécurité** : OWASP, IDOR, injection, secrets, auth - renvoie une liste `fichier:ligne - problème`
-   - **perf** : requêtes N+1, boucles coûteuses, allocations inutiles, index manquants
-   - **tests** : cas limites non couverts, mocks trop larges, assertions faibles
-2. Attends leurs retours. Ne relance un worker que si son retour est vide ou hors sujet.
-3. Fusionne : déduplique, classe par sévérité, un seul bloc `fichier:ligne - problème - correctif`. Pas de blabla, pas de félicitations.
-```
-
-- Les workers tournent sur le modèle de l'orchestrateur par défaut ; leur passer un modèle plus léger (Haiku) via l'outil `Agent` réduit le coût - Opus pour l'orchestrateur qui synthétise, Haiku pour les workers qui lisent.
+- **`tools: Agent, ...` obligatoire dans le frontmatter** - sans l'outil `Agent`, l'orchestrateur ne peut pas lancer de workers. Claude Code autorise l'imbrication jusqu'à 3 niveaux sous la session principale (`CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH`).
+- **Modèles différenciés** : `model: opus` sur l'orchestrateur qui planifie et synthétise ; les workers tournent sur le modèle hérité, ou un modèle plus léger (Haiku) passé à l'outil `Agent` pour réduire le coût des passes de lecture.
+- **Lecture seule** : pas de `Write`/`Edit`, l'agent propose des correctifs, il ne les applique pas.
 - Un cran au-dessus (plusieurs harnais différents en parallèle, pas juste des subagents du même harness) : **Orca**, voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#8-panorama-des-outils).
 
 ---
