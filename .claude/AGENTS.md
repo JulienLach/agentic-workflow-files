@@ -125,7 +125,7 @@ frontend/src/
 
 - Tous les appels centralisés dans `frontend/src/services/api.ts`
 - Utiliser `credentials: "include"` pour le cookie JWT
-- `API_URL` switche selon l'environnement : `localhost:3001` en dev, `/api` en prod
+- `API_URL` vaut `/api` en prod (même origine, servie derrière un reverse proxy). En dev, préférer un proxy Vite (`server.proxy` dans `vite.config`) qui route `/api` vers le backend, plutôt qu'un switch d'URL conditionnel dans le code JS
 
 ---
 
