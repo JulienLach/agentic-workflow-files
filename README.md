@@ -11,7 +11,6 @@ Ce repo est la **sauvegarde versionnée** de la config en scope utilisateur de p
 - [Stack cible](#stack-cible)
 - [Contenu](#contenu)
 - [`CLAUDE.md` vs `AGENTS.md`](#claudemd-vs-agentsmd)
-- [Le `AGENTS.md` racine de ce repo](#le-agentsmd-racine-de-ce-repo)
 - [Installation](#installation)
     - [Prérequis](#prérequis)
     - [Démarrer un nouveau projet de code](#démarrer-un-nouveau-projet-de-code)
@@ -44,7 +43,6 @@ Node.js/Express/TypeScript/PostgreSQL + React/Vite, monorepo `backend/`+`fronten
 
 ```
 agentic-workflow-files/
-├── AGENTS.md                        ← Copie racine du même contenu que .claude/AGENTS.md, à copier-coller telle quelle dans le dossier de config global de n'importe quel harnais compatible AGENTS.md (ex. ~/.config/opencode/, ~/.codex/) - voir Le AGENTS.md racine de ce repo
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
 ├── STRUCTURE-AGNOSTIQUE.md          ← Schéma de la centralisation Claude Code / OpenCode
@@ -80,13 +78,7 @@ Au scope **utilisateur** (global), ce repo utilise les deux (`CLAUDE.md` → `@A
 
 Au scope **projet**, plus de `CLAUDE.md` : un seul `AGENTS.md` à la racine, lu nativement par Claude Code (v2.1.277+) et partagé avec les autres harnais.
 
----
-
-## Le `AGENTS.md` racine de ce repo
-
-En plus de `.claude/AGENTS.md` (backup de `~/.claude/AGENTS.md`, scope Claude Code), ce repo a un `AGENTS.md` à sa propre racine - même contenu, mais positionné pour être copié-collé directement dans le dossier de config global de n'importe quel harnais (`~/.config/opencode/AGENTS.md`, `~/.codex/AGENTS.md`...), sans dépendre de l'arborescence `.claude/`.
-
-⚠️ Trois copies du même contenu existent sur le disque (`~/.claude/AGENTS.md`, `.claude/AGENTS.md` de ce repo, `AGENTS.md` racine de ce repo) - après toute modif des guidelines, répercuter dans les trois pour éviter qu'elles divergent.
+⚠️ Pas de copie dédiée par harnais dans ce repo : [`.claude/AGENTS.md`](./.claude/AGENTS.md) est la seule source à copier-coller (pas de symlink, un fichier qui diverge silencieusement est pire qu'une copie à resynchroniser à la main) dans le dossier de config global de tout **nouveau** harnais compatible `AGENTS.md` que tu branches (ex. `~/.codex/AGENTS.md` pour Codex) - après toute modif des guidelines, répercuter dans `~/.claude/AGENTS.md` **et** `.claude/AGENTS.md` de ce repo, puis recopier vers chaque harnais qui n'a pas de lien vivant vers l'un des deux (OpenCode a un symlink, donc rien à refaire pour lui).
 
 ---
 
