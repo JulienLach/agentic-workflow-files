@@ -28,6 +28,7 @@ Ce repo est la **sauvegarde versionnée** de la config en scope utilisateur de p
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Écrire l'AGENTS.md d'un projet](#écrire-lagentsmd-dun-projet)
 - [Skills disponibles](#skills-disponibles)
+    - [Évaluer un skill (`claude plugin eval`)](#évaluer-un-skill-claude-plugin-eval)
 - [Concepts IA - glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
 - [Atelier - tester un nouveau modèle open-weight](#atelier---tester-un-nouveau-modèle-open-weight)
 
@@ -54,13 +55,15 @@ agentic-workflow-files/
 ├── .claude/                         ← backup de ~/.claude/ (scope utilisateur Claude Code)
 │   ├── AGENTS.md                    ← Guidelines de dev communes à tous les projets (stack, conventions, sécurité, git)
 │   ├── CLAUDE.md                    ← Import `@AGENTS.md`
-│   ├── settings.json                ← Permissions MCP (Context7) + prefs
+│   ├── settings.json                ← Permissions MCP (Context7) + plugins activés (Playwright, Superpowers, Claude Pulse, Obsidian skills)
 │   ├── agents/
-│   │   └── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
+│   │   ├── obsidian-expert.md       ← Agent custom : expertise Obsidian (notes, plugins, templates)
+│   │   └── deep-review.md           ← Agent orchestrateur : revue de code en 3 passes parallèles (sécu/perf/tests)
 │   └── skills/                      ← un sous-dossier par skill, `<nom>/SKILL.md` (format standard, aucun fichier plat) :
 │                                       stack-review, debug, refactor, add-entity, write-tests,
 │                                       security-audit, prep, prep-check, roast, competitor-benchmark,
-│                                       ai-news, learn, pulse
+│                                       ai-news, learn, pulse (fourni par le plugin Claude Pulse, pas écrit à la main)
+│                                       - 10 d'entre eux ont une suite `evals/` (voir Évaluer un skill, plus bas)
 │                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
     ├── AGENTS.md                    ← symlink vers ../.claude/AGENTS.md (un seul fichier, agnostique du harnais)
@@ -167,6 +170,28 @@ claude plugin install https://claude.com/plugins/superpowers
 | `/skill-authoring` | Créer/tester de nouveaux skills (TDD)                      |
 
 > Déclenchement auto : le skill méta `using-superpowers` (hook `SessionStart`) active `systematic-debugging` sans commande explicite dès qu'un bug/test cassé apparaît - à ne pas confondre avec le skill `/debug` de ce repo, complémentaire.
+
+---
+
+#### Playwright
+
+Plugin officiel Anthropic (marketplace `claude-plugins-official`, même source que Context7) : navigateur headless scriptable via MCP - utilisé pour vérifier réellement un changement UI/frontend (voir étape 4 du [`WORKFLOW.md`](./WORKFLOW.md)), pas seulement la compilation/les tests unitaires.
+
+```bash
+claude plugin install playwright@claude-plugins-official
+```
+
+---
+
+#### Claude Pulse
+
+Statusline personnalisable (thèmes, couleurs, animations, coût de session en temps réel) - pas lié au workflow de dev, juste du confort d'affichage dans le terminal.
+
+```bash
+claude plugin install https://github.com/NoobyGains/claude-pulse
+```
+
+> Ce plugin installe aussi un skill `/pulse` (visible dans `.claude/skills/pulse/`) qui pilote sa config - distinct des skills métier de ce repo listés dans [Skills disponibles](#skills-disponibles), il vient avec le plugin plutôt qu'écrit à la main.
 
 ---
 
@@ -373,6 +398,17 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 /competitor-benchmark https://app-concurrente.com
 /learn les principes SOLID
 ```
+
+### Évaluer un skill (`claude plugin eval`)
+
+10 des skills ci-dessus ont une suite d'éval sous `evals/` (`prompt.md` + `graders/criteria.md`) - un cas de test qui compare la réponse **avec** le skill vs **sans** (baseline), noté par un juge LLM. Sert à vérifier qu'une modif d'un skill l'améliore plutôt que de le casser, avant de la committer :
+
+```bash
+cd .claude/skills/<nom-du-skill>
+claude plugin eval . --runs 1 --trust-plugin --no-publish
+```
+
+`ai-news`, `competitor-benchmark` et `pulse` n'en ont pas : ils dépendent du web en temps réel (non-déterministe, coûteux) ou modifient une vraie config (`pulse`), pas adaptés à ce genre de test automatisé.
 
 ---
 
