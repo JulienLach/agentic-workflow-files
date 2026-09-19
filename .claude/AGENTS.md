@@ -2,7 +2,7 @@
 
 Ce fichier fournit à Claude Code (et tout autre outil compatible [AGENTS.md](https://agents.md/)) les guidelines de développement **communes à tous mes projets** - stack par défaut, conventions, sécurité, qualité, git. Il est chargé automatiquement dans **toutes** les sessions, quel que soit le projet ouvert (via `~/.claude/CLAUDE.md` → `@AGENTS.md`).
 
-Chaque projet a en plus son **propre** `CLAUDE.md`/`AGENTS.md` à la racine, écrit à la main, qui ne contient QUE les détails spécifiques à ce projet (entités, schéma DB, variables d'env, patterns métier) - pas ces guidelines générales, qui n'ont pas à être répétées par projet.
+Chaque projet a en plus son **propre** `AGENTS.md` à la racine (plus de `CLAUDE.md` par projet - `AGENTS.md` est lu nativement par Claude Code depuis la v2.1.277, et permet de partager le même fichier avec les autres outils IA utilisés en parallèle, ex. Orca, OpenCode), écrit à la main, qui ne contient QUE les détails spécifiques à ce projet (entités, schéma DB, variables d'env, patterns métier) - pas ces guidelines générales, qui n'ont pas à être répétées par projet.
 
 ---
 
@@ -341,4 +341,4 @@ refactor/scope-du-refacto
 
 ## Contexte projet
 
-Ce fichier est global - il ne contient volontairement **aucun détail de projet spécifique** (entités, schéma DB, business rules). Ces détails vivent dans le `CLAUDE.md`/`AGENTS.md` à la racine du projet en cours, écrit à la main pour ce projet précis.
+Ce fichier est global - il ne contient volontairement **aucun détail de projet spécifique** (entités, schéma DB, business rules). Ces détails vivent dans le `AGENTS.md` à la racine du projet en cours, écrit à la main pour ce projet précis.
