@@ -439,7 +439,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | --- | --- |
 | **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
 | **Fine-tunes communautaires** | Nous Hermes (Nous Research), Dolphin, OpenHermes, WizardLM |
-| **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Gemini CLI, Aider |
+| **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Gemini CLI, Mistral Vibe, Aider |
 | **IDE avec agent intégré** | Cursor, Windsurf, GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Devin, Claude Code (mode cloud/remote), Jules (Google) |
 | **Protocoles / standards** | MCP (Model Context Protocol), function calling / tool use |
