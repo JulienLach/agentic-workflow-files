@@ -13,9 +13,9 @@ Ce repo est la **sauvegarde versionnée** de la config en scope utilisateur de p
 - [`CLAUDE.md` vs `AGENTS.md`](#claudemd-vs-agentsmd)
 - [Le `AGENTS.md` racine de ce repo](#le-agentsmd-racine-de-ce-repo)
 - [Installation](#installation)
+    - [Prérequis](#prérequis)
     - [Démarrer un nouveau projet de code](#démarrer-un-nouveau-projet-de-code)
 - [Configuration](#configuration)
-    - [Prérequis](#prérequis)
     - [Skills vs MCP vs Plugins - quelle différence ?](#skills-vs-mcp-vs-plugins--quelle-différence)
     - [Plugins](#plugins)
     - [`skills.sh` - installer des skills externes via CLI](#skillssh--installer-des-skills-externes-via-cli)
@@ -92,24 +92,34 @@ En plus de `.claude/AGENTS.md` (backup de `~/.claude/AGENTS.md`, scope Claude Co
 
 ## Installation
 
+### Prérequis
+
+- [Claude Code CLI](https://code.claude.com/docs) installé - seul outil obligatoire, le reste de ce repo fonctionne sans les autres.
+- OpenCode installé, **seulement** si tu comptes t'en servir en plus de Claude Code - pas fait par ce repo, voir [Setup OpenCode](./TEST-MODELES.md#setup-une-seule-fois) dans `TEST-MODELES.md`.
+
 Ce repo se clone une fois par machine, pour restaurer la config **scope utilisateur** (pas pour être copié dans chaque projet de code) :
 
 ```bash
 git clone https://github.com/JulienLach/agentic-workflow-files.git
+```
 
+⚠️ Si `~/.claude/` a déjà du contenu (une install existante, pas une machine neuve), `cp -r ... ~/.claude/` ci-dessous **écrase** les fichiers de même nom (`settings.json` compris) sans confirmation. Inspecter `~/.claude/` avant, ou fusionner à la main plutôt qu'un `cp -r` aveugle si tu as déjà des réglages spécifiques à cette machine.
+
+```bash
 # Restaurer la config Claude Code (scope utilisateur)
 cp -r agentic-workflow-files/.claude/* ~/.claude/
 
-# Restaurer la config OpenCode (scope utilisateur)
+# Restaurer la config OpenCode (scope utilisateur) - seulement si OpenCode est installé (voir Prérequis)
 mkdir -p ~/.config/opencode
 ln -sf ~/.claude/AGENTS.md ~/.config/opencode/AGENTS.md          # symlink, pas une copie
 cp agentic-workflow-files/.opencode/opencode.json ~/.config/opencode/opencode.json
 
-# Clé API Context7 (commune aux deux harnais, jamais commitée) - dans ~/.zshrc :
+# Clé API Context7 (commune aux deux harnais, jamais commitée) - dans le fichier de conf de ton shell
+# (~/.zshrc pour zsh, ~/.bashrc pour bash...) :
 #   export CONTEXT7_API_KEY="ctx7sk-..."   # clé depuis https://context7.com/dashboard
 ```
 
-Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/agents/commandes sont disponibles automatiquement dans **tous** tes projets, sans rien copier dedans.
+Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/agents/commandes sont disponibles automatiquement dans **tous** tes projets, sans rien copier dedans. Pour vérifier que la config a bien été prise en compte, lancer `claude` dans un dossier quelconque et taper `/context` : la liste des **Memory files** doit inclure `~/.claude/CLAUDE.md` (qui importe `AGENTS.md`).
 
 `CONTEXT7_API_KEY` est lue depuis l'environnement du shell par les deux harnais : Claude Code via `${CONTEXT7_API_KEY}` dans le `.mcp.json` du plugin `context7`, OpenCode via `{env:CONTEXT7_API_KEY}` dans `opencode.json`. Sans elle, le serveur MCP Context7 renvoie `HTTP 401`.
 
@@ -120,11 +130,6 @@ Un nouveau projet n'a besoin que de son propre `AGENTS.md` - voir [Écrire l'AGE
 ---
 
 ## Configuration
-
-### Prérequis
-
-- [Claude Code CLI](https://code.claude.com/docs) installé
-- MCP Context7 configuré (voir ci-dessous)
 
 ### Skills vs MCP vs Plugins - quelle différence ?
 
