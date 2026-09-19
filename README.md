@@ -11,6 +11,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
 - [Stack cible](#stack-cible)
 - [Contenu](#contenu)
 - [`CLAUDE.md` vs `AGENTS.md`](#claudemd-vs-agentsmd)
+- [Le `AGENTS.md` racine de ce repo](#le-agentsmd-racine-de-ce-repo)
 - [Installation](#installation)
     - [Démarrer un nouveau projet de code](#démarrer-un-nouveau-projet-de-code)
 - [Configuration](#configuration)
@@ -25,7 +26,7 @@ Ce repo est la **sauvegarde versionnée** de la config Claude Code/OpenCode en s
     - [Agent orchestrateur](#agent-orchestrateur)
 - [Design - maquette client avant le code](#design--maquette-client-avant-le-code)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
-- [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet)
+- [Écrire l'AGENTS.md d'un projet](#écrire-lagentsmd-dun-projet)
 - [Skills disponibles](#skills-disponibles)
 - [Concepts IA - glossaire et fondamentaux](#concepts-ia--glossaire-et-fondamentaux)
 - [Atelier - tester un nouveau modèle open-weight](#atelier---tester-un-nouveau-modèle-open-weight)
@@ -42,6 +43,7 @@ Node.js/Express/TypeScript/PostgreSQL + React/Vite, monorepo `backend/`+`fronten
 
 ```
 agentic-workflow-files/
+├── AGENTS.md                        ← Copie racine du même contenu que .claude/AGENTS.md, à copier-coller telle quelle dans le dossier de config global de n'importe quel harnais compatible AGENTS.md (ex. ~/.config/opencode/, ~/.codex/) - voir Le AGENTS.md racine de ce repo
 ├── WORKFLOW.md                      ← Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub
 ├── CONCEPTS-IA.md                   ← Glossaire et concepts IA (harness, modèles, tokens, RAG...)
 ├── STRUCTURE-AGNOSTIQUE.md          ← Schéma de la centralisation Claude Code / OpenCode
@@ -65,13 +67,23 @@ agentic-workflow-files/
     └── opencode.json               ← config OpenCode : MCP Context7 (clé via {env:CONTEXT7_API_KEY}, pas dans le repo)
 ```
 
-Chaque projet garde ensuite son propre `CLAUDE.md` - voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet).
+Chaque projet garde ensuite son propre `AGENTS.md` - voir [Écrire l'AGENTS.md d'un projet](#écrire-lagentsmd-dun-projet).
 
 ---
 
 ## `CLAUDE.md` vs `AGENTS.md`
 
-Ce repo utilise les deux (`CLAUDE.md` → `@AGENTS.md`) pour rester lisible par Claude Code et par tout outil compatible [AGENTS.md](https://agents.md/) (OpenCode...). Explication complète (pourquoi, précédence, symlink vs import) dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#le-fichier-dinstructions-racine--claudemd-et-agentsmd).
+Au scope **utilisateur** (global), ce repo utilise les deux (`CLAUDE.md` → `@AGENTS.md`) pour rester lisible par Claude Code même dans les sessions qui ne supportent pas encore la lecture native d'`AGENTS.md`, et par tout outil compatible [AGENTS.md](https://agents.md/) (OpenCode, Codex...). Explication complète (pourquoi, précédence, symlink vs import) dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#le-fichier-dinstructions-racine--claudemd-et-agentsmd).
+
+Au scope **projet**, plus de `CLAUDE.md` : un seul `AGENTS.md` à la racine, lu nativement par Claude Code (v2.1.277+) et partagé avec les autres harnais.
+
+---
+
+## Le `AGENTS.md` racine de ce repo
+
+En plus de `.claude/AGENTS.md` (backup de `~/.claude/AGENTS.md`, scope Claude Code), ce repo a un `AGENTS.md` à sa propre racine - même contenu, mais positionné pour être copié-collé directement dans le dossier de config global de n'importe quel harnais (`~/.config/opencode/AGENTS.md`, `~/.codex/AGENTS.md`...), sans dépendre de l'arborescence `.claude/`.
+
+⚠️ Trois copies du même contenu existent sur le disque (`~/.claude/AGENTS.md`, `.claude/AGENTS.md` de ce repo, `AGENTS.md` racine de ce repo) - après toute modif des guidelines, répercuter dans les trois pour éviter qu'elles divergent.
 
 ---
 
@@ -100,7 +112,7 @@ Une fois ça fait, `~/.claude/AGENTS.md` (guidelines communes) et les skills/age
 
 ### Démarrer un nouveau projet de code
 
-Un nouveau projet n'a besoin que de son propre `CLAUDE.md` - voir [Écrire le CLAUDE.md d'un projet](#écrire-le-claudemd-dun-projet) plus bas.
+Un nouveau projet n'a besoin que de son propre `AGENTS.md` - voir [Écrire l'AGENTS.md d'un projet](#écrire-lagentsmd-dun-projet) plus bas.
 
 ---
 
@@ -299,12 +311,12 @@ Voir [`WORKFLOW.md`](./WORKFLOW.md) : capture des tâches (Obsidian skills) → 
 
 ---
 
-## Écrire le CLAUDE.md d'un projet
+## Écrire l'AGENTS.md d'un projet
 
-`~/.claude/AGENTS.md` (global) ne contient volontairement aucun détail de projet. Chaque projet a son propre `CLAUDE.md` à la racine, à écrire à la main, avec ce type de structure :
+`~/.claude/AGENTS.md` (global) ne contient volontairement aucun détail de projet. Chaque projet a son propre `AGENTS.md` à la racine, à écrire à la main, avec ce type de structure :
 
 ```markdown
-# CLAUDE.md
+# AGENTS.md
 
 ## Vue d'ensemble
 

@@ -9,7 +9,7 @@ flowchart LR
     CC["Claude Code<br/>CLAUDE.md → @AGENTS.md"]
     OC["OpenCode<br/>AGENTS.md (symlink)"]
     BACKUP["agentic-workflow-files<br/>backup git, cloné sur les autres machines"]
-    PROJ["Chaque projet (radar, ...)<br/>son propre CLAUDE.md, spécifique"]
+    PROJ["Chaque projet (radar, ...)<br/>son propre AGENTS.md, spécifique"]
 
     SRC -->|lu par| CC
     SRC -. symlink .-> OC

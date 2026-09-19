@@ -2,7 +2,7 @@
 
 Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**, avec **Claude Code** comme hub central (contexte, plugins, skills, agents), le **CLI Obsidian** et **`gh` CLI**.
 
-Il complète le `AGENTS.md` global (guidelines de dev communes) + le `CLAUDE.md` du projet (spécificités) et le `README.md` de ce repo (setup des skills/MCP) : ceux-ci décrivent _comment coder_, celui-ci décrit _comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi_.
+Il complète le `AGENTS.md` global (guidelines de dev communes) + le `AGENTS.md` du projet (spécificités) et le `README.md` de ce repo (setup des skills/MCP) : ceux-ci décrivent _comment coder_, celui-ci décrit _comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi_.
 
 ---
 
@@ -25,7 +25,7 @@ Il complète le `AGENTS.md` global (guidelines de dev communes) + le `CLAUDE.md`
 ┌───────────────────────────────────────────────────────────────────────┐
 │                         Claude Code (hub central)                       │
 │                                                                          │
-│  AGENTS.md/CLAUDE.md ──▶ context window   Plugins ──▶ Context7          │
+│  AGENTS.md (global + projet) ──▶ context window   Plugins ──▶ Context7  │
 │                                             ├───▶ Obsidian skills        │
 │                                             └───▶ Playwright (MCP)       │
 │  MCP Excalidraw ──▶ Conception / Architecture                           │
@@ -121,7 +121,7 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / A
 
 Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatre briques :
 
-- **Fichiers de contexte** (`AGENTS.md` global + `CLAUDE.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
+- **Fichiers de contexte** (`AGENTS.md` global + `AGENTS.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
 - **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable - voir étape 4 pour la vérification des changements UI).
 - **Skills** (`.claude/skills/*.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` - à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
 
@@ -160,7 +160,7 @@ Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et l
     git checkout -b feat/nom-de-la-feature
     ```
 
-3. Implémenter en suivant `AGENTS.md` (stack, conventions, tests) et le `CLAUDE.md` du projet (spécificités).
+3. Implémenter en suivant `AGENTS.md` (stack, conventions, tests) et le `AGENTS.md` du projet (spécificités).
 4. Vérifier avant de committer : tests, lint, exécution locale - et pour tout changement **UI/frontend**, passage réel dans un navigateur via le **MCP Playwright** (parcours nominal + cas limites, pas seulement la compilation/les tests unitaires qui ne garantissent pas le comportement visuel).
 
 ---

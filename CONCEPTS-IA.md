@@ -467,7 +467,7 @@ Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un
 
 **Où le placer :** à la **racine du repo**, toujours - c'est l'endroit où tous les harness le cherchent par défaut, sans configuration supplémentaire.
 
-- **Claude Code ne lit pas `AGENTS.md` seul** - il ne charge que `CLAUDE.md` ([doc officielle](https://code.claude.com/docs/en/memory#agents-md)). Fix : un `CLAUDE.md` qui importe l'autre (`@AGENTS.md`), ou un symlink `ln -s AGENTS.md CLAUDE.md`.
+- **Claude Code lit `AGENTS.md` nativement depuis la v2.1.277** ([doc officielle](https://code.claude.com/docs/en/memory#agents-md)), mais seulement au niveau **projet** (répertoire de travail et parents) - pas au niveau utilisateur/global, qui ne connaît que `CLAUDE.md`. Précédence par défaut : si un `CLAUDE.md` (ou `CLAUDE.local.md`) existe dans l'arborescence du projet, il est lu à la place d'`AGENTS.md`, pas en plus. Pour le scope global, la seule option reste un `CLAUDE.md` qui importe l'autre (`@AGENTS.md`), ou un symlink `ln -s AGENTS.md CLAUDE.md`.
 
 **Contenu typique** (ce n'est pas une doc générale du projet - ça, c'est le rôle du `README.md`) :
 
@@ -503,7 +503,7 @@ Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent
 
 | | Claude Code | OpenCode |
 | --- | --- | --- |
-| Fichier d'instructions racine | `CLAUDE.md` (+ `AGENTS.md` supporté) | `AGENTS.md`, repli sur `CLAUDE.md` si absent |
+| Fichier d'instructions racine | `AGENTS.md` natif (v2.1.277+), repli sur `CLAUDE.md` si présent | `AGENTS.md`, repli sur `CLAUDE.md` si absent |
 | Dossier config projet | `.claude/` | `.opencode/` |
 | Subagents | `.claude/agents/*.md` | `.opencode/agent/**/*.md` |
 | Config générale | `.claude/settings.json` | `opencode.json` |
