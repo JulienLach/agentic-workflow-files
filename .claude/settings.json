@@ -14,7 +14,7 @@
     "claude-pulse@claude-pulse": true,
     "context7@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
-    "playwright@claude-plugins-official": false,
+    "playwright@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
