@@ -248,7 +248,7 @@ Les hooks vivent dans le `.claude/settings.json` **du projet** (jamais ici : ils
           {
             "type": "command",
             "if": "Edit(frontend/**/*.ts)|Edit(frontend/**/*.tsx)|Write(frontend/**/*.ts)|Write(frontend/**/*.tsx)",
-            "command": "cd frontend && npx tsc --noEmit && npm run lint",
+            "command": "cd frontend && npx tsc -p tsconfig.app.json --noEmit && npm run lint",
             "timeout": 120
           }
         ]
@@ -260,6 +260,7 @@ Les hooks vivent dans le `.claude/settings.json` **du projet** (jamais ici : ils
 
 - `matcher` filtre sur l'outil (`Edit`/`Write`) ; `if` filtre en plus sur le chemin (syntaxe des règles de permission).
 - Le hook s'exécute depuis la racine du projet : adapter les `cd` et les commandes au projet réel (projet mono-package : enlever le `cd backend`/`cd frontend`).
+- **Frontend Vite : ne jamais lancer `npx tsc --noEmit` seul.** Le `tsconfig.json` généré par Vite est un fichier racine vide (`"files": []` + `references` vers `tsconfig.app.json` et `tsconfig.node.json`) : `tsc --noEmit` sort sans erreur sans avoir vérifié un seul fichier, et le hook passe toujours. Cibler `-p tsconfig.app.json` (ou `tsc -b`, comme `npm run build`). En cas de doute, `--listFilesOnly` montre les fichiers réellement analysés.
 - Code de sortie **2** = l'erreur est renvoyée à Claude qui la corrige ; **0** = silencieux. Tester avec `/hooks`.
 - Trop lent à chaque édition ? Déplacer le même bloc sous l'évènement `Stop` (déclenché quand Claude a fini de répondre) au lieu de `PostToolUse`.
 - Ne pas mettre en hook ce qu'un test d'intégration couvre déjà mieux. La suite de tests complète reste manuelle ou en CI.
