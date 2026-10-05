@@ -178,6 +178,14 @@ Plugin officiel Anthropic (marketplace `claude-plugins-official`, même source q
 claude plugin install playwright@claude-plugins-official
 ```
 
+En complément, installer aussi le MCP directement en scope user (tous les projets) - c'est lui qui sert au quotidien :
+
+```bash
+claude mcp add --scope user playwright -- npx @playwright/mcp@latest
+```
+
+> Plugin et MCP lancent la même commande (`npx @playwright/mcp@latest`) : Claude Code dédoublonne et n'en garde qu'un, le doublon est inoffensif. Le plugin reste activé dans `settings.json` comme filet de sécurité sur une machine où le MCP n'aurait pas été ajouté.
+
 ---
 
 #### Claude Pulse
