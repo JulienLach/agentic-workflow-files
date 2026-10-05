@@ -222,16 +222,16 @@ Options : `-g` (global, `~/.claude/skills/`) · `-a <agent>` (cible un harness p
 
 ### MCP (Model Context Protocol) - outils externes
 
-Concept détaillé dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#mcp-model-context-protocol). Côté pratique : un MCP s'installe via CLI et peut être configuré **globalement** (tous tes projets) ou **par projet** (dans `.claude/`).
+Concept détaillé dans [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#mcp-model-context-protocol). Côté pratique : un MCP s'installe via CLI et peut être configuré **globalement** (tous tes projets) ou **par projet**. Par défaut, `claude mcp add` installe en scope `local` (dossier courant uniquement) : pour un MCP global, toujours passer `--scope user` (config stockée dans `~/.claude.json`).
 
 #### Installer un MCP globalement
 
 ```bash
 # Syntaxe générale
-claude mcp add <nom> -- <commande-de-lancement>
+claude mcp add --scope user <nom> -- <commande-de-lancement>
 
 # Exemple
-claude mcp add context7 -- npx -y @upstash/context7-mcp
+claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp
 ```
 
 #### Lister / supprimer les MCP
@@ -248,7 +248,7 @@ claude mcp remove <nom>
 Doc à jour des librairies (Express, React, Zod, Vitest, pg...) directement en conversation.
 
 ```bash
-claude mcp add context7 -- npx -y @upstash/context7-mcp
+claude mcp add --scope user context7 -- npx -y @upstash/context7-mcp
 ```
 
 Utilisé automatiquement par Claude, ou explicitement : `Utilise context7 pour...`.
