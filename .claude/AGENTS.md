@@ -189,6 +189,8 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 - **I** - Interfaces spécifiques plutôt que générales
 - **D** - Dépendre des abstractions, pas des implémentations
 
+**SOLID est une direction, pas une règle à satisfaire à 100 %.** En cas de conflit, KISS et YAGNI priment : pas d'injection de dépendance, d'interface ou de couche que le style du projet n'utilise pas déjà. On garde une abstraction seulement quand une contrainte réelle l'impose (sécurité, fonctionnalité produit, changement probable), et on dit laquelle.
+
 **YAGNI** - N'implémenter que ce qui est nécessaire maintenant. Pas de fonctionnalités "au cas où".
 
 ### Standards TypeScript
