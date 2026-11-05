@@ -193,7 +193,7 @@ claude mcp add --scope user playwright -- npx @playwright/mcp@latest
 Statusline personnalisable (thèmes, couleurs, animations, coût de session en temps réel) - pas lié au workflow de dev, juste du confort d'affichage dans le terminal.
 
 ```bash
-claude plugin install https://github.com/NoobyGains/claude-pulse
+claude plugin install claude-pulse@anthropic-plugin-directory
 ```
 
 > Ce plugin installe aussi un skill `/pulse` (visible dans `.claude/skills/pulse/`) qui pilote sa config - distinct des skills métier de ce repo listés dans [Skills disponibles](#skills-disponibles), il vient avec le plugin plutôt qu'écrit à la main.
