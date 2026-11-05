@@ -267,6 +267,19 @@ Points clés de ce genre d'agent :
 - **Lecture seule** : pas de `Write`/`Edit`, l'agent propose des correctifs, il ne les applique pas.
 - Un cran au-dessus (plusieurs harnais différents en parallèle, pas juste des subagents du même harnais) : **Orca**, voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#8-panorama-des-outils).
 
+**Tester `deep-review`** : dans une nouvelle session, sur une branche avec un petit diff (l'orchestrateur tourne sur Opus et les workers en héritent par défaut) :
+
+```
+@"deep-review (agent)" deep-review sur le diff de la branche courante
+```
+
+Le test est réussi si :
+
+1. Trois workers partent : sécurité, performance et tests.
+2. La réponse est une seule synthèse, avec un verdict et des lignes `chemin:ligne - problème - correctif`.
+3. Chaque finding pointe vers du code réel : en vérifier deux ou trois.
+4. `git status` ne montre aucun fichier modifié.
+
 ---
 
 ## Design - maquette client avant le code
