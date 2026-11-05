@@ -19,8 +19,8 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Training vs inference](#training-vs-inference)
    - [Poids et quantization](#poids-et-quantization)
    - [VRAM, RAM et SSD : où vivent les poids d'un modèle](#vram-ram-et-ssd--où-vivent-les-poids-dun-modèle)
-2. [Harness, agents et boucle agentique](#2-harness-agents-et-boucle-agentique)
-   - [Le "Harness"](#le-harness)
+2. [Harnais, agents et boucle agentique](#2-harnais-agents-et-boucle-agentique)
+   - [Le "Harnais"](#le-harnais)
    - [La boucle agentique (agentic loop)](#la-boucle-agentique-agentic-loop)
    - [Tool use / function calling](#tool-use--function-calling)
    - [Computer use / agents navigateur](#computer-use--agents-navigateur)
@@ -46,11 +46,13 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Évaluer et comparer les modèles (benchmarks)](#évaluer-et-comparer-les-modèles-benchmarks)
    - [Comment choisir un modèle pour une tâche donnée](#comment-choisir-un-modèle-pour-une-tâche-donnée)
    - [Le "raisonnement étendu" (adaptive thinking / reasoning models)](#le-raisonnement-étendu-adaptive-thinking--reasoning-models)
+   - [Modèles de décision (System One)](#modèles-de-décision-system-one)
 6. [Prompting et context engineering](#6-prompting-et-context-engineering)
    - [Prompt engineering](#prompt-engineering)
    - [System prompt](#system-prompt)
    - [Zero-shot, few-shot, chain-of-thought](#zero-shot-few-shot-chain-of-thought)
    - [Context engineering](#context-engineering)
+   - [Réduire la consommation de tokens](#réduire-la-consommation-de-tokens)
 7. [RAG, embeddings et mémoire](#7-rag-embeddings-et-mémoire)
    - [Embeddings](#embeddings)
    - [RAG (Retrieval-Augmented Generation)](#rag-retrieval-augmented-generation)
@@ -59,7 +61,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
 8. [Panorama des outils](#8-panorama-des-outils)
 9. [Architecture de fichiers pour agents IA](#9-architecture-de-fichiers-pour-agents-ia)
    - [Le fichier d'instructions racine : CLAUDE.md et AGENTS.md](#le-fichier-dinstructions-racine--claudemd-et-agentsmd)
-   - [Le dossier de config du harness : .claude/ et .opencode/](#le-dossier-de-config-du-harness--claude-et-opencode)
+   - [Le dossier de config du harnais : .claude/ et .opencode/](#le-dossier-de-config-du-harnais--claude-et-opencode)
    - [Portée : projet, sous-dossier, utilisateur, organisation](#portée--projet-sous-dossier-utilisateur-organisation)
    - [Bonnes pratiques](#bonnes-pratiques)
 10. [Références incontournables : le workflow IA au quotidien](#10-références-incontournables--le-workflow-ia-au-quotidien)
@@ -144,13 +146,13 @@ Sur un modèle **MoE (Mixture of Experts, voir plus haut)**, ce n'est plus vrai 
 
 ---
 
-## 2. Harness, agents et boucle agentique
+## 2. Harnais, agents et boucle agentique
 
-### Le "Harness"
+### Le "Harnais"
 
-Un modèle seul ne fait que **générer du texte**. Le **harness** est le logiciel qui l'entoure et lui donne des "mains" : accès à des outils (lire/écrire des fichiers, exécuter du shell, appeler des APIs), gestion de la mémoire et du contexte, permissions, interface utilisateur, boucle d'exécution. C'est le harness qui transforme "un LLM qui répond à des questions" en "un agent qui accomplit des tâches".
+Un modèle seul ne fait que **générer du texte**. Le **harnais** est le logiciel qui l'entoure et lui donne des "mains" : accès à des outils (lire/écrire des fichiers, exécuter du shell, appeler des APIs), gestion de la mémoire et du contexte, permissions, interface utilisateur, boucle d'exécution. C'est le harnais qui transforme "un LLM qui répond à des questions" en "un agent qui accomplit des tâches".
 
-**Exemples de harness pour le dev :**
+**Exemples de harnais pour le dev :**
 
 | Outil | Type |
 | --- | --- |
@@ -158,8 +160,6 @@ Un modèle seul ne fait que **générer du texte**. Le **harness** est le logici
 | **OpenCode** | Alternative CLI open-source, agnostique au fournisseur de modèle |
 | **Codex CLI** (OpenAI) | CLI agentique équivalent côté OpenAI |
 | **Antigravity CLI** (Google) | CLI agentique côté Google |
-| **Aider** | CLI open-source, orienté pair-programming en terminal |
-| **Cursor** | IDE avec agent intégré (fork de VS Code) |
 | **GitHub Copilot** (mode agent) | Extension IDE + agent autonome dans les PR/issues |
 
 ### La boucle agentique (agentic loop)
@@ -168,7 +168,7 @@ Ce qui distingue un **agent** d'un simple chatbot : le cycle **observer → plan
 
 ### Tool use / function calling
 
-La capacité du modèle à décider, au milieu de sa génération, d'**appeler un outil** avec des arguments structurés (ex. `Read(file_path="...")`) plutôt que de répondre uniquement en texte. C'est le mécanisme technique de base qui rend l'agentique possible - le modèle "choisit" quel outil utiliser et avec quels paramètres, le harness exécute l'appel et renvoie le résultat au modèle.
+La capacité du modèle à décider, au milieu de sa génération, d'**appeler un outil** avec des arguments structurés (ex. `Read(file_path="...")`) plutôt que de répondre uniquement en texte. C'est le mécanisme technique de base qui rend l'agentique possible - le modèle "choisit" quel outil utiliser et avec quels paramètres, le harnais exécute l'appel et renvoie le résultat au modèle.
 
 ### Computer use / agents navigateur
 
@@ -179,7 +179,7 @@ Une variante du tool use ci-dessus : plutôt que d'appeler des outils structuré
 
 ### MCP (Model Context Protocol)
 
-Standard ouvert créé par Anthropic pour connecter un LLM à des sources de données et outils externes de façon **uniforme**, plutôt que de coder une intégration spécifique par outil et par fournisseur de modèle - souvent résumé comme *"l'USB-C des agents IA"*. Il est aujourd'hui hébergé par l'Agentic AI Foundation (Linux Foundation). Un **serveur MCP** expose des outils/ressources que n'importe quel harness compatible peut utiliser.
+Standard ouvert créé par Anthropic pour connecter un LLM à des sources de données et outils externes de façon **uniforme**, plutôt que de coder une intégration spécifique par outil et par fournisseur de modèle - souvent résumé comme *"l'USB-C des agents IA"*. Il est aujourd'hui hébergé par l'Agentic AI Foundation (Linux Foundation). Un **serveur MCP** expose des outils/ressources que n'importe quel harnais compatible peut utiliser.
 
 - Exemple dans ce repo : **Context7** (documentation de librairies à jour, servie via MCP).
 - **Le protocole aujourd'hui** (spec du 28 juillet 2026) : un cœur **stateless** (un serveur MCP distant peut tourner derrière un simple load balancer round-robin), un **framework d'Extensions** (`MCP Apps` pour des UI servies par le serveur, `Tasks` pour du travail longue durée) et une auth alignée sur OAuth 2.0/OIDC, avec les **Client ID Metadata Documents** pour identifier les clients.
@@ -190,7 +190,7 @@ Standard ouvert créé par Anthropic pour connecter un LLM à des sources de don
 - **Skill** : un dossier `<nom>/SKILL.md` d'instructions réutilisables, invocable à la demande (`/nom-du-skill`) - un prompt structuré et versionné plutôt qu'à réécrire à chaque fois. Le format **Agent Skills** est un standard ouvert, confié à l'Agentic AI Foundation en octobre 2026. Ex. `/code-review`, `/debug` dans ce repo.
 - **Plugin** : un bundle complet (skills + MCP + hooks) packagé et installable en une commande.
 - **Subagent** : une instance séparée du modèle, avec son propre contexte, ses propres outils et parfois son propre modèle, lancée par l'agent principal pour isoler ou paralléliser une tâche. Ex. `obsidian-expert` dans ce repo.
-- **Hook** : une commande shell déclenchée **automatiquement** par le harness en réaction à un événement précis (avant/après un appel d'outil, fin de session...) - de l'automatisation "dure", pas pilotée par une décision du modèle.
+- **Hook** : une commande shell déclenchée **automatiquement** par le harnais en réaction à un événement précis (avant/après un appel d'outil, fin de session...) - de l'automatisation "dure", pas pilotée par une décision du modèle.
 
 ### MCP vs Skill - quand choisir quoi
 
@@ -258,7 +258,7 @@ Un premier LLM (ou une règle plus simple) classe la requête entrante et la dir
 Une tâche est éclatée en plusieurs appels LLM **indépendants et connus à l'avance**, exécutés simultanément, puis agrégés - soit pour la vitesse (*sectioning* : chaque LLM traite une portion différente de la tâche), soit pour la fiabilité (*voting* : plusieurs tentatives indépendantes sur la même question, dont on retient la réponse majoritaire ou la meilleure).
 
 - Différence avec Orchestrator-Workers : ici, le nombre de branches et leur contenu sont **fixés avant de lancer les LLM** - pas de décision dynamique en cours de route.
-- Dans ce repo : `superpowers:dispatching-parallel-agents` correspond au sectioning - plusieurs subagents indépendants, lancés en parallèle dans un seul message, chacun sur une portion de la tâche connue à l'avance (voir aussi la règle "un seul message, plusieurs appels d'outils indépendants" côté harness).
+- Dans ce repo : `superpowers:dispatching-parallel-agents` correspond au sectioning - plusieurs subagents indépendants, lancés en parallèle dans un seul message, chacun sur une portion de la tâche connue à l'avance (voir aussi la règle "un seul message, plusieurs appels d'outils indépendants" côté harnais).
 
 ### Orchestrator-Workers
 
@@ -269,9 +269,9 @@ Un agent central (l'orchestrateur) découpe une tâche volumineuse et distribue 
 
 Ce pattern se décline à **deux niveaux** selon ce qu'on orchestre :
 
-**Niveau 1 - un agent orchestrateur, à l'intérieur d'un seul harness.** L'agent principal, ou un subagent dédié écrit dans `.claude/agents/<nom>.md`, découpe la tâche et lance plusieurs subagents (chacun dans son contexte isolé) puis fusionne leurs retours. Chaque subagent peut tourner sur un **modèle différent** de l'orchestrateur : un petit modèle rapide et pas cher (Haiku) pour les workers de recherche/lecture, un gros modèle (Opus) pour l'orchestrateur qui planifie et synthétise. Utile quand la même orchestration revient souvent - pour un one-shot, l'agent principal sait déjà orchestrer à la volée, inutile d'écrire un fichier. Exemple concret d'agent orchestrateur dans le [`README.md`](./README.md#agent-orchestrateur).
+**Niveau 1 - un agent orchestrateur, à l'intérieur d'un seul harnais.** L'agent principal, ou un subagent dédié écrit dans `.claude/agents/<nom>.md`, découpe la tâche et lance plusieurs subagents (chacun dans son contexte isolé) puis fusionne leurs retours. Chaque subagent peut tourner sur un **modèle différent** de l'orchestrateur : un petit modèle rapide et pas cher (Haiku) pour les workers de recherche/lecture, un gros modèle (Opus) pour l'orchestrateur qui planifie et synthétise. Utile quand la même orchestration revient souvent - pour un one-shot, l'agent principal sait déjà orchestrer à la volée, inutile d'écrire un fichier. Exemple concret d'agent orchestrateur dans le [`README.md`](./README.md#agent-orchestrateur).
 
-**Niveau 2 - un logiciel qui chapeaute plusieurs harnais.** Un cran au-dessus : au lieu de subagents du même harness, on fait collaborer plusieurs **harnais complets et différents** (Claude Code + Codex + OpenCode + Pi...), chacun avec son modèle et ses forces. Un logiciel dédié - une "ADE", agent development environment, comme **Orca** (Stably AI, MIT, gratuit, tu utilises tes propres abonnements) - lance chaque agent dans un **worktree git isolé**, route les tâches, affiche tout au même endroit et te prévient (ex. sur ton téléphone) quand un agent a besoin d'une décision. Le code ne transite pas par les serveurs d'Orca. Cf. section 8.
+**Niveau 2 - un logiciel qui chapeaute plusieurs harnais.** Un cran au-dessus : au lieu de subagents du même harnais, on fait collaborer plusieurs **harnais complets et différents** (Claude Code + Codex + OpenCode + Pi...), chacun avec son modèle et ses forces. Un logiciel dédié - une "ADE", agent development environment, comme **Orca** (Stably AI, MIT, gratuit, tu utilises tes propres abonnements) - lance chaque agent dans un **worktree git isolé**, route les tâches, affiche tout au même endroit et te prévient (ex. sur ton téléphone) quand un agent a besoin d'une décision. Le code ne transite pas par les serveurs d'Orca. Cf. section 8.
 
 ### Reflection et Evaluator-Optimizer
 
@@ -296,10 +296,10 @@ Décomposer un objectif de haut niveau en sous-tâches, séquentielles ou parall
 
 Un **endpoint**, c'est une URL précise à laquelle on envoie une requête pour parler à un service - la "porte d'entrée" d'une API. Dans un workflow IA, on en croise plusieurs types :
 
-- **Endpoint de modèle (API)** : l'URL que le harness appelle pour envoyer un prompt et récupérer une réponse. Un même fournisseur expose souvent plusieurs endpoints selon la fonction : chat/génération, embeddings, batch (traitement asynchrone en masse, moins cher), fine-tuning.
+- **Endpoint de modèle (API)** : l'URL que le harnais appelle pour envoyer un prompt et récupérer une réponse. Un même fournisseur expose souvent plusieurs endpoints selon la fonction : chat/génération, embeddings, batch (traitement asynchrone en masse, moins cher), fine-tuning.
 - **Endpoint auto-hébergé / déployé** : quand un modèle est déployé sur ta propre infra (cloud ML type SageMaker/Vertex AI, ou en local avec **Ollama**), il expose son propre endpoint, distinct de celui du fournisseur d'origine.
 - **Endpoint compatible OpenAI** : beaucoup de fournisseurs exposent un endpoint qui respecte le même format que l'API OpenAI, pour permettre de changer de modèle/fournisseur juste en changeant l'URL et la clé, sans réécrire le code.
-- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint - en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP** - auquel le harness se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** - leur nom, leur description, les arguments qu'ils acceptent - que le harness rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harness et un outil venu d'un serveur MCP.
+- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint - en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP** - auquel le harnais se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** - leur nom, leur description, les arguments qu'ils acceptent - que le harnais rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harnais et un outil venu d'un serveur MCP.
   > Le transport distant standard est **Streamable HTTP** (voir section 2, "MCP").
 - **Streaming vs non-streaming** : un endpoint peut renvoyer la réponse complète d'un coup, ou la **streamer** token par token au fur et à mesure de la génération.
 
@@ -335,7 +335,7 @@ On l'ajoute comme **MCP personnalisé** dans Claude Desktop, ou en CLI avec `cla
 
 Un modèle open-weights publié par son créateur (le "modèle de base") peut être **re-fine-tuné par un tiers** sur des données ciblées, pour produire une variante spécialisée - publiée elle aussi en open-weights, sous un nouveau nom. C'est un fine-tuning fait par la communauté, pas par le fournisseur d'origine.
 
-- **Nous Hermes** (Nous Research) est l'exemple le plus connu : une famille de fine-tunes construits par-dessus des modèles de base (Llama, Mistral, Qwen selon la version), réputée pour son bon comportement en **tool use / function calling** et en tâches agentiques - d'où la confusion fréquente avec un "agent" ou un harness : **Hermes reste un modèle**, pas un outil d'orchestration. C'est le harness (Claude Code, OpenCode...) qui l'utiliserait comme moteur si on voulait le faire tourner dans un contexte agentique.
+- **Nous Hermes** (Nous Research) est l'exemple le plus connu : une famille de fine-tunes construits par-dessus des modèles de base (Llama, Mistral, Qwen selon la version), réputée pour son bon comportement en **tool use / function calling** et en tâches agentiques - d'où la confusion fréquente avec un "agent" ou un harnais : **Hermes reste un modèle**, pas un outil d'orchestration. C'est le harnais (Claude Code, OpenCode...) qui l'utiliserait comme moteur si on voulait le faire tourner dans un contexte agentique.
 - Autres fine-tunes communautaires connus : Dolphin, OpenHermes, WizardLM - chacun optimisé pour un usage particulier (moins de refus, meilleur suivi d'instructions, function calling, etc.).
 - Pour choisir entre un modèle de base et un de ses fine-tunes : le fine-tune apporte un comportement plus ciblé sur son cas d'usage (souvent mieux pour l'agentique/tool use), mais peut perdre en performance générale par rapport au modèle de base sur d'autres tâches - à tester sur le besoin réel, pas sur la réputation seule.
 
@@ -380,6 +380,36 @@ Certains modèles (ou certains modes de modèles existants) peuvent "réfléchir
 
 Chez Anthropic, c'est l'**adaptive thinking**, dont on règle la profondeur avec le paramètre `effort`.
 
+### Modèles de décision (System One)
+
+Un **modèle de décision** répond à une question fermée sans générer de texte : il renvoie une valeur typée et une probabilité. Le nom « System One » vient de Kahneman : réponse rapide et intuitive, là où un LLM de raisonnement joue le rôle du « System 2 », lent et délibéré. Ce n'est donc pas une façon de prompter, mais un autre type de modèle, qui remplace un appel LLM quand la réponse tient dans une liste connue.
+
+**[Jev](https://docs.typesafe.ai/models)** (TypeSafe AI, en accès anticipé) est le modèle qui a popularisé cette catégorie. C'est une API hébergée, dont les poids ne sont pas publiés :
+
+| Type de question | Réponse |
+| --- | --- |
+| **Choice** | Une option parmi celles fournies, avec la distribution de probabilités |
+| **Score** | Une note sur une échelle de niveaux que tu décris |
+| **Noul** | La probabilité que la réponse soit oui |
+
+```ts
+const { answers } = await client.systemOne({
+  state: { ticket },
+  questions: {
+    category: choice('What kind of ticket is `ticket`?', categories),
+    has_repro_steps: noul('Does `ticket` say how to reproduce the problem?'),
+  },
+})
+```
+
+- **D'où vient l'économie** : l'état n'est lu qu'une fois, toutes les questions sont évaluées en parallèle, et seuls les tokens d'entrée sont facturés (0,042 $ par million). TypeSafe annonce un coût 444 fois plus bas et une réponse 193 fois plus rapide qu'un LLM sur ce type de tâche, d'après ses propres mesures.
+- **Quand l'utiliser** : les réponses possibles sont connues, la décision se répète et le code peut agir selon la probabilité. Typiquement du routing, de la classification ou de la vérification.
+- **Pattern courant** : un LLM extrait une valeur, puis le modèle de décision vérifie qu'elle correspond bien à la source.
+- **Limites** : il ne rédige pas, n'explique pas son raisonnement et n'est pas fiable pour le calcul. Sa précision est meilleure en anglais qu'en français. La calibration des probabilités reste à vérifier sur ses propres données.
+- **Sécurité** : [HiddenLayer a montré](https://www.theregister.com/ai-and-ml/2026/10/15/jev-and-other-decision-models-can-still-be-tricked-with-prompt-injection/5303184) que l'injection de prompt fonctionne aussi sur ces modèles, même si Jev y a cédé moins souvent que le LLM testé. Une décision du modèle reste une action dans ton système : elle doit passer par les mêmes garde-fous.
+
+Autres modèles de ce type : d1-ultra (Liquid AI) et GLiDE (Fastino).
+
 ---
 
 ## 6. Prompting et context engineering
@@ -408,6 +438,17 @@ Une discipline de plus en plus centrale avec les agents autonomes : **gérer act
 - Utiliser des subagents pour isoler des recherches volumineuses (ex. explorer un gros repo) sans polluer le contexte principal avec les résultats intermédiaires.
 
 Un contexte mal géré (trop long, mal trié) dégrade la qualité des réponses et fait grimper le coût - c'est souvent plus déterminant pour la qualité du résultat que le choix du modèle lui-même.
+
+### Réduire la consommation de tokens
+
+Au-delà du contexte bien géré, quelques techniques reviennent, à mesurer sur ses propres tâches :
+
+- **Déléguer les décisions fermées** à un modèle de décision (section 5) plutôt qu'à un LLM.
+- **Charger à la demande** : l'agent ne voit d'abord que le nom et la description des skills et des outils, et ne charge le détail que s'il en a besoin.
+- **Filtrer les sorties d'outils** avant qu'elles n'entrent dans le contexte, pour ne garder que ce qui sert à la tâche.
+- **Écrire des prompts courts mais cadrés** : une demande brève suffit souvent si les critères de réussite sont clairs.
+- **Imposer un style télégraphique** à l'agent, comme le fait le plugin Caveman. Cela réduit la sortie, mais une simplification trop forte peut faire perdre des détails.
+- **Minifier le code envoyé** : [une étude de la TU Wien](https://arxiv.org/pdf/2606.01326) mesure 42 % de tokens d'entrée en moins, mais 12 points de résolution de tâches en moins. Toute économie a un coût en qualité, à vérifier.
 
 ---
 
@@ -442,9 +483,10 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | Catégorie | Outils |
 | --- | --- |
 | **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama et Muse Spark (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
+| **Modèles de décision** | Jev (TypeSafe AI), d1-ultra (Liquid AI), GLiDE (Fastino) |
 | **Fine-tunes communautaires** | Nous Hermes (Nous Research), Dolphin, OpenHermes, WizardLM |
-| **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe, Aider |
-| **IDE avec agent intégré** | Cursor, GitHub Copilot (mode agent), Zed |
+| **Harnais CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe |
+| **IDE avec agent intégré** | GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Claude Code (mode cloud/remote), Jules (Google) |
 | **Protocoles / standards** | MCP (Model Context Protocol), A2A, Agent Skills, function calling / tool use |
 | **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, Microsoft Agent Framework |
@@ -460,16 +502,16 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 ## 9. Architecture de fichiers pour agents IA
 
-Au-delà des concepts (section 2) et des patterns (section 3), une question très concrète revient dès qu'on met en place un repo pensé pour les agents IA : **où mettre quoi**. Cette organisation n'est pas arbitraire - elle découle directement de la façon dont le harness (section 2) construit le system prompt (section 6) et gère le prompt caching (section 1) à chaque session.
+Au-delà des concepts (section 2) et des patterns (section 3), une question très concrète revient dès qu'on met en place un repo pensé pour les agents IA : **où mettre quoi**. Cette organisation n'est pas arbitraire - elle découle directement de la façon dont le harnais (section 2) construit le system prompt (section 6) et gère le prompt caching (section 1) à chaque session.
 
 ### Le fichier d'instructions racine : CLAUDE.md et AGENTS.md
 
 Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un repo porte des noms différents selon l'outil :
 
 - **`CLAUDE.md`** : le nom historique propre à Claude Code.
-- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot, Aider, Zed...).
+- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Gemini CLI, OpenCode, Copilot, Zed...).
 
-**Où le placer :** à la **racine du repo**, toujours - c'est l'endroit où tous les harness le cherchent par défaut, sans configuration supplémentaire.
+**Où le placer :** à la **racine du repo**, toujours - c'est l'endroit où tous les harnais le cherchent par défaut, sans configuration supplémentaire.
 
 - **Claude Code lit `AGENTS.md` nativement depuis la v2.1.277** ([doc officielle](https://code.claude.com/docs/en/memory#agents-md)), mais seulement au niveau **projet** (répertoire de travail et parents) - pas au niveau utilisateur/global, qui ne connaît que `CLAUDE.md`. Précédence par défaut : si un `CLAUDE.md` (ou `CLAUDE.local.md`) existe dans l'arborescence du projet, il est lu à la place d'`AGENTS.md`, pas en plus ; le réglage `claude-md-and-agents-md` (`/config`, *Project instructions*) permet de lire les deux. Pour le scope global, la seule option reste un `CLAUDE.md` qui importe l'autre (`@AGENTS.md`), ou un symlink `ln -s AGENTS.md CLAUDE.md`.
 
@@ -484,9 +526,9 @@ Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un
 
 > Comme ce fichier est injecté à **chaque** session et reste stable d'un appel à l'autre, il bénéficie à plein du prompt caching (section 1) - le garder court et stable coûte moins cher et va plus vite à traiter que d'y déverser toute la documentation du projet, qui a davantage sa place en RAG (section 7) ou en fichiers chargés à la demande.
 
-### Le dossier de config du harness : .claude/ et .opencode/
+### Le dossier de config du harnais : .claude/ et .opencode/
 
-À côté du fichier d'instructions, chaque harness range sa configuration structurée dans un dossier caché dédié - à la racine du repo pour la partie projet, et dans le profil utilisateur pour la partie globale.
+À côté du fichier d'instructions, chaque harnais range sa configuration structurée dans un dossier caché dédié - à la racine du repo pour la partie projet, et dans le profil utilisateur pour la partie globale.
 
 **Claude Code - `.claude/` (projet) :**
 
@@ -534,7 +576,7 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 - **Garder le fichier racine court.** Il est relu à chaque session et pèse sur le prompt caching (section 1) - la documentation volumineuse a davantage sa place en fichiers séparés référencés, voire en RAG (section 7), que collée dans `AGENTS.md`.
 - **Sous-dossiers seulement si le contexte diverge vraiment.** Un monorepo avec un vrai frontend et une vraie infra justifie des `CLAUDE.md` locaux ; un repo simple n'en a pas besoin - la complexité doit suivre un besoin réel, pas être ajoutée par précaution.
 - **Centraliser en global ce qui n'est pas spécifique à un projet.** Agents, skills, commandes et plugins/MCP personnels (pas des règles d'équipe) devraient vivre une seule fois dans `~/.claude/` plutôt que d'être dupliqués dans chaque repo - c'est le scope **utilisateur** du tableau ci-dessus, chargé automatiquement à chaque session, tous projets confondus. Chaque nouveau projet n'a alors besoin que d'un `CLAUDE.md`/`AGENTS.md` minimal propre à son contexte (stack, conventions, contraintes) : tout le reste de l'outillage suit déjà, sans rien reconfigurer. En cas de nom identique en projet et en global (ex. un agent `obsidian-expert` dans les deux), la version **projet** prend le dessus - pratique pour surcharger ponctuellement un agent global sur un repo précis sans toucher à la config personnelle.
-- **Un dossier canonique + des symlinks pour être agnostique du harness.** Le tableau plus haut montre que chaque outil range sa config global sous un nom différent (`~/.claude/` pour Claude Code, `~/.config/opencode/` pour OpenCode...). Plutôt que de dupliquer un agent ou un skill dans chacun, garder une seule copie source dans un dossier neutre (ex. `~/agents/`, souvent versionné dans un repo dotfiles) et faire pointer chaque harness dessus par symlink :
+- **Un dossier canonique + des symlinks pour être agnostique du harnais.** Le tableau plus haut montre que chaque outil range sa config global sous un nom différent (`~/.claude/` pour Claude Code, `~/.config/opencode/` pour OpenCode...). Plutôt que de dupliquer un agent ou un skill dans chacun, garder une seule copie source dans un dossier neutre (ex. `~/agents/`, souvent versionné dans un repo dotfiles) et faire pointer chaque harnais dessus par symlink :
 
   ```bash
   ln -s ~/agents/obsidian-expert.md ~/.claude/agents/obsidian-expert.md
@@ -543,7 +585,7 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 
   Le contenu n'est édité qu'à un seul endroit et reste disponible identiquement, que ce soit Claude Code ou OpenCode qui tourne - sans copier-coller à synchroniser à la main à chaque changement. Seule limite : le frontmatter (`name`/`description`/`model`/`color` côté Claude Code, structure un peu différente côté OpenCode) n'est pas forcément 100 % interchangeable champ pour champ selon l'outil - mais le corps de l'instruction, lui, reste commun.
 
-- **Un MCP en scope utilisateur, agnostique du harness : le symlink ne marche pas.** Contrairement aux agents/skills (point précédent), un serveur MCP déclaré en scope **utilisateur** ne peut **pas** être partagé par un simple symlink entre Claude Code et OpenCode - deux obstacles cumulés, pas juste un frontmatter qui diverge :
+- **Un MCP en scope utilisateur, agnostique du harnais : le symlink ne marche pas.** Contrairement aux agents/skills (point précédent), un serveur MCP déclaré en scope **utilisateur** ne peut **pas** être partagé par un simple symlink entre Claude Code et OpenCode - deux obstacles cumulés, pas juste un frontmatter qui diverge :
   - **Le fichier conteneur n'est pas dédié côté Claude Code.** Le scope projet a un fichier propre (`.mcp.json`, uniquement des serveurs MCP - symlinkable sans problème). Mais le scope utilisateur (`claude mcp add --scope user ...`) écrit dans la clé `mcpServers` de `~/.claude.json`, un **gros fichier d'état** qui mélange aussi session state, cache, analytics, préférences UI. Symlinker ce fichier entier vers la config OpenCode n'a aucun sens ; symlinker juste une clé JSON à l'intérieur d'un fichier n'est pas possible nativement (contrairement à un fichier markdown entier). Le format est d'ailleurs jugé assez confus pour avoir sa propre issue GitHub ([anthropics/claude-code#37165](https://github.com/anthropics/claude-code/issues/37165)), et `--scope user` a un historique de bugs sur la disponibilité effective inter-projets ([anthropics/claude-code#32939](https://github.com/anthropics/claude-code/issues/32939)) - à vérifier avec `claude mcp list` après coup plutôt qu'à supposer que ça marche.
   - **Le schéma JSON diverge, même pour le même serveur.** Claude Code (`mcpServers`) : `command` (string) + `args` (array) séparés, `env` pour les variables. OpenCode (`opencode.json`, clé `mcp`) : `type: "local"` ou `"remote"` obligatoire, `command` en **un seul array** combinant binaire et arguments, `environment` (pas `env`) pour les variables. Un même serveur playwright s'écrit donc différemment dans chaque fichier :
     ```json
@@ -553,7 +595,7 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
     // OpenCode - opencode.json (ou ~/.config/opencode/opencode.json), clé "mcp"
     "playwright": { "type": "local", "command": ["npx", "-y", "@playwright/mcp@latest"] }
     ```
-  - **Verdict : pas de source unique symlinkée pour le scope utilisateur.** La solution pragmatique est de dupliquer volontairement le bloc de déclaration (deux blocs de 2-3 lignes, un par harness, versionnés côte à côte dans le repo dotfiles) plutôt que d'automatiser une génération à partir d'un format pivot - le gain n'en vaut pas la fragilité d'un script qui réécrirait `~/.claude.json`. Si le besoin est **par projet** plutôt que global, préférer `.mcp.json` (scope projet Claude Code) : fichier dédié, committable, donc un bien meilleur candidat au symlink vers l'équivalent projet d'OpenCode que le scope utilisateur.
+  - **Verdict : pas de source unique symlinkée pour le scope utilisateur.** La solution pragmatique est de dupliquer volontairement le bloc de déclaration (deux blocs de 2-3 lignes, un par harnais, versionnés côte à côte dans le repo dotfiles) plutôt que d'automatiser une génération à partir d'un format pivot - le gain n'en vaut pas la fragilité d'un script qui réécrirait `~/.claude.json`. Si le besoin est **par projet** plutôt que global, préférer `.mcp.json` (scope projet Claude Code) : fichier dédié, committable, donc un bien meilleur candidat au symlink vers l'équivalent projet d'OpenCode que le scope utilisateur.
 
 ---
 
@@ -596,11 +638,13 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **RLHF** | Reinforcement Learning from Human Feedback - technique de post-training qui aligne le modèle sur les préférences humaines |
 | **Hallucination** | Réponse générée avec assurance mais factuellement fausse |
 | **Temperature / top-p** | Paramètres qui contrôlent le degré d'aléatoire/créativité de la génération |
-| **Harness** | Logiciel qui entoure un LLM pour lui donner des outils, une mémoire et une boucle d'exécution |
+| **Harnais** | Logiciel qui entoure un LLM pour lui donner des outils, une mémoire et une boucle d'exécution |
 | **Harness engineering** | Conception de ce qui encadre un agent de code : règles, outils, garde-fous et vérifications automatiques |
 | **Agent** | Système qui exécute une tâche de façon autonome via une boucle observer/agir |
 | **Agentic engineering** | Développement logiciel piloté avec des agents de code, en gardant les exigences d'ingénierie : architecture, tests, revue. S'oppose au simple usage ponctuel de l'autocomplétion |
 | **Spec-driven development** | Méthode où une spec détaillée et testable précède le code, puis pilote les agents dans une boucle spec, génération, tests, correction |
+| **Modèle de décision / System One** | Modèle qui répond à une question fermée par une valeur typée et une probabilité, sans générer de texte (ex. Jev) |
+| **Calibration** | Fiabilité d'une probabilité : sur beaucoup de réponses données à 0,8, environ 80 % doivent être justes |
 | **ReAct** | Pattern où l'agent alterne raisonnement explicite et appel d'outil - nom donné à la boucle agentique de base |
 | **Prompt Chaining** | Décomposition d'une tâche en une séquence fixe d'étapes, la sortie de l'une nourrissant l'entrée de la suivante |
 | **Routing** | Dispatch d'une requête vers un LLM ou un chemin de traitement spécialisé parmi plusieurs, selon sa nature |
@@ -628,7 +672,7 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **LLM-as-judge** | Utiliser un LLM pour évaluer/noter la réponse d'un autre modèle sur une tâche sans réponse unique correcte |
 | **Skill** | Prompt réutilisable et versionné, invocable à la demande |
 | **Subagent** | Instance séparée du modèle avec son propre contexte/rôle, lancée par l'agent principal |
-| **Hook** | Commande shell déclenchée automatiquement par le harness sur un événement |
+| **Hook** | Commande shell déclenchée automatiquement par le harnais sur un événement |
 | **Prompt engineering** | Formuler une requête pour obtenir le résultat voulu |
 | **System prompt** | Instructions persistantes qui cadrent le comportement du modèle sur toute une session |
 | **Zero-shot / few-shot** | Demander sans exemple / avec un ou plusieurs exemples dans le prompt |
@@ -638,5 +682,5 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **RAG** | Injection dynamique d'information externe pertinente dans le contexte, au moment de la requête |
 | **Guardrails** | Garde-fous (techniques ou de prompt) qui limitent les sorties indésirables d'un modèle |
 | **Latency / throughput** | Temps de réponse d'une requête / nombre de requêtes traitées par unité de temps |
-| **CLAUDE.md / AGENTS.md** | Fichier d'instructions persistant à la racine d'un repo, lu comme system prompt par le harness ; `AGENTS.md` est le standard ouvert multi-outils, `CLAUDE.md` le nom historique côté Claude Code |
-| **.claude/ / .opencode/** | Dossier de configuration du harness dans un projet : subagents, skills, commands, settings - la contrepartie projet du dossier global (`~/.claude/`, `~/.config/opencode/`) |
+| **CLAUDE.md / AGENTS.md** | Fichier d'instructions persistant à la racine d'un repo, lu comme system prompt par le harnais ; `AGENTS.md` est le standard ouvert multi-outils, `CLAUDE.md` le nom historique côté Claude Code |
+| **.claude/ / .opencode/** | Dossier de configuration du harnais dans un projet : subagents, skills, commands, settings - la contrepartie projet du dossier global (`~/.claude/`, `~/.config/opencode/`) |
