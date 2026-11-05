@@ -130,7 +130,7 @@ Pour ce que sont ces mécanismes conceptuellement, voir [`CONCEPTS-IA.md`](./CON
 |               | **Skills**              | **MCP**                     | **Plugins**               | **Agents**                         |
 | ------------- | ----------------------- | --------------------------- | ------------------------- | ---------------------------------- |
 | **Invoquer**  | `/nom-du-skill`         | Automatique ou à la demande | `/nom-du-plugin:commande` | Automatique ou via l'outil `Agent` |
-| **Installer** | Copier le fichier `.md` | `claude mcp add`            | `claude plugin install`   | Copier le fichier `.md`            |
+| **Installer** | Copier le dossier du skill | `claude mcp add`            | `claude plugin install`   | Copier le fichier `.md`            |
 
 > Ce repo fournit des **skills**, un **MCP** (Context7) et un **agent custom** (`obsidian-expert`). Les plugins officiels Anthropic s'installent séparément.
 
