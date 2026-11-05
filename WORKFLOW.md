@@ -77,15 +77,15 @@ Après une réunion (point dev interne, recette client), transformer les échang
 
 1. **Noter à chaud** pendant/juste après la réunion, dans une note dédiée ou la note du jour :
     ```bash
-    obsidian daily:append content="## Point dev 2026-07-15\n- Rozenn: retirer les phases non nécessaires à la sync\n- Anthony: tester la modif de phase a posteriori"
+    obsidian daily:append content="## Point dev 2026-07-15\n- Dev A: retirer les étapes inutiles de la synchronisation\n- Dev B: tester la modification a posteriori"
     ```
     ou une note dédiée :
     ```bash
-    obsidian create name="Recette client 2026-07-15" content="- Retour Laurent: ..." folder="Projets/Simon Médical/notes"
+    obsidian create name="Recette client 2026-07-15" content="- Retour client: ..." folder="Projets/Mon Projet/notes"
     ```
 2. **Demander à Claude Code de structurer** : « transforme les notes de la réunion du 15/07 en tâches dans le Sprint courant ». Claude :
     - lit la note de réunion (`obsidian read file="..."` ou lecture directe) ;
-    - lit le sprint courant pour repérer le bon sous-titre (ex. `#### App Audit`) ;
+    - lit le sprint courant pour repérer le bon sous-titre (ex. `#### API`) ;
     - insère les nouvelles lignes `- [ ] ...` **sous ce sous-titre précis**, via édition directe du fichier (le CLI `append` ajouterait à la fin du fichier entier, pas sous la bonne section).
 3. Vérifier le résultat (`obsidian read path="Projets/<Projet>/sprints/Sprint NN.md"`) avant de passer à l'implémentation.
 
@@ -119,7 +119,7 @@ Les tâches suivent le format checklist du plugin **Tasks** :
 - [x] Tâche faite ✅ 2026-06-18
 ```
 
-Quand un projet couvre plusieurs sous-thèmes (ex. Configurateur / App Audit / Axelor pour ET2I), les tâches sont regroupées sous des sous-titres (`#### App Audit`) - ça permet de retrouver rapidement à quoi correspond une tâche et de filtrer par sous-projet.
+Quand un projet couvre plusieurs sous-thèmes (ex. Frontend / API / Intégration), les tâches sont regroupées sous des sous-titres (`#### API`) - ça permet de retrouver rapidement à quoi correspond une tâche et de filtrer par sous-projet.
 
 **Pour demander une tâche à Claude Code** : « fais la tâche X du sprint N » → Claude ouvre `Sprint 0N.md`, repère la section correspondante et la ligne `- [ ]` associée.
 
@@ -131,11 +131,11 @@ Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatr
 
 - **Fichiers de contexte** (`AGENTS.md` global + `AGENTS.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
 - **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable - voir étape 4 pour la vérification des changements UI).
-- **Skills** (`.claude/skills/*.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` - à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
+- **Skills** (`.claude/skills/<nom>/SKILL.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` - à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
 
 - **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
     - `Plan` - agent intégré à Claude Code pour concevoir des plans d'implémentation.
-    - `obsidian-expert` - agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`. Un agent du même nom existe aussi en config **globale** (`~/.claude/agents/`) : en cas de doublon, l'agent du repo (local au projet) prime.
+    - `obsidian-expert` - agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`.
 
 Deux **modes d'interaction** viennent s'ajouter par-dessus - ce ne sont pas des agents séparés, juste la façon dont la demande est formulée dans le prompt :
 
@@ -188,7 +188,7 @@ git commit -m "feat(auth): add password reset via email"
 git push -u origin feat/nom-de-la-feature
 ```
 
-> **Envie d'une vraie automatisation ?** La section « Hooks recommandés » de `AGENTS.md` documente un hook `PostToolUse` prêt à copier (typecheck backend + lint frontend après chaque edit) - déterministe, contrairement à une règle `AGENTS.md` que Claude peut zapper si le contexte est chargé. Un `Stop` en fin de session (rappel de commit) reste à faire au cas par cas. Voir le skill `update-config` pour la mise en place.
+> **Envie d'une vraie automatisation ?** La section « Hooks (à configurer par projet) » de `AGENTS.md` documente un hook `PostToolUse` prêt à copier (typecheck backend + lint frontend après chaque edit) - déterministe, contrairement à une règle `AGENTS.md` que Claude peut zapper si le contexte est chargé. Un `Stop` en fin de session (rappel de commit) reste à faire au cas par cas. Voir le skill `update-config` pour la mise en place.
 
 ---
 
@@ -207,23 +207,13 @@ EOF
 )"
 ```
 
-### Environnement sans `gh` ni credentials Git préinstallés (sandbox)
-
-Certains environnements d'exécution (sandbox Claude Code sans accès root) n'ont ni `gh` ni identifiants Git configurés. Contournement qui fonctionne sans `sudo` :
-
-1. Télécharger le binaire `gh` (release tarball sur `github.com/cli/cli/releases`), l'extraire, le copier dans `~/.local/bin/gh` (déjà dans le `PATH` en général, pas besoin de droits admin).
-2. **L'utilisateur** doit lancer lui-même `gh auth login` (flux interactif par device code dans un navigateur) - Claude Code ne peut pas le faire à sa place.
-3. Une fois authentifié : `gh auth setup-git`, pour que `git push`/`git pull` en HTTPS fonctionnent (sinon erreur `could not read Username`).
-
-Avant de repartir de zéro sur un nouvel environnement, vérifier d'abord si `~/.local/bin/gh` existe déjà et si `gh auth status` est valide.
-
 ---
 
 ## 7. Revue de la PR (dev solo)
 
 Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait la revue lui-même**, assisté par Claude Code, avant de merger. Ne pas sauter cette étape sous prétexte d'être seul sur le projet - c'est justement ce qui remplace la revue par les pairs.
 
-1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code - bugs, cohérence, sécurité). Envie d'une revue multi-agents plus poussée (conformité `AGENTS.md`, contexte git, commentaires PR) ? Installer le [plugin officiel Anthropic](./README.md#plugins), pas installé par défaut.
+1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code - bugs, cohérence, sécurité).
 2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits - pas d'amend sur un commit déjà pushé sans raison explicite).
 3. Relire soi-même le diff final (`gh pr diff` ou l'interface GitHub) avant de merger.
 4. Merger :
