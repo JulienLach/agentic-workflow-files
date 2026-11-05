@@ -1,6 +1,6 @@
 # agentic-workflow-files
 
-Dotfiles agnostiques du harnais IA (Claude Code, OpenCode, Codex...) pour les projets **TypeScript / Node.js / React / PostgreSQL**.
+Kit de développement agentique pour Claude Code et OpenCode, conçu pour les projets **TypeScript / Node.js / React / PostgreSQL**.
 
 Ce repo est la **sauvegarde versionnée** de la config en scope utilisateur de plusieurs harnais (`~/.claude/`, `~/.config/opencode/`) - guidelines de dev communes (`AGENTS.md`), skills, agents, commandes. La vraie source de vérité vit dans ces dossiers globaux ; ce repo n'est lu par aucun harnais, il sert à versionner/cloner cette config sur d'autres machines. Voir [`STRUCTURE-AGNOSTIQUE.md`](./STRUCTURE-AGNOSTIQUE.md) pour le schéma complet.
 
