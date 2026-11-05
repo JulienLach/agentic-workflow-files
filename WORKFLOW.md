@@ -28,7 +28,7 @@ Il complète le `AGENTS.md` global (guidelines de dev communes) + le `AGENTS.md`
 │  AGENTS.md (global + projet) ──▶ context window   Plugins ──▶ Context7  │
 │                                             ├───▶ Obsidian skills        │
 │                                             └───▶ Playwright (MCP)       │
-│  MCP Excalidraw ──▶ Conception / Architecture                           │
+│  Canvas Obsidian ──▶ Conception / Architecture                          │
 │                                                                          │
 │  Skills ──▶ /prep · /prep-check · /code-review · /debug · /refactor …   │
 │  Agents (.claude/agents/*.md) ──▶ Plan · obsidian-expert                │
@@ -51,11 +51,11 @@ Le vault Obsidian et le repo de code sont deux répertoires distincts sur la mê
 
 ---
 
-## 0. Conception / Architecture - MCP Excalidraw (optionnel)
+## 0. Conception / Architecture - Canvas Obsidian (optionnel)
 
 Pour une tâche qui demande de clarifier une architecture ou un flux avant de coder (nouvelle entité complexe, refonte, intégration externe), passer par un schéma plutôt que d'improviser directement en code :
 
-1. Demander à Claude Code de produire un schéma via le **MCP Excalidraw** : « fais-moi un schéma d'architecture pour [fonctionnalité] ».
+1. Demander à Claude Code de produire un schéma dans un **canvas Obsidian natif** (fichier `.canvas`, skill `obsidian:json-canvas`) : « fais-moi un schéma d'architecture pour [fonctionnalité] ».
 2. Itérer sur le schéma jusqu'à ce que la structure soit claire (entités, flux de données, séquence d'appels).
 3. Une fois validée, la conception sert de base à l'étape 1 (capture de la tâche) ou directement à l'étape 4 (implémentation) si la tâche existe déjà dans le sprint.
 
@@ -246,7 +246,7 @@ Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian c
 
 | Étape | Où                           | Action                                                                                                  |
 | ----- | ---------------------------- | ------------------------------------------------------------------------------------------------------- |
-| 0     | Claude Code (MCP Excalidraw) | Schéma d'architecture/conception si la tâche le justifie _(optionnel)_                                  |
+| 0     | Claude Code (canvas Obsidian) | Schéma d'architecture/conception si la tâche le justifie _(optionnel)_                                  |
 | 1     | Réunion → Vault Obsidian     | Capturer les notes (`obsidian daily:append`/`create`), en extraire des tâches sous le bon sous-titre    |
 | 2     | Vault Obsidian               | Repérer une tâche `- [ ]` dans le sprint courant                                                        |
 | 3     | Claude Code                  | Contexte (`AGENTS.md`), plugins (Context7, Obsidian skills), skills et agents mobilisés selon le besoin |
