@@ -170,8 +170,11 @@ claude plugin install playwright@claude-plugins-official
 
 Statusline personnalisable (thèmes, couleurs, animations, coût de session en temps réel) - pas lié au workflow de dev, juste du confort d'affichage dans le terminal.
 
+Installé depuis le dépôt de l'auteur ([NoobyGains/claude-pulse](https://github.com/NoobyGains/claude-pulse)), plus à jour que la version de l'Anthropic Directory. Le plugin s'appelle désormais `usage-pulse`.
+
 ```bash
-claude plugin install claude-pulse@anthropic-plugin-directory
+claude plugin marketplace add NoobyGains/claude-pulse
+claude plugin install usage-pulse@claude-pulse
 ```
 
 ---

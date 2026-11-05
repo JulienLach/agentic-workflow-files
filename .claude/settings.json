@@ -11,11 +11,11 @@
     "command": "/usr/bin/python \"/home/julien/.claude/plugins/marketplaces/claude-pulse/claude_status.py\""
   },
   "enabledPlugins": {
-    "claude-pulse@anthropic-plugin-directory": true,
     "context7@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
     "playwright@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true
+    "superpowers@claude-plugins-official": true,
+    "usage-pulse@claude-pulse": true
   },
   "extraKnownMarketplaces": {
     "claude-pulse": {
