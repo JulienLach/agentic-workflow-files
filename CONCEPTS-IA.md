@@ -13,9 +13,9 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
 1. [Les fondamentaux d'un LLM](#1-les-fondamentaux-dun-llm)
    - [Qu'est-ce qu'un LLM](#quest-ce-quun-llm)
    - [Comment un LLM "regarde" le texte : l'architecture Transformer](#comment-un-llm-regarde-le-texte--larchitecture-transformer)
-   - [Paramètres - c'est quoi, et pourquoi on en parle tout le temps](#paramètres--cest-quoi-et-pourquoi-on-en-parle-tout-le-temps)
-   - [Tokens - l'unité de mesure de tout](#tokens--lunité-de-mesure-de-tout)
-   - [Prompt caching - réduire coût et latence sur un contexte répété](#prompt-caching--réduire-coût-et-latence-sur-un-contexte-répété)
+   - [Paramètres - c'est quoi, et pourquoi on en parle tout le temps](#paramètres---cest-quoi-et-pourquoi-on-en-parle-tout-le-temps)
+   - [Tokens - l'unité de mesure de tout](#tokens---lunité-de-mesure-de-tout)
+   - [Prompt caching - réduire coût et latence sur un contexte répété](#prompt-caching---réduire-coût-et-latence-sur-un-contexte-répété)
    - [Training vs inference](#training-vs-inference)
    - [Poids et quantization](#poids-et-quantization)
    - [VRAM, RAM et SSD : où vivent les poids d'un modèle](#vram-ram-et-ssd--où-vivent-les-poids-dun-modèle)
@@ -26,8 +26,8 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Computer use / agents navigateur](#computer-use--agents-navigateur)
    - [MCP (Model Context Protocol)](#mcp-model-context-protocol)
    - [Skills, plugins et subagents](#skills-plugins-et-subagents)
-   - [MCP vs Skill - quand choisir quoi](#mcp-vs-skill--quand-choisir-quoi)
-   - [Prompt injection - le risque de sécurité des agents](#prompt-injection--le-risque-de-sécurité-des-agents)
+   - [MCP vs Skill - quand choisir quoi](#mcp-vs-skill---quand-choisir-quoi)
+   - [Prompt injection - le risque de sécurité des agents](#prompt-injection---le-risque-de-sécurité-des-agents)
 3. [Design patterns agentiques](#3-design-patterns-agentiques)
    - [ReAct (Reason + Act)](#react-reason--act)
    - [Prompt Chaining](#prompt-chaining)
@@ -41,7 +41,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Exemple concret : exposer une app métier comme endpoint MCP](#exemple-concret--exposer-une-app-métier-comme-endpoint-mcp)
 5. [Les modèles : familles, tailles, comment choisir](#5-les-modèles--familles-tailles-comment-choisir)
    - [Propriétaire vs open-weights](#propriétaire-vs-open-weights)
-   - [Fine-tunes communautaires - l'exemple Nous Hermes](#fine-tunes-communautaires--lexemple-nous-hermes)
+   - [Fine-tunes communautaires - l'exemple Nous Hermes](#fine-tunes-communautaires---lexemple-nous-hermes)
    - [Frontier vs petits modèles](#frontier-vs-petits-modèles)
    - [Évaluer et comparer les modèles (benchmarks)](#évaluer-et-comparer-les-modèles-benchmarks)
    - [Comment choisir un modèle pour une tâche donnée](#comment-choisir-un-modèle-pour-une-tâche-donnée)
@@ -56,7 +56,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
 7. [RAG, embeddings et mémoire](#7-rag-embeddings-et-mémoire)
    - [Embeddings](#embeddings)
    - [RAG (Retrieval-Augmented Generation)](#rag-retrieval-augmented-generation)
-   - [Fine-tuning vs prompting vs RAG - quand utiliser quoi](#fine-tuning-vs-prompting-vs-rag--quand-utiliser-quoi)
+   - [Fine-tuning vs prompting vs RAG - quand utiliser quoi](#fine-tuning-vs-prompting-vs-rag---quand-utiliser-quoi)
    - [Mémoire d'agent](#mémoire-dagent)
 8. [Panorama des outils](#8-panorama-des-outils)
 9. [Architecture de fichiers pour agents IA](#9-architecture-de-fichiers-pour-agents-ia)
@@ -333,11 +333,7 @@ On l'ajoute comme **MCP personnalisé** dans Claude Desktop, ou en CLI avec `cla
 
 ### Fine-tunes communautaires - l'exemple Nous Hermes
 
-Un modèle open-weights publié par son créateur (le "modèle de base") peut être **re-fine-tuné par un tiers** sur des données ciblées, pour produire une variante spécialisée - publiée elle aussi en open-weights, sous un nouveau nom. C'est un fine-tuning fait par la communauté, pas par le fournisseur d'origine.
-
-- **Nous Hermes** (Nous Research) est l'exemple le plus connu : une famille de fine-tunes construits par-dessus des modèles de base (Llama, Mistral, Qwen selon la version), réputée pour son bon comportement en **tool use / function calling** et en tâches agentiques - d'où la confusion fréquente avec un "agent" ou un harnais : **Hermes reste un modèle**, pas un outil d'orchestration. C'est le harnais (Claude Code, OpenCode...) qui l'utiliserait comme moteur si on voulait le faire tourner dans un contexte agentique.
-- Autres fine-tunes communautaires connus : Dolphin, OpenHermes, WizardLM - chacun optimisé pour un usage particulier (moins de refus, meilleur suivi d'instructions, function calling, etc.).
-- Pour choisir entre un modèle de base et un de ses fine-tunes : le fine-tune apporte un comportement plus ciblé sur son cas d'usage (souvent mieux pour l'agentique/tool use), mais peut perdre en performance générale par rapport au modèle de base sur d'autres tâches - à tester sur le besoin réel, pas sur la réputation seule.
+Un modèle open-weights peut être **re-fine-tuné par un tiers** pour produire une variante spécialisée, publiée elle aussi en open-weights. **Nous Hermes** (Nous Research) en est l'exemple le plus connu, réputé pour le tool use. Cela reste un modèle, pas un harnais : à tester sur le besoin réel, car il peut perdre en performance générale.
 
 ### Frontier vs petits modèles
 
@@ -484,7 +480,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | --- | --- |
 | **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama et Muse Spark (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
 | **Modèles de décision** | Jev (TypeSafe AI), d1-ultra (Liquid AI), GLiDE (Fastino) |
-| **Fine-tunes communautaires** | Nous Hermes (Nous Research), Dolphin, OpenHermes, WizardLM |
+| **Fine-tunes communautaires** | Nous Hermes (Nous Research) |
 | **Harnais CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe |
 | **IDE avec agent intégré** | GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Claude Code (mode cloud/remote), Jules (Google) |
@@ -576,26 +572,8 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 - **Garder le fichier racine court.** Il est relu à chaque session et pèse sur le prompt caching (section 1) - la documentation volumineuse a davantage sa place en fichiers séparés référencés, voire en RAG (section 7), que collée dans `AGENTS.md`.
 - **Sous-dossiers seulement si le contexte diverge vraiment.** Un monorepo avec un vrai frontend et une vraie infra justifie des `CLAUDE.md` locaux ; un repo simple n'en a pas besoin - la complexité doit suivre un besoin réel, pas être ajoutée par précaution.
 - **Centraliser en global ce qui n'est pas spécifique à un projet.** Agents, skills, commandes et plugins/MCP personnels (pas des règles d'équipe) devraient vivre une seule fois dans `~/.claude/` plutôt que d'être dupliqués dans chaque repo - c'est le scope **utilisateur** du tableau ci-dessus, chargé automatiquement à chaque session, tous projets confondus. Chaque nouveau projet n'a alors besoin que d'un `CLAUDE.md`/`AGENTS.md` minimal propre à son contexte (stack, conventions, contraintes) : tout le reste de l'outillage suit déjà, sans rien reconfigurer. En cas de nom identique en projet et en global (ex. un agent `obsidian-expert` dans les deux), la version **projet** prend le dessus - pratique pour surcharger ponctuellement un agent global sur un repo précis sans toucher à la config personnelle.
-- **Un dossier canonique + des symlinks pour être agnostique du harnais.** Le tableau plus haut montre que chaque outil range sa config global sous un nom différent (`~/.claude/` pour Claude Code, `~/.config/opencode/` pour OpenCode...). Plutôt que de dupliquer un agent ou un skill dans chacun, garder une seule copie source dans un dossier neutre (ex. `~/agents/`, souvent versionné dans un repo dotfiles) et faire pointer chaque harnais dessus par symlink :
-
-  ```bash
-  ln -s ~/agents/obsidian-expert.md ~/.claude/agents/obsidian-expert.md
-  ln -s ~/agents/obsidian-expert.md ~/.config/opencode/agent/obsidian-expert.md
-  ```
-
-  Le contenu n'est édité qu'à un seul endroit et reste disponible identiquement, que ce soit Claude Code ou OpenCode qui tourne - sans copier-coller à synchroniser à la main à chaque changement. Seule limite : le frontmatter (`name`/`description`/`model`/`color` côté Claude Code, structure un peu différente côté OpenCode) n'est pas forcément 100 % interchangeable champ pour champ selon l'outil - mais le corps de l'instruction, lui, reste commun.
-
-- **Un MCP en scope utilisateur, agnostique du harnais : le symlink ne marche pas.** Contrairement aux agents/skills (point précédent), un serveur MCP déclaré en scope **utilisateur** ne peut **pas** être partagé par un simple symlink entre Claude Code et OpenCode - deux obstacles cumulés, pas juste un frontmatter qui diverge :
-  - **Le fichier conteneur n'est pas dédié côté Claude Code.** Le scope projet a un fichier propre (`.mcp.json`, uniquement des serveurs MCP - symlinkable sans problème). Mais le scope utilisateur (`claude mcp add --scope user ...`) écrit dans la clé `mcpServers` de `~/.claude.json`, un **gros fichier d'état** qui mélange aussi session state, cache, analytics, préférences UI. Symlinker ce fichier entier vers la config OpenCode n'a aucun sens ; symlinker juste une clé JSON à l'intérieur d'un fichier n'est pas possible nativement (contrairement à un fichier markdown entier). Le format est d'ailleurs jugé assez confus pour avoir sa propre issue GitHub ([anthropics/claude-code#37165](https://github.com/anthropics/claude-code/issues/37165)), et `--scope user` a un historique de bugs sur la disponibilité effective inter-projets ([anthropics/claude-code#32939](https://github.com/anthropics/claude-code/issues/32939)) - à vérifier avec `claude mcp list` après coup plutôt qu'à supposer que ça marche.
-  - **Le schéma JSON diverge, même pour le même serveur.** Claude Code (`mcpServers`) : `command` (string) + `args` (array) séparés, `env` pour les variables. OpenCode (`opencode.json`, clé `mcp`) : `type: "local"` ou `"remote"` obligatoire, `command` en **un seul array** combinant binaire et arguments, `environment` (pas `env`) pour les variables. Un même serveur playwright s'écrit donc différemment dans chaque fichier :
-    ```json
-    // Claude Code - ~/.claude.json, clé "mcpServers"
-    "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@latest"] }
-
-    // OpenCode - opencode.json (ou ~/.config/opencode/opencode.json), clé "mcp"
-    "playwright": { "type": "local", "command": ["npx", "-y", "@playwright/mcp@latest"] }
-    ```
-  - **Verdict : pas de source unique symlinkée pour le scope utilisateur.** La solution pragmatique est de dupliquer volontairement le bloc de déclaration (deux blocs de 2-3 lignes, un par harnais, versionnés côte à côte dans le repo dotfiles) plutôt que d'automatiser une génération à partir d'un format pivot - le gain n'en vaut pas la fragilité d'un script qui réécrirait `~/.claude.json`. Si le besoin est **par projet** plutôt que global, préférer `.mcp.json` (scope projet Claude Code) : fichier dédié, committable, donc un bien meilleur candidat au symlink vers l'équivalent projet d'OpenCode que le scope utilisateur.
+- **Une seule source, lue par chaque harnais.** Dans ce repo, `~/.claude/AGENTS.md` est lu par import côté Claude Code et par symlink côté OpenCode (voir [`STRUCTURE-AGNOSTIQUE.md`](./STRUCTURE-AGNOSTIQUE.md)).
+- **Un serveur MCP se déclare une fois par harnais.** En scope utilisateur, Claude Code le stocke dans `~/.claude.json` et OpenCode dans `opencode.json`, avec des schémas différents : un symlink ne marche pas, il vaut mieux dupliquer le bloc. Pour un besoin par projet, préférer `.mcp.json`, un fichier dédié et committable.
 
 ---
 
@@ -607,7 +585,7 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | --- | --- | --- |
 | **Hugging Face** | huggingface.co | Le hub de modèles/datasets open-weights (Qwen, Llama, DeepSeek...) + Spaces (démos en ligne) + Inference API. Le point de départ pour trouver et tester un modèle avant de l'utiliser en local ou via API. |
 | **OpenRouter** | openrouter.ai | Une seule clé API (format compatible OpenAI) pour appeler des dizaines de fournisseurs/modèles, propriétaires et open-weights. Comparateur de prix/latence par modèle intégré, fallback automatique si un fournisseur est indisponible - évite de multiplier les comptes et clés API pour tester différents modèles. |
-| **Ollama** | ollama.com | Exécution de modèles open-weights en local en une commande (`ollama run qwen3`) ; `ollama.com/library` pour parcourir le catalogue de modèles prêts à l'emploi. |
+| **Ollama** | ollama.com | Exécution de modèles open-weights en local en une commande (`ollama run qwen3.6`) ; `ollama.com/library` pour parcourir le catalogue de modèles prêts à l'emploi. |
 | **LM Studio** | lmstudio.ai | Équivalent d'Ollama avec interface graphique - pratique pour tester des modèles locaux sans terminal. |
 | **Artificial Analysis** | artificialanalysis.ai | Comparateur indépendant de perf/prix/latence entre fournisseurs et modèles (frontier et open-weights) - pour choisir sur des critères objectifs plutôt que sur la réputation. |
 | **llm-stats.com** | llm-stats.com | Équivalent d'Artificial Analysis, avec en plus un flux de nouveautés modèles tenu à jour (`llm-stats.com/ai-news`). |
