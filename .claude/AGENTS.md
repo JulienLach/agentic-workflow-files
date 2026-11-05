@@ -101,7 +101,7 @@ backend/
 ```
 frontend/src/
 ├── main.tsx / App.tsx  ← Point d'entrée, routing
-├── components/         ← Composants réutilisables (Charts/, forms/, Layout/)
+├── components/         ← Composants réutilisables (Charts/, Forms/, Layout/, Table/)
 ├── contexts/           ← React Context providers (AuthContext, etc.)
 ├── hooks/              ← Custom hooks React
 ├── interfaces/         ← Interfaces TypeScript

@@ -57,7 +57,7 @@ Avant de coder, clarifie :
 ### `frontend/src/interfaces/EntityName.ts`
 - Interface TypeScript pour l'entité
 
-### `frontend/src/components/forms/EntityNameForm.tsx`
+### `frontend/src/components/Forms/EntityNameForm.tsx`
 - Formulaire de création/modification
 - Validation avec Zod au submit
 - Gestion des états : loading, error, success
