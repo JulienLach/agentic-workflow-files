@@ -15,7 +15,7 @@ flowchart LR
     SRC -->|lu par| CC
     SRC -. symlink .-> OC
     SRC -. copie manuelle .-> BACKUP
-    BACKUP -. copier .claude/AGENTS.md .-> NEW
+    BACKUP -. "copier .claude/AGENTS.md" .-> NEW
     CC -->|+ complété par| PROJ
 ```
 
