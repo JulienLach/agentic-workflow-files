@@ -10,7 +10,7 @@ Analyse méthodiquement chaque vecteur d'attaque ci-dessous, structuré selon l'
 ## 1. Broken Access Control (A01)
 
 - Les routes d'écriture (POST/PUT/DELETE) vérifient-elles le rôle requis (`requireRole`) ?
-- Les GET par ID filtrent-ils par `id_context` (ou équivalent) directement en SQL, pas par un filtrage côté application après coup ?
+- Les opérations par ID (lecture, modification, suppression) filtrent-elles par `id_context` (ou équivalent) directement en SQL, pas par un filtrage côté application après coup ?
 - Un utilisateur peut-il accéder à une ressource en devinant/incrémentant un ID (IDOR) ? La réponse doit être 404, pas 403, pour ne pas confirmer l'existence de la ressource.
 - Les actions sont-elles vérifiées côté **serveur** (pas seulement masquées côté frontend) ?
 - La navigation directe vers une URL admin (sans passer par l'UI) est-elle bloquée par le middleware, pas seulement par le routing frontend ?
@@ -28,7 +28,7 @@ Analyse méthodiquement chaque vecteur d'attaque ci-dessous, structuré selon l'
 - Toutes les requêtes SQL utilisent-elles des paramètres (`$1, $2, ...`) ? Aucune concaténation de chaînes ?
 - Les valeurs triées/filtrées dynamiquement (ORDER BY, noms de colonnes) sont-elles validées par whitelist plutôt qu'interpolées ?
 - Un schéma Zod valide-t-il le body de chaque requête POST/PUT (types, longueurs maximales, formats) ?
-- Les inputs passent-ils par `sanitizeInputs` (DOMPurify) pour prévenir le XSS stocké/reflété ?
+- Le XSS est-il évité : pas de `dangerouslySetInnerHTML` sur une donnée utilisateur, et tout HTML généré côté serveur (emails...) échappé à la sortie ?
 - Les paramètres d'URL (`:id`) sont-ils validés (integer, UUID, etc.) avant d'atteindre la requête SQL ?
 - Aucun `eval`, `child_process.exec` ou équivalent n'est construit à partir d'un input utilisateur non validé ?
 
@@ -58,7 +58,7 @@ Analyse méthodiquement chaque vecteur d'attaque ci-dessous, structuré selon l'
 - Le JWT est-il vérifié (signature + expiration) à chaque requête ?
 - Les tokens sont-ils stockés de façon sécurisée (httpOnly cookie côté client) ?
 - Le cookie JWT a-t-il l'attribut `SameSite` (Strict/Lax) ? Sans lui, un cookie httpOnly reste vulnérable au CSRF - le navigateur l'envoie automatiquement sur une requête cross-site.
-- Le rate limiting est-il en place sur `/login` pour empêcher le brute-force ?
+- Le rate limiting est-il en place sur `/login` et les routes publiques pour empêcher le brute-force et les abus ?
 - Les tokens expirés/révoqués sont-ils correctement rejetés ?
 
 ## 8. Software and Data Integrity Failures (A08)

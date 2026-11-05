@@ -10,9 +10,9 @@ Analyse le code selon ces axes dans cet ordre :
 ## 1. Sécurité
 
 - **SQL injection** : toutes les requêtes sont-elles paramétrées (`$1, $2, ...`) ?
-- **XSS** : les inputs utilisateur passent-ils par une sanitization (DOMPurify ou équivalent) ?
+- **XSS** : pas de `dangerouslySetInnerHTML` sur une donnée utilisateur, et HTML généré côté serveur (emails...) échappé à la sortie ?
 - **Authentification** : le middleware `authenticateToken` est-il présent sur toutes les routes protégées ?
-- **IDOR** : les endpoints GET par ID filtrent-ils par `id_context` ou équivalent en SQL ?
+- **IDOR** : les opérations par ID (lecture et écriture) filtrent-elles par `id_context` ou équivalent en SQL ?
 - **Exposition de données sensibles** : tokens, mots de passe, clés dans les logs ou réponses API ?
 - **Validation** : schéma Zod présent côté backend ET frontend aux frontières du système ?
 

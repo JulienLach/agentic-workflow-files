@@ -40,7 +40,7 @@ Avant de coder, clarifie :
 ### `backend/routes/entityName.routes.ts`
 - Routes Express : GET (liste), GET (par id), POST, PUT, DELETE
 - Appliquer `requireRole(1)` sur les routes d'écriture si nécessaire
-- Protection IDOR sur les GET par ID : valider `id_context` directement en SQL (retourner 404 si mismatch)
+- Protection IDOR sur toutes les opérations par ID : valider `id_context` directement en SQL (retourner 404 si mismatch)
 
 ### `backend/server.ts`
 - Enregistrer la nouvelle route : `app.use('/entity-name', entityNameRouter)`
@@ -57,12 +57,12 @@ Avant de coder, clarifie :
 ### `frontend/src/interfaces/EntityName.ts`
 - Interface TypeScript pour l'entité
 
-### `frontend/src/components/Forms/EntityNameForm.tsx`
+### `frontend/src/components/forms/EntityNameForm.tsx`
 - Formulaire de création/modification
 - Validation avec Zod au submit
 - Gestion des états : loading, error, success
 
-### `frontend/src/pages/EntityNamePage/`
+### `frontend/src/pages/EntityName/`
 - `EntityNameListPage.tsx` - liste avec recherche/filtre si pertinent
 - `EntityNameDetailPage.tsx` - détail et actions (optionnel selon le besoin)
 
@@ -75,12 +75,12 @@ Avant de coder, clarifie :
 - [ ] Migration SQL idempotente et testée
 - [ ] Requêtes SQL paramétrées (pas de concaténation de chaînes)
 - [ ] Filtrage `id_context` présent si applicable
-- [ ] Protection IDOR sur les GET par ID (404 si mismatch de contexte)
+- [ ] Protection IDOR sur toutes les opérations par ID (404 si mismatch de contexte)
 - [ ] Validation Zod backend ET frontend
 - [ ] `authenticateToken` appliqué sur les routes (via `server.ts`)
 - [ ] `requireRole(1)` sur les routes d'écriture si nécessaire
 - [ ] Appels API centralisés dans `services/api.ts`
-- [ ] Tests écrits pour le service ou le data model
+- [ ] Tests écrits pour le service ou le data model, avec un test d'isolation si les données sont isolées par client
 - [ ] Pas de `console.log` de debug oubliés
 
 ## Format de réponse

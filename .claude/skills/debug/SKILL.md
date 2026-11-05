@@ -17,7 +17,7 @@ Procède dans cet ordre :
 
 Trace le flux d'exécution selon l'architecture :
 
-**Backend** : `Route → Middleware (auth, sanitize) → Validator (Zod) → Service → Data model → PostgreSQL`
+**Backend** : `Route → Middleware (auth) → Validator (Zod) → Service → Data model → PostgreSQL`
 
 **Frontend** : `Composant → Hook → services/api.ts → Backend`
 
