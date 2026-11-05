@@ -45,7 +45,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Frontier vs petits modèles](#frontier-vs-petits-modèles)
    - [Évaluer et comparer les modèles (benchmarks)](#évaluer-et-comparer-les-modèles-benchmarks)
    - [Comment choisir un modèle pour une tâche donnée](#comment-choisir-un-modèle-pour-une-tâche-donnée)
-   - [Le "raisonnement étendu" (extended thinking / reasoning models)](#le-raisonnement-étendu-extended-thinking--reasoning-models)
+   - [Le "raisonnement étendu" (adaptive thinking / reasoning models)](#le-raisonnement-étendu-adaptive-thinking--reasoning-models)
 6. [Prompting et context engineering](#6-prompting-et-context-engineering)
    - [Prompt engineering](#prompt-engineering)
    - [System prompt](#system-prompt)
@@ -157,11 +157,10 @@ Un modèle seul ne fait que **générer du texte**. Le **harness** est le logici
 | **Claude Code** (Anthropic) | CLI agentique, ce que tu utilises dans ce repo |
 | **OpenCode** | Alternative CLI open-source, agnostique au fournisseur de modèle |
 | **Codex CLI** (OpenAI) | CLI agentique équivalent côté OpenAI |
-| **Antigravity CLI** (Google) | CLI agentique côté Google. Remplace Gemini CLI pour les comptes individuels depuis juin 2026 ; les offres entreprise ne sont pas concernées |
+| **Antigravity CLI** (Google) | CLI agentique côté Google |
 | **Aider** | CLI open-source, orienté pair-programming en terminal |
-| **Cursor**, **Devin Desktop** (ex-Windsurf) | IDE avec agent intégré (fork de VS Code) |
+| **Cursor** | IDE avec agent intégré (fork de VS Code) |
 | **GitHub Copilot** (mode agent) | Extension IDE + agent autonome dans les PR/issues |
-| **Devin** (Cognition) | Agent autonome "ingénieur logiciel" cloud |
 
 ### La boucle agentique (agentic loop)
 
@@ -183,8 +182,8 @@ Une variante du tool use ci-dessus : plutôt que d'appeler des outils structuré
 Standard ouvert créé par Anthropic pour connecter un LLM à des sources de données et outils externes de façon **uniforme**, plutôt que de coder une intégration spécifique par outil et par fournisseur de modèle - souvent résumé comme *"l'USB-C des agents IA"*. Il est aujourd'hui hébergé par l'Agentic AI Foundation (Linux Foundation). Un **serveur MCP** expose des outils/ressources que n'importe quel harness compatible peut utiliser.
 
 - Exemple dans ce repo : **Context7** (documentation de librairies à jour, servie via MCP).
-- **Le protocole continue d'évoluer vite** : la spec du 28 juillet 2026 a rendu le cœur du protocole **stateless** (un serveur MCP distant peut tourner derrière un simple load balancer round-robin), ajouté un **framework d'Extensions** (`MCP Apps` pour des UI servies par le serveur, `Tasks` pour du travail longue durée), et durci l'auth (alignement OAuth 2.0/OIDC, dépréciation de la dynamic client registration au profit des Client ID Metadata Documents).
-- Le transport **HTTP+SSE** (mentionné section 4) est déprécié depuis la spec du 26 mars 2025, au profit de **Streamable HTTP**. La spec de juillet 2026 confirme ce statut : à ne plus utiliser pour un nouveau projet.
+- **Le protocole aujourd'hui** (spec du 28 juillet 2026) : un cœur **stateless** (un serveur MCP distant peut tourner derrière un simple load balancer round-robin), un **framework d'Extensions** (`MCP Apps` pour des UI servies par le serveur, `Tasks` pour du travail longue durée) et une auth alignée sur OAuth 2.0/OIDC, avec les **Client ID Metadata Documents** pour identifier les clients.
+- Le transport distant est **Streamable HTTP** (voir section 4).
 
 ### Skills, plugins et subagents
 
@@ -301,7 +300,7 @@ Un **endpoint**, c'est une URL précise à laquelle on envoie une requête pour 
 - **Endpoint auto-hébergé / déployé** : quand un modèle est déployé sur ta propre infra (cloud ML type SageMaker/Vertex AI, ou en local avec **Ollama**), il expose son propre endpoint, distinct de celui du fournisseur d'origine.
 - **Endpoint compatible OpenAI** : beaucoup de fournisseurs exposent un endpoint qui respecte le même format que l'API OpenAI, pour permettre de changer de modèle/fournisseur juste en changeant l'URL et la clé, sans réécrire le code.
 - **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint - en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP** - auquel le harness se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** - leur nom, leur description, les arguments qu'ils acceptent - que le harness rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harness et un outil venu d'un serveur MCP.
-  > Le transport historique **HTTP+SSE** est déprécié depuis la spec MCP de mars 2025, remplacé par **Streamable HTTP** (voir section 2, "MCP") - à ne plus utiliser comme référence pour un nouveau déploiement.
+  > Le transport distant standard est **Streamable HTTP** (voir section 2, "MCP").
 - **Streaming vs non-streaming** : un endpoint peut renvoyer la réponse complète d'un coup, ou la **streamer** token par token au fur et à mesure de la génération.
 
 Un endpoint est généralement protégé par une **authentification** (clé API, token), soumis à des **rate limits** (nombre de requêtes/tokens max par minute), et a sa propre latence - des critères qui comptent dans le choix d'un fournisseur ou d'un déploiement.
@@ -330,7 +329,7 @@ On l'ajoute comme **MCP personnalisé** dans Claude Desktop, ou en CLI avec `cla
 ### Propriétaire vs open-weights
 
 - **Modèles propriétaires** : accessibles uniquement via API du fournisseur (Claude/Anthropic, GPT/OpenAI, Gemini/Google, Grok/xAI, Muse Spark/Meta). Pas de poids téléchargeables.
-- **Modèles open-weights** : les poids sont publiés et téléchargeables (Mistral, DeepSeek, Qwen/Alibaba, gpt-oss/OpenAI, Llama/Meta). Un même fournisseur peut proposer les deux : OpenAI garde GPT fermé mais publie gpt-oss, et le modèle phare de Meta, Muse Spark, est fermé depuis avril 2026. Exécutables en local ou chez n'importe quel hébergeur - utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
+- **Modèles open-weights** : les poids sont publiés et téléchargeables (Mistral, DeepSeek, Qwen/Alibaba, gpt-oss/OpenAI, Llama/Meta). Un même fournisseur peut proposer les deux : OpenAI publie gpt-oss à côté de GPT, et Meta Llama à côté de Muse Spark. Exécutables en local ou chez n'importe quel hébergeur - utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
 
 ### Fine-tunes communautaires - l'exemple Nous Hermes
 
@@ -356,7 +355,7 @@ Avant de choisir un modèle, on s'appuie sur des **benchmarks** - des jeux de te
 | --- | --- |
 | **MMLU** | Culture générale et connaissances multi-domaines (questions à choix multiples) |
 | **HumanEval** | Génération de code Python à partir d'un énoncé |
-| **SWE-bench Pro** | Résolution de vraies issues GitHub, en plusieurs langages - le plus proche d'un usage "agent de code". OpenAI le recommande à la place de **SWE-bench Verified**, dont il ne publie plus les scores car il le juge contaminé |
+| **SWE-bench Pro** | Résolution de vraies issues GitHub, en plusieurs langages - le plus proche d'un usage "agent de code" |
 | **GPQA** | Questions scientifiques de niveau expert |
 | **MATH** | Raisonnement mathématique |
 
@@ -375,11 +374,11 @@ Avant de choisir un modèle, on s'appuie sur des **benchmarks** - des jeux de te
 | Confidentialité / souveraineté | Données sensibles → modèle open-weight en local plutôt qu'API cloud |
 | Multimodalité | Besoin d'images/audio/vidéo → vérifier que le modèle les supporte nativement |
 
-### Le "raisonnement étendu" (extended thinking / reasoning models)
+### Le "raisonnement étendu" (adaptive thinking / reasoning models)
 
 Certains modèles (ou certains modes de modèles existants) peuvent "réfléchir" plus longtemps avant de répondre - générer une chaîne de raisonnement interne, explorer plusieurs pistes, avant de produire la réponse finale. Ça améliore nettement les résultats sur les tâches complexes (maths, debug difficile, architecture), au prix d'une latence et d'un coût plus élevés. À réserver aux tâches qui le justifient, pas en usage systématique.
 
-Chez Anthropic, l'**extended thinking** (avec `budget_tokens`) est déprécié : Claude 4.7 et les modèles suivants rejettent ces requêtes. On utilise maintenant l'**adaptive thinking**, et on règle la profondeur de raisonnement avec le paramètre `effort`.
+Chez Anthropic, c'est l'**adaptive thinking**, dont on règle la profondeur avec le paramètre `effort`.
 
 ---
 
@@ -445,10 +444,10 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama et Muse Spark (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
 | **Fine-tunes communautaires** | Nous Hermes (Nous Research), Dolphin, OpenHermes, WizardLM |
 | **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe, Aider |
-| **IDE avec agent intégré** | Cursor, Devin Desktop (ex-Windsurf), GitHub Copilot (mode agent), Zed |
-| **Agents autonomes cloud** | Devin, Claude Code (mode cloud/remote), Jules (Google) |
+| **IDE avec agent intégré** | Cursor, GitHub Copilot (mode agent), Zed |
+| **Agents autonomes cloud** | Claude Code (mode cloud/remote), Jules (Google) |
 | **Protocoles / standards** | MCP (Model Context Protocol), A2A, Agent Skills, function calling / tool use |
-| **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, Microsoft Agent Framework (successeur d'AutoGen, en maintenance) |
+| **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, Microsoft Agent Framework |
 | **Chapeautage multi-harnais (ADE)** | Orca (Stably AI) - fait tourner Claude Code, Codex, OpenCode, Pi... côte à côte, chacun isolé dans son worktree git ; desktop + app mobile |
 | **AI Gateway / routing multi-fournisseurs** | LiteLLM, OpenRouter, Portkey |
 | **Agents navigateur / computer use** | Playwright (MCP), Claude in Chrome, computer use (API) |
@@ -468,7 +467,7 @@ Au-delà des concepts (section 2) et des patterns (section 3), une question trè
 Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un repo porte des noms différents selon l'outil :
 
 - **`CLAUDE.md`** : le nom historique propre à Claude Code.
-- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot, Aider, Zed, Devin Desktop (ex-Windsurf)...).
+- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot, Aider, Zed...).
 
 **Où le placer :** à la **racine du repo**, toujours - c'est l'endroit où tous les harness le cherchent par défaut, sans configuration supplémentaire.
 
@@ -497,7 +496,7 @@ Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un
 | `.claude/settings.local.json` | Overrides personnels (souvent générés par les prompts d'autorisation) | Non - à gitignorer |
 | `.claude/agents/*.md` | Subagents (section 2) : un fichier par agent, frontmatter `name` / `description` / `model` / `color` | Oui |
 | `.claude/skills/<nom>/SKILL.md` | Skills projet (section 2), invocables via `/nom` | Oui |
-| `.claude/commands/*.md` | Ancien format, toujours supporté et fusionné avec les skills ; à nom égal, le skill l'emporte | Oui |
+| `.claude/commands/*.md` | Commandes custom (`/nom`), équivalentes à un skill ; à nom égal, le skill l'emporte | Oui |
 | `.mcp.json` (à la racine, hors `.claude/`) | Serveurs MCP (section 2) scopés au projet | Oui, sauf secrets en dur |
 
 Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent comme un champ `hooks` dans `settings.json`, qui associe un événement (avant/après un appel d'outil, début/fin de session...) à une commande shell.
@@ -570,7 +569,7 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **LM Studio** | lmstudio.ai | Équivalent d'Ollama avec interface graphique - pratique pour tester des modèles locaux sans terminal. |
 | **Artificial Analysis** | artificialanalysis.ai | Comparateur indépendant de perf/prix/latence entre fournisseurs et modèles (frontier et open-weights) - pour choisir sur des critères objectifs plutôt que sur la réputation. |
 | **llm-stats.com** | llm-stats.com | Équivalent d'Artificial Analysis, avec en plus un flux de nouveautés modèles tenu à jour (`llm-stats.com/ai-news`). |
-| **Arena** (ex-LMArena) | arena.ai | Classement par préférence humaine en aveugle (deux réponses comparées, l'utilisateur vote pour la meilleure) - complète les benchmarks académiques (section 5) par une mesure d'usage réel. |
+| **Arena** | arena.ai | Classement par préférence humaine en aveugle (deux réponses comparées, l'utilisateur vote pour la meilleure) - complète les benchmarks académiques (section 5) par une mesure d'usage réel. |
 | **MCP - doc officielle** | modelcontextprotocol.io | Spec officielle du protocole MCP (section 2) - pour trouver un serveur MCP existant ou comprendre le protocole avant d'en coder un. |
 | **Docs officielles fournisseurs** | platform.claude.com/docs / platform.openai.com/docs / ai.google.dev | Première source pour tout détail précis d'API (pricing exact, limites, nouveaux paramètres) - toujours préférer à un article tiers qui peut dater vite. |
 | **Veille communautaire** | r/LocalLLaMA · simonwillison.net · latent.space | Suivi qualitatif de l'IA locale, des patterns agentiques et des retours d'expérience terrain, en complément du briefing `ai-news`. |
@@ -615,7 +614,7 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **Workflow (vs agent)** | Système dont le chemin d'exécution est fixé à l'avance dans le code, par opposition à un agent qui décide dynamiquement de son parcours |
 | **Tool use / function calling** | Capacité du modèle à appeler un outil avec des arguments structurés |
 | **Computer use** | Variante du tool use où le modèle pilote une interface graphique (navigateur, OS) via captures d'écran et actions bas niveau, plutôt que des outils à arguments typés |
-| **MCP** | Standard ouvert pour connecter un LLM à des outils/données externes de façon uniforme ; depuis juillet 2026, cœur du protocole stateless + framework d'Extensions (`MCP Apps`, `Tasks`) |
+| **MCP** | Standard ouvert pour connecter un LLM à des outils/données externes de façon uniforme ; cœur du protocole stateless + framework d'Extensions (`MCP Apps`, `Tasks`) |
 | **AI Gateway** | Couche centralisée de routage/policy entre une app et plusieurs fournisseurs de modèles (ex. LiteLLM, OpenRouter) - un seul point pour changer de modèle/fournisseur sans réécrire le code appelant |
 | **Endpoint** | URL précise à laquelle on envoie une requête pour parler à un service (API modèle, serveur MCP, déploiement local...) |
 | **Rate limit** | Nombre maximum de requêtes/tokens qu'un endpoint accepte par unité de temps |
