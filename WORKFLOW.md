@@ -8,38 +8,46 @@ Il complète le `AGENTS.md` global (guidelines de dev communes) + le `AGENTS.md`
 
 ## Vue d'ensemble
 
-```
-┌───────────────────────────────────────────────────────────────────────┐
-│                              Vault Obsidian                             │
-│                                                                          │
-│   Projets ──▶ Index ──▶ Backlog ◀── Notes (réunions/recettes)           │
-│      │           └────▶ Ressources                                     │
-│      ▼                                                                 │
-│   Sprints ◀───────────────────────┐                                    │
-│      │                            │                                    │
-│      ▼                            │ 6. boucler : cocher + MAJ progress │
-│   Tâches ──────────────────────────┘                                   │
-└──────────────────────┬───────────────────────────────────────────────┘
-                        │ 1. choisir une tâche (Obsidian skills)
-                        ▼
-┌───────────────────────────────────────────────────────────────────────┐
-│                         Claude Code (hub central)                       │
-│                                                                          │
-│  AGENTS.md (global + projet) ──▶ context window   Plugins ──▶ Context7  │
-│                                             ├───▶ Obsidian skills        │
-│                                             └───▶ Playwright (MCP)       │
-│  Canvas Obsidian ──▶ Conception / Architecture                          │
-│                                                                          │
-│  Skills ──▶ /prep · /prep-check · /code-review · /debug · /refactor …   │
-│  Agents (.claude/agents/*.md) ──▶ Plan · obsidian-expert                │
-│  Modes de prompt ──▶ agentique standard · pédagogique (sur demande)     │
-└──────────────────────┬───────────────────────────────────────────────┘
-                        │ 4. implémentation
-                        ▼
-┌─────────────────────┐  5-6. commit/push + gh pr create  ┌──────────────────┐
-│  Repo de code          │ ─────────────────────────────▶ │  GitHub (PR)       │
-│  (feat/xxx)             │ ◀──────────────────────────── │  gh pr merge        │
-└─────────────────────┘        7. revue solo dev (/code-review)  └──────────────────┘
+```mermaid
+flowchart TD
+    subgraph VAULT["Vault Obsidian"]
+        direction TB
+        NOTES["Notes<br/>réunions, recettes"]
+        PROJETS["Projets"]
+        INDEX["Index"]
+        RESSOURCES["Ressources"]
+        BACKLOG["Backlog"]
+        SPRINTS["Sprints"]
+        TACHES["Tâches"]
+
+        PROJETS --> INDEX
+        INDEX --> RESSOURCES
+        INDEX --> BACKLOG
+        NOTES -->|"Étape 1 : capturer"| BACKLOG
+        PROJETS --> SPRINTS
+        SPRINTS --> TACHES
+    end
+
+    subgraph HUB["Étape 3 : Claude Code"]
+        direction TB
+        CONTEXTE["AGENTS.md global + projet<br/>context window"]
+        PLUGINS["Plugins<br/>Context7, Obsidian skills, Playwright"]
+        CANVAS["Étape 0 : canvas Obsidian<br/>conception et architecture (optionnel)"]
+        SKILLS["Skills<br/>/prep, /prep-check, /code-review, /debug, /refactor..."]
+        SUBAGENTS["Agents<br/>Plan, obsidian-expert"]
+        MODES["Modes de prompt<br/>agentique standard, pédagogique (sur demande)"]
+
+        CONTEXTE ~~~ PLUGINS ~~~ CANVAS ~~~ SKILLS ~~~ SUBAGENTS ~~~ MODES
+    end
+
+    REPO["Repo de code<br/>branche feat/xxx"]
+    GITHUB["GitHub<br/>Pull Request"]
+    SUIVI["Étape 8 : retour au vault<br/>cocher la tâche, mettre à jour la progression"]
+
+    TACHES -->|"Étape 2 : choisir une tâche"| HUB
+    HUB -->|"Étape 4 : implémentation"| REPO
+    REPO -->|"Étapes 5-6 : commit, push, gh pr create"| GITHUB
+    GITHUB -->|"Étape 7 : revue solo (/code-review), gh pr merge"| SUIVI
 ```
 
 Le vault Obsidian et le repo de code sont deux répertoires distincts sur la même machine. Claude Code peut passer de l'un à l'autre de deux façons :
