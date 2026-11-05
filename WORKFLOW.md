@@ -32,7 +32,7 @@ flowchart TD
         direction TB
         CONTEXTE["AGENTS.md global + projet<br/>context window"]
         PLUGINS["Plugins<br/>Context7, Obsidian skills, Playwright"]
-        CANVAS["Étape 0 : canvas Obsidian<br/>conception et architecture (optionnel)"]
+        CANVAS["Étape 0 : schémas<br/>canvas Obsidian, Mermaid, draw.io"]
         SKILLS["Skills<br/>/prep, /prep-check, /code-review, /debug, /refactor..."]
         SUBAGENTS["Agents<br/>Plan, obsidian-expert"]
         MODES["Modes de prompt<br/>agentique standard, pédagogique (sur demande)"]
@@ -59,15 +59,25 @@ Le vault Obsidian et le repo de code sont deux répertoires distincts sur la mê
 
 ---
 
-## 0. Conception / Architecture - Canvas Obsidian (optionnel)
+## 0. Conception et schémas - Canvas Obsidian, Mermaid, draw.io
 
-Pour une tâche qui demande de clarifier une architecture ou un flux avant de coder (nouvelle entité complexe, refonte, intégration externe), passer par un schéma plutôt que d'improviser directement en code :
+Dès qu'il faut concevoir ou expliquer une grande fonctionnalité, un flux ou une architecture (nouvelle entité complexe, refonte, intégration externe), faire un schéma plutôt que de tout décrire en texte ou d'improviser directement en code. L'outil dépend du besoin :
 
-1. Demander à Claude Code de produire un schéma dans un **canvas Obsidian natif** (fichier `.canvas`, skill `obsidian:json-canvas`) : « fais-moi un schéma d'architecture pour [fonctionnalité] ».
-2. Itérer sur le schéma jusqu'à ce que la structure soit claire (entités, flux de données, séquence d'appels).
-3. Une fois validée, la conception sert de base à l'étape 1 (capture de la tâche) ou directement à l'étape 4 (implémentation) si la tâche existe déjà dans le sprint.
+| Outil | Pour quoi | Où |
+| --- | --- | --- |
+| **Canvas Obsidian natif** (fichier `.canvas`, skill `obsidian:json-canvas`) | Conception libre avant de coder : idées, modules, liens entre eux | Vault Obsidian |
+| **Mermaid** | Décrire un fonctionnement ou une architecture en texte versionné : `flowchart` pour un flux ou une grande fonctionnalité, `sequenceDiagram` pour une suite d'appels, `erDiagram` pour le schéma de la base | `docs/` de chaque projet, notes de projet, README, PR |
+| **draw.io** (extension VS Code) | Diagramme de classes UML détaillé | Repo du projet |
 
-> Cette étape est **optionnelle** - à réserver aux tâches où un schéma apporte réellement de la clarté (architecture, refonte). Pour un bugfix ou une petite feature, passer directement à l'étape 1 ou 4.
+Mermaid s'affiche directement sur GitHub et dans Obsidian. Quand il faut une image (SVG dans une page, un livrable client, une app), la générer avec [Pele](https://pele.run), la librairie de rendu Mermaid de l'équipe d'Obsidian.
+
+1. Demander le schéma à Claude Code : « fais-moi un flowchart Mermaid de [fonctionnalité] » ou « un canvas d'architecture pour [fonctionnalité] ».
+2. Itérer jusqu'à ce que la structure soit claire (entités, flux de données, séquence d'appels).
+3. Une fois validé, ranger le schéma Mermaid dans `docs/` du projet (ou la note du projet) pour qu'il évolue avec le code. La conception sert de base à l'étape 1 (capture de la tâche) ou directement à l'étape 4 (implémentation) si la tâche existe déjà dans le sprint.
+
+> Systématique pour une grande fonctionnalité ou une architecture. Pour un bugfix ou une petite feature, passer directement à l'étape 1 ou 4.
+>
+> Deux pièges Mermaid : un label qui contient un point doit être entre guillemets (`A["draw.io"]`), et un label qui commence par « 1. » s'affiche comme une erreur de liste Markdown.
 
 ---
 
@@ -244,7 +254,7 @@ Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian c
 
 | Étape | Où                           | Action                                                                                                  |
 | ----- | ---------------------------- | ------------------------------------------------------------------------------------------------------- |
-| 0     | Claude Code (canvas Obsidian) | Schéma d'architecture/conception si la tâche le justifie _(optionnel)_                                  |
+| 0     | Claude Code (canvas, Mermaid, draw.io) | Schéma de la fonctionnalité ou de l'architecture : canvas pour concevoir, Mermaid dans `docs/` pour documenter, draw.io pour les classes |
 | 1     | Réunion → Vault Obsidian     | Capturer les notes (`obsidian daily:append`/`create`), en extraire des tâches sous le bon sous-titre    |
 | 2     | Vault Obsidian               | Repérer une tâche `- [ ]` dans le sprint courant                                                        |
 | 3     | Claude Code                  | Contexte (`AGENTS.md`), plugins (Context7, Obsidian skills), skills et agents mobilisés selon le besoin |
