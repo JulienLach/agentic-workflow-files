@@ -174,7 +174,7 @@ La capacité du modèle à décider, au milieu de sa génération, d'**appeler u
 
 Une variante du tool use ci-dessus : plutôt que d'appeler des outils structurés à arguments typés, le modèle pilote directement une interface graphique - navigateur ou système d'exploitation - via des captures d'écran et des actions bas niveau (clic à des coordonnées, saisie clavier, scroll). L'agent "voit" l'écran et agit dessus comme le ferait un humain, ce qui permet d'automatiser des interfaces qui n'exposent aucune API.
 
-- Dans ce repo : le skill `claude-in-chrome` pilote une session Chrome réelle, existante. Le MCP `playwright` lance un navigateur scriptable, mais s'appuie surtout sur des snapshots d'accessibilité plutôt que sur des captures d'écran : c'est un pattern voisin, avec des actions plus structurées.
+- Exemples : le skill `claude-in-chrome`, fourni par Claude Code, pilote une session Chrome réelle, existante. Le MCP `playwright` lance un navigateur scriptable, mais s'appuie surtout sur des snapshots d'accessibilité plutôt que sur des captures d'écran : c'est un pattern voisin, avec des actions plus structurées.
 - Compromis par rapport au tool use classique : plus lent et plus coûteux (chaque action nécessite une capture d'écran + une décision du modèle), mais fonctionne sur n'importe quelle interface, même sans API exposée.
 
 ### MCP (Model Context Protocol)
@@ -187,7 +187,7 @@ Standard ouvert créé par Anthropic pour connecter un LLM à des sources de don
 
 ### Skills, plugins et subagents
 
-- **Skill** : un dossier `<nom>/SKILL.md` d'instructions réutilisables, invocable à la demande (`/nom-du-skill`) - un prompt structuré et versionné plutôt qu'à réécrire à chaque fois. Le format **Agent Skills** est un standard ouvert, confié à l'Agentic AI Foundation en octobre 2026. Ex. `/code-review`, `/debug` dans ce repo.
+- **Skill** : un dossier `<nom>/SKILL.md` d'instructions réutilisables, invocable à la demande (`/nom-du-skill`) - un prompt structuré et versionné plutôt qu'à réécrire à chaque fois. Le format **Agent Skills** est un standard ouvert, confié à l'Agentic AI Foundation en octobre 2026. Ex. `/stack-review`, `/debug` dans ce repo.
 - **Plugin** : un bundle complet (skills + MCP + hooks) packagé et installable en une commande.
 - **Subagent** : une instance séparée du modèle, avec son propre contexte, ses propres outils et parfois son propre modèle, lancée par l'agent principal pour isoler ou paralléliser une tâche. Ex. `obsidian-expert` dans ce repo.
 - **Hook** : une commande shell déclenchée **automatiquement** par le harnais en réaction à un événement précis (avant/après un appel d'outil, fin de session...) - de l'automatisation "dure", pas pilotée par une décision du modèle.
@@ -299,7 +299,7 @@ Un **endpoint**, c'est une URL précise à laquelle on envoie une requête pour 
 - **Endpoint de modèle (API)** : l'URL que le harnais appelle pour envoyer un prompt et récupérer une réponse. Un même fournisseur expose souvent plusieurs endpoints selon la fonction : chat/génération, embeddings, batch (traitement asynchrone en masse, moins cher), fine-tuning.
 - **Endpoint auto-hébergé / déployé** : quand un modèle est déployé sur ta propre infra (cloud ML type SageMaker/Vertex AI, ou en local avec **Ollama**), il expose son propre endpoint, distinct de celui du fournisseur d'origine.
 - **Endpoint compatible OpenAI** : beaucoup de fournisseurs exposent un endpoint qui respecte le même format que l'API OpenAI, pour permettre de changer de modèle/fournisseur juste en changeant l'URL et la clé, sans réécrire le code.
-- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint - en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP** - auquel le harnais se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** - leur nom, leur description, les arguments qu'ils acceptent - que le harnais rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harnais et un outil venu d'un serveur MCP.
+- **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint - en local via **stdio** (un simple process lancé sur ta machine, ex. Playwright), ou à distance en **HTTP** (ex. Context7) - auquel le harnais se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** - leur nom, leur description, les arguments qu'ils acceptent - que le harnais rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harnais et un outil venu d'un serveur MCP.
   > Le transport distant standard est **Streamable HTTP** (voir section 2, "MCP").
 - **Streaming vs non-streaming** : un endpoint peut renvoyer la réponse complète d'un coup, ou la **streamer** token par token au fur et à mesure de la génération.
 
@@ -539,7 +539,7 @@ Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un
 
 Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent comme un champ `hooks` dans `settings.json`, qui associe un événement (avant/après un appel d'outil, début/fin de session...) à une commande shell.
 
-**Claude Code - `~/.claude/` (utilisateur, global) :** même logique de structure (`settings.json`, `agents/`, `commands/`, plugins installés) mais appliquée à **toutes** les sessions, tous projets confondus - pour des préférences personnelles plutôt que des règles d'équipe.
+**Claude Code - `~/.claude/` (utilisateur, global) :** même logique de structure (`settings.json`, `agents/`, `skills/`, `commands/`, plugins installés) mais appliquée à **toutes** les sessions, tous projets confondus - pour des préférences personnelles plutôt que des règles d'équipe.
 
 **OpenCode - `.opencode/` (projet) :** structure équivalente mais nommée différemment - `.opencode/agent/` (au singulier), où le chemin devient l'id de l'agent (`.opencode/agent/team/reviewer.md` → agent `team/reviewer`), `.opencode/command/`, et `opencode.json` pour la config générale (modèles, outils, MCP). Contrairement à ce qu'on pourrait croire, OpenCode ne se limite pas à `AGENTS.md` : au niveau projet il cherche `AGENTS.md` en priorité, mais lit `CLAUDE.md` en repli si aucun `AGENTS.md` n'existe dans le dossier - si les deux existent, seul `AGENTS.md` est pris en compte ([doc officielle](https://opencode.ai/docs/rules/)). Global et projet se **combinent** (pas de remplacement). Le pendant global est `~/.config/opencode/`.
 
