@@ -2,9 +2,9 @@
 
 Nouveau modèle open-weight qui sort (Cohere, Moonshot/Kimi, Qwen, DeepSeek...) ? Ce guide donne une méthode rapide pour le tester : via un fournisseur cloud si pas de GPU sous la main (OpenRouter), ou en local si tu as un GPU correct (Ollama) - dans les deux cas avec le même harnais agentique, OpenCode.
 
-> **Document vivant.** Les identifiants de modèles ci-dessous et les commandes d'installation ont été vérifiés le 6 septembre 2026. Les fournisseurs de modèles sortent de nouvelles versions en continu (ex: Kimi K2 → K2.5 → K2.6, Qwen3 → Qwen3.5, DeepSeek v3 → v4) et les slugs changent avec - à revérifier sur [openrouter.ai/models](https://openrouter.ai/models) avant d'utiliser un identifiant figé ici.
+> **Document vivant.** Les tags Ollama ci-dessous ont été vérifiés le 5 novembre 2026. Les fournisseurs sortent de nouvelles versions en continu : pour OpenRouter, repartir de la liste à jour sur [openrouter.ai/models](https://openrouter.ai/models).
 
-Complète [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) (concept de "harness") et [`WORKFLOW.md`](./WORKFLOW.md) (workflow Claude Code) pour un usage ponctuel : "un modèle sort, je le teste vite".
+Complète [`CONCEPTS-IA.md`](./CONCEPTS-IA.md) (concept de "harnais") et [`WORKFLOW.md`](./WORKFLOW.md) (workflow Claude Code) pour un usage ponctuel : "un modèle sort, je le teste vite".
 
 ---
 
@@ -40,11 +40,11 @@ Le repo a déjà un `.opencode/AGENTS.md` (backup du scope utilisateur `~/.confi
 
 ## Boucle de test à chaque nouveau modèle
 
-1. **Trouver le slug du modèle** sur [openrouter.ai/models](https://openrouter.ai/models) (format `organisation/modele`, ex: `moonshotai/kimi-k2`, `cohere/command-r-plus`, `qwen/qwen3-235b-a22b`, `deepseek/deepseek-v3.2`).
+1. **Trouver le slug du modèle** sur [openrouter.ai/models](https://openrouter.ai/models) (format `organisation/modele`).
 
 2. **Lancer OpenCode dessus**, en préfixant avec `openrouter/` :
    ```bash
-   opencode run --model openrouter/moonshotai/kimi-k2 "ton prompt de test"
+   opencode run --model openrouter/<organisation>/<modele> "ton prompt de test"
    ```
    Ou en mode interactif : `opencode`, puis `/models` pour choisir le modèle dans la liste et switcher en cours de session sans tout reconfigurer.
 
@@ -67,7 +67,7 @@ Le repo a déjà un `.opencode/AGENTS.md` (backup du scope utilisateur `~/.confi
 | Qwen (Alibaba) | Bon rapport perf/prix, multilingue | `qwen/` sur openrouter.ai/models |
 | DeepSeek | Raisonnement, code | `deepseek/` sur openrouter.ai/models |
 
-Table volontairement sans version figée (K2 vs K2.6, Qwen3 vs Qwen3.5...) - toujours repartir de la liste à jour sur OpenRouter plutôt que de ce tableau.
+Table volontairement sans version figée - toujours repartir de la liste à jour sur OpenRouter plutôt que de ce tableau.
 
 ---
 
@@ -80,19 +80,19 @@ Si tu as un GPU avec assez de VRAM, **Ollama** remplace OpenRouter comme fournis
 ```bash
 curl -fsSL https://ollama.com/install.sh | sh   # macOS/Linux ; installeur dédié sous Windows
 
-ollama pull qwen2.5:7b     # télécharge le modèle (quantization Q4_K_M par défaut)
-ollama run qwen2.5:7b      # chat interactif rapide, pour un premier smoke test
+ollama pull qwen3.5:9b     # télécharge le modèle
+ollama run qwen3.5:9b      # chat interactif rapide, pour un premier smoke test
 ```
 
 ### Combien de VRAM pour quelle taille de modèle
 
-En Q4_K_M (quantization par défaut d'Ollama, bon compromis qualité/poids) :
+D'après les tailles affichées par Ollama, ordres de grandeur à confirmer sur ta machine :
 
 | VRAM dispo | Taille de modèle confortable | Exemples |
 |---|---|---|
-| 8 Go | 7-8B | `qwen2.5:7b`, `llama3.1:8b` |
-| 12 Go | 7-8B confortable, 13-14B tendu (moins de contexte dispo) | `qwen3:14b`, `deepseek-r1:14b`, `gemma3:12b` |
-| 16-24 Go | 14B confortable, jusqu'à ~20-30B tendu | `qwen3:32b` (Q4 serré) |
+| 8 Go | Environ 9B, tendu à 12B | `qwen3.5:9b` (7-8 Go), `gemma4:12b` (8 Go) |
+| 12 Go | 9-12B confortable | `qwen3.5:9b`, `gemma4:12b` |
+| 16-24 Go | 26-35B selon la VRAM | `gemma4:26b` (16-19 Go), `qwen3.6:27b` (18-19 Go), `qwen3.6:35b` (23 Go) |
 
 Au-delà de la VRAM dispo, le modèle "swap" sur la RAM système et devient très lent - dans ce cas, redescendre d'un cran de taille plutôt que forcer.
 
@@ -114,7 +114,7 @@ Sinon, config manuelle dans `~/.config/opencode/opencode.json` (utile pour fixer
       "npm": "@ai-sdk/openai-compatible",
       "name": "Ollama",
       "options": { "baseURL": "http://localhost:11434/v1" },
-      "models": { "qwen2.5:7b": {} }
+      "models": { "qwen3.5:9b": {} }
     }
   }
 }
