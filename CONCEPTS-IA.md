@@ -4,7 +4,7 @@ Un document de référence pour comprendre le vocabulaire, les concepts et les o
 
 Chaque section combine **le concept** et **des outils concrets** qui l'illustrent, pour ancrer la théorie dans des choses que tu utilises déjà (notamment via ce repo).
 
-> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) - ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 5 septembre 2026.
+> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) - ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 5 novembre 2026.
 
 ---
 
@@ -110,7 +110,7 @@ Un **token** est un fragment de texte (souvent un mot, un bout de mot, ou un car
 Beaucoup d'API de LLM (dont celle d'Anthropic) permettent de **mettre en cache** la portion stable d'un prompt - typiquement les instructions système, la doc, les fichiers de contexte qui ne changent pas d'un appel à l'autre - pour éviter de la retraiter (et de la refacturer) intégralement à chaque requête.
 
 - La première requête d'une session "écrit" le cache pour la partie stable du prompt (ex. le contenu de `AGENTS.md`, l'historique de conversation) ; les requêtes suivantes qui réutilisent ce même préfixe le lisent depuis le cache - nettement moins cher et plus rapide qu'un traitement complet.
-- Le cache a une **durée de vie limitée** (TTL - souvent de l'ordre de l'heure) : passé ce délai, il expire et la requête suivante doit "réécrire" le cache depuis zéro.
+- Le cache a une **durée de vie limitée** (TTL) : chez Anthropic, 5 minutes par défaut, renouvelées à chaque réutilisation, avec une option à 1 heure facturée plus cher à l'écriture. Passé ce délai, il expire et la requête suivante doit "réécrire" le cache depuis zéro.
 - C'est exactement ce qui se passe dans une session Claude Code : tant que tu enchaînes des messages dans ce délai, le contexte déjà envoyé (fichiers lus, instructions système) reste en cache plutôt que d'être refacturé à chaque tour.
 - Implication pratique pour le **context engineering** (section 6) : placer le contenu stable (instructions, docs) **en début de prompt**, et le contenu variable (la question du moment) à la fin - ça maximise la portion réutilisable du cache d'un appel à l'autre.
 
@@ -157,9 +157,9 @@ Un modèle seul ne fait que **générer du texte**. Le **harness** est le logici
 | **Claude Code** (Anthropic) | CLI agentique, ce que tu utilises dans ce repo |
 | **OpenCode** | Alternative CLI open-source, agnostique au fournisseur de modèle |
 | **Codex CLI** (OpenAI) | CLI agentique équivalent côté OpenAI |
-| **Gemini CLI** (Google) | CLI agentique côté Google |
+| **Antigravity CLI** (Google) | CLI agentique côté Google. Remplace Gemini CLI pour les comptes individuels depuis juin 2026 ; les offres entreprise ne sont pas concernées |
 | **Aider** | CLI open-source, orienté pair-programming en terminal |
-| **Cursor**, **Windsurf** | IDE avec agent intégré (fork de VS Code) |
+| **Cursor**, **Devin Desktop** (ex-Windsurf) | IDE avec agent intégré (fork de VS Code) |
 | **GitHub Copilot** (mode agent) | Extension IDE + agent autonome dans les PR/issues |
 | **Devin** (Cognition) | Agent autonome "ingénieur logiciel" cloud |
 
@@ -175,20 +175,20 @@ La capacité du modèle à décider, au milieu de sa génération, d'**appeler u
 
 Une variante du tool use ci-dessus : plutôt que d'appeler des outils structurés à arguments typés, le modèle pilote directement une interface graphique - navigateur ou système d'exploitation - via des captures d'écran et des actions bas niveau (clic à des coordonnées, saisie clavier, scroll). L'agent "voit" l'écran et agit dessus comme le ferait un humain, ce qui permet d'automatiser des interfaces qui n'exposent aucune API.
 
-- Dans ce repo : le skill `claude-in-chrome` (pilote une session Chrome réelle, existante) et le MCP `playwright` (lance un navigateur headless scriptable) sont deux implémentations concrètes de ce pattern.
+- Dans ce repo : le skill `claude-in-chrome` pilote une session Chrome réelle, existante. Le MCP `playwright` lance un navigateur scriptable, mais s'appuie surtout sur des snapshots d'accessibilité plutôt que sur des captures d'écran : c'est un pattern voisin, avec des actions plus structurées.
 - Compromis par rapport au tool use classique : plus lent et plus coûteux (chaque action nécessite une capture d'écran + une décision du modèle), mais fonctionne sur n'importe quelle interface, même sans API exposée.
 
 ### MCP (Model Context Protocol)
 
-Standard ouvert créé par Anthropic pour connecter un LLM à des sources de données et outils externes de façon **uniforme**, plutôt que de coder une intégration spécifique par outil et par fournisseur de modèle - souvent résumé comme *"l'USB-C des agents IA"*. Un **serveur MCP** expose des outils/ressources que n'importe quel harness compatible peut utiliser.
+Standard ouvert créé par Anthropic pour connecter un LLM à des sources de données et outils externes de façon **uniforme**, plutôt que de coder une intégration spécifique par outil et par fournisseur de modèle - souvent résumé comme *"l'USB-C des agents IA"*. Il est aujourd'hui hébergé par l'Agentic AI Foundation (Linux Foundation). Un **serveur MCP** expose des outils/ressources que n'importe quel harness compatible peut utiliser.
 
 - Exemple dans ce repo : **Context7** (documentation de librairies à jour, servie via MCP).
 - **Le protocole continue d'évoluer vite** : la spec du 28 juillet 2026 a rendu le cœur du protocole **stateless** (un serveur MCP distant peut tourner derrière un simple load balancer round-robin), ajouté un **framework d'Extensions** (`MCP Apps` pour des UI servies par le serveur, `Tasks` pour du travail longue durée), et durci l'auth (alignement OAuth 2.0/OIDC, dépréciation de la dynamic client registration au profit des Client ID Metadata Documents).
-- Le transport **HTTP+SSE** (mentionné section 4) est officiellement en dépréciation depuis cette même spec, au profit d'un transport HTTP stateless - encore supporté ~1 an, mais à ne plus considérer comme le standard pour un nouveau projet.
+- Le transport **HTTP+SSE** (mentionné section 4) est déprécié depuis la spec du 26 mars 2025, au profit de **Streamable HTTP**. La spec de juillet 2026 confirme ce statut : à ne plus utiliser pour un nouveau projet.
 
 ### Skills, plugins et subagents
 
-- **Skill** : un fichier d'instructions réutilisable, invocable à la demande (`/nom-du-skill`) - un prompt structuré et versionné plutôt qu'à réécrire à chaque fois. Ex. `/code-review`, `/debug` dans ce repo.
+- **Skill** : un dossier `<nom>/SKILL.md` d'instructions réutilisables, invocable à la demande (`/nom-du-skill`) - un prompt structuré et versionné plutôt qu'à réécrire à chaque fois. Le format **Agent Skills** est un standard ouvert, confié à l'Agentic AI Foundation en octobre 2026. Ex. `/code-review`, `/debug` dans ce repo.
 - **Plugin** : un bundle complet (skills + MCP + hooks) packagé et installable en une commande.
 - **Subagent** : une instance séparée du modèle, avec son propre contexte, ses propres outils et parfois son propre modèle, lancée par l'agent principal pour isoler ou paralléliser une tâche. Ex. `obsidian-expert` dans ce repo.
 - **Hook** : une commande shell déclenchée **automatiquement** par le harness en réaction à un événement précis (avant/après un appel d'outil, fin de session...) - de l'automatisation "dure", pas pilotée par une décision du modèle.
@@ -266,7 +266,7 @@ Une tâche est éclatée en plusieurs appels LLM **indépendants et connus à l'
 Un agent central (l'orchestrateur) découpe une tâche volumineuse et distribue les morceaux à des **subagents spécialisés** (workers) qui travaillent en parallèle ou isolément, puis synthétise leurs résultats - mais contrairement à Parallelization, c'est l'orchestrateur qui **décide dynamiquement**, en fonction de la requête reçue, combien de sous-tâches créer et lesquelles.
 
 - Dans ce repo : `superpowers:subagent-driven-development` implémente directement ce pattern - l'agent principal utilise l'outil `Agent` (section 2) pour lancer des subagents (`Explore`, `general-purpose`...) sur des sous-tâches décidées au fil de l'eau, et protège son propre contexte en ne récupérant que leur synthèse finale plutôt que tous leurs résultats intermédiaires.
-- Côté frameworks dédiés : LangChain, CrewAI, AutoGen (section 8, "Orchestration multi-agents") formalisent ce pattern comme brique de base.
+- Côté frameworks dédiés : LangChain, CrewAI, Microsoft Agent Framework (section 8, "Orchestration multi-agents") formalisent ce pattern comme brique de base.
 
 Ce pattern se décline à **deux niveaux** selon ce qu'on orchestre :
 
@@ -301,24 +301,27 @@ Un **endpoint**, c'est une URL précise à laquelle on envoie une requête pour 
 - **Endpoint auto-hébergé / déployé** : quand un modèle est déployé sur ta propre infra (cloud ML type SageMaker/Vertex AI, ou en local avec **Ollama**), il expose son propre endpoint, distinct de celui du fournisseur d'origine.
 - **Endpoint compatible OpenAI** : beaucoup de fournisseurs exposent un endpoint qui respecte le même format que l'API OpenAI, pour permettre de changer de modèle/fournisseur juste en changeant l'URL et la clé, sans réécrire le code.
 - **Endpoint MCP** : un serveur MCP expose lui aussi un endpoint - en local via **stdio** (un simple process lancé sur ta machine, ex. Context7), ou à distance en **HTTP** - auquel le harness se connecte. Une fois connecté, l'endpoint **déclare une liste d'outils (tools)** - leur nom, leur description, les arguments qu'ils acceptent - que le harness rend directement utilisables par le modèle, exactement comme ses outils natifs (`Read`, `Edit`, `Bash`...). C'est le même mécanisme de **tool use / function calling** (voir section 2) : le endpoint ne fait qu'ajouter de nouveaux outils à la liste disponible, le modèle ne fait pas de différence entre un outil natif du harness et un outil venu d'un serveur MCP.
-  > Le transport historique **HTTP+SSE** est en dépréciation depuis la spec MCP de juillet 2026, remplacé par un transport HTTP stateless (voir section 2, "MCP") - à ne plus utiliser comme référence pour un nouveau déploiement.
+  > Le transport historique **HTTP+SSE** est déprécié depuis la spec MCP de mars 2025, remplacé par **Streamable HTTP** (voir section 2, "MCP") - à ne plus utiliser comme référence pour un nouveau déploiement.
 - **Streaming vs non-streaming** : un endpoint peut renvoyer la réponse complète d'un coup, ou la **streamer** token par token au fur et à mesure de la génération.
 
 Un endpoint est généralement protégé par une **authentification** (clé API, token), soumis à des **rate limits** (nombre de requêtes/tokens max par minute), et a sa propre latence - des critères qui comptent dans le choix d'un fournisseur ou d'un déploiement.
 
 ### Exemple concret : exposer une app métier comme endpoint MCP
 
-Un cas très courant en dev : rendre une application interne interrogeable par un agent IA, en l'exposant comme **serveur MCP distant (HTTP)** plutôt qu'en local.
-
-Concrètement : l'app définit une route (ex. `/api/mcp`), génère un **token propre à chaque utilisateur** (authentification), et l'URL complète devient l'endpoint à donner à l'agent :
+Un cas très courant en dev : rendre une application interrogeable par un agent IA, en l'exposant comme **serveur MCP distant (HTTP)** plutôt qu'en local. L'URL ne contient aucun secret :
 
 ```
-https://mon-app.exemple.com/api/mcp?token=<token-utilisateur>
+https://mon-app.exemple.com/api/mcp
 ```
 
-Côté Claude Desktop (ou Claude Code), on ajoute ensuite cet endpoint comme **MCP personnalisé** - via l'UI de Claude Desktop, ou en CLI avec `claude mcp add --transport http mon-app https://mon-app.exemple.com/api/mcp?token=...`. Dès lors, l'agent peut appeler les outils exposés par cette app, **authentifié en tant que cet utilisateur précis** - exactement le même principe qu'un endpoint MCP local (Context7, Obsidian skills), sauf qu'il tourne sur ton propre serveur, à distance, avec une authentification par token plutôt qu'une clé API globale partagée.
+On l'ajoute comme **MCP personnalisé** dans Claude Desktop, ou en CLI avec `claude mcp add --transport http mon-app https://mon-app.exemple.com/api/mcp`. L'authentification passe ensuite par **OAuth 2.1** :
 
-> Le token dans l'URL joue le même rôle qu'une clé API : il identifie et authentifie l'appelant. Comme il apparaît en clair dans l'URL, il faut le traiter comme un secret (ne pas le committer, le régénérer s'il est exposé) - au même titre qu'une clé API classique.
+1. Le client appelle l'endpoint sans token et reçoit une erreur 401, qui lui indique où s'authentifier.
+2. L'utilisateur se connecte à l'application et choisit les droits accordés, par exemple lecture seule.
+3. Le client reçoit un access token et l'envoie à chaque appel dans l'en-tête `Authorization`.
+4. Le serveur vérifie ce token et déduit l'utilisateur et le client de sa connexion, jamais d'un argument de tool.
+
+> **Pas de token dans l'URL** : la spec MCP interdit de placer un access token dans la query string. Une URL finit facilement dans des logs, un historique ou une capture d'écran.
 
 ---
 
@@ -326,8 +329,8 @@ Côté Claude Desktop (ou Claude Code), on ajoute ensuite cet endpoint comme **M
 
 ### Propriétaire vs open-weights
 
-- **Modèles propriétaires** : accessibles uniquement via API du fournisseur (Claude/Anthropic, GPT/OpenAI, Gemini/Google, Grok/xAI). Pas de poids téléchargeables.
-- **Modèles open-weights** : les poids sont publiés et téléchargeables (Llama/Meta, Mistral, DeepSeek, Qwen/Alibaba). Exécutables en local ou chez n'importe quel hébergeur - utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
+- **Modèles propriétaires** : accessibles uniquement via API du fournisseur (Claude/Anthropic, GPT/OpenAI, Gemini/Google, Grok/xAI, Muse Spark/Meta). Pas de poids téléchargeables.
+- **Modèles open-weights** : les poids sont publiés et téléchargeables (Mistral, DeepSeek, Qwen/Alibaba, gpt-oss/OpenAI, Llama/Meta). Un même fournisseur peut proposer les deux : OpenAI garde GPT fermé mais publie gpt-oss, et le modèle phare de Meta, Muse Spark, est fermé depuis avril 2026. Exécutables en local ou chez n'importe quel hébergeur - utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
 
 ### Fine-tunes communautaires - l'exemple Nous Hermes
 
@@ -341,7 +344,7 @@ Un modèle open-weights publié par son créateur (le "modèle de base") peut ê
 
 Chaque fournisseur propose en général plusieurs tailles de modèles, avec un arbitrage capacité/vitesse/coût :
 
-- **Frontier / haut de gamme** (ex. Opus côté Claude) : le plus capable, pour du raisonnement complexe, de l'architecture, des tâches ambiguës.
+- **Frontier / haut de gamme** (ex. Fable et Opus côté Claude, Fable visant le raisonnement le plus exigeant) : le plus capable, pour du raisonnement complexe, de l'architecture, des tâches ambiguës.
 - **Milieu de gamme** (ex. Sonnet côté Claude) : le meilleur rapport capacité/coût pour l'usage quotidien - c'est le modèle par défaut de la plupart des workflows dev.
 - **Petit/rapide** (ex. Haiku côté Claude) : très rapide et peu coûteux, pour des tâches simples, répétitives, ou à fort volume (classification, extraction, résumé court).
 
@@ -353,7 +356,7 @@ Avant de choisir un modèle, on s'appuie sur des **benchmarks** - des jeux de te
 | --- | --- |
 | **MMLU** | Culture générale et connaissances multi-domaines (questions à choix multiples) |
 | **HumanEval** | Génération de code Python à partir d'un énoncé |
-| **SWE-bench** | Résolution de vraies issues GitHub - le plus proche d'un usage "agent de code" |
+| **SWE-bench Pro** | Résolution de vraies issues GitHub, en plusieurs langages - le plus proche d'un usage "agent de code". OpenAI le recommande à la place de **SWE-bench Verified**, dont il ne publie plus les scores car il le juge contaminé |
 | **GPQA** | Questions scientifiques de niveau expert |
 | **MATH** | Raisonnement mathématique |
 
@@ -375,6 +378,8 @@ Avant de choisir un modèle, on s'appuie sur des **benchmarks** - des jeux de te
 ### Le "raisonnement étendu" (extended thinking / reasoning models)
 
 Certains modèles (ou certains modes de modèles existants) peuvent "réfléchir" plus longtemps avant de répondre - générer une chaîne de raisonnement interne, explorer plusieurs pistes, avant de produire la réponse finale. Ça améliore nettement les résultats sur les tâches complexes (maths, debug difficile, architecture), au prix d'une latence et d'un coût plus élevés. À réserver aux tâches qui le justifient, pas en usage systématique.
+
+Chez Anthropic, l'**extended thinking** (avec `budget_tokens`) est déprécié : Claude 4.7 et les modèles suivants rejettent ces requêtes. On utilise maintenant l'**adaptive thinking**, et on règle la profondeur de raisonnement avec le paramètre `effort`.
 
 ---
 
@@ -437,20 +442,20 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 | Catégorie | Outils |
 | --- | --- |
-| **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
+| **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama et Muse Spark (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
 | **Fine-tunes communautaires** | Nous Hermes (Nous Research), Dolphin, OpenHermes, WizardLM |
-| **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Gemini CLI, Mistral Vibe, Aider |
-| **IDE avec agent intégré** | Cursor, Windsurf, GitHub Copilot (mode agent), Zed |
+| **Harness CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe, Aider |
+| **IDE avec agent intégré** | Cursor, Devin Desktop (ex-Windsurf), GitHub Copilot (mode agent), Zed |
 | **Agents autonomes cloud** | Devin, Claude Code (mode cloud/remote), Jules (Google) |
-| **Protocoles / standards** | MCP (Model Context Protocol), function calling / tool use |
-| **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, AutoGen |
+| **Protocoles / standards** | MCP (Model Context Protocol), A2A, Agent Skills, function calling / tool use |
+| **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, Microsoft Agent Framework (successeur d'AutoGen, en maintenance) |
 | **Chapeautage multi-harnais (ADE)** | Orca (Stably AI) - fait tourner Claude Code, Codex, OpenCode, Pi... côte à côte, chacun isolé dans son worktree git ; desktop + app mobile |
 | **AI Gateway / routing multi-fournisseurs** | LiteLLM, OpenRouter, Portkey |
 | **Agents navigateur / computer use** | Playwright (MCP), Claude in Chrome, computer use (API) |
 | **Bases vectorielles (RAG)** | Pinecone, Weaviate, Chroma, pgvector |
 | **Exécution locale** | Ollama, LM Studio |
 | **Observabilité / évaluation** | LangSmith, Langfuse, evals maison |
-| **Benchmarks connus** | MMLU, HumanEval, SWE-bench, GPQA, MATH |
+| **Benchmarks connus** | MMLU, HumanEval, SWE-bench Pro, GPQA, MATH |
 
 ---
 
@@ -463,11 +468,11 @@ Au-delà des concepts (section 2) et des patterns (section 3), une question trè
 Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un repo porte des noms différents selon l'outil :
 
 - **`CLAUDE.md`** : le nom historique propre à Claude Code.
-- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot, Aider, Zed, Windsurf...).
+- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Cursor, Gemini CLI, OpenCode, Copilot, Aider, Zed, Devin Desktop (ex-Windsurf)...).
 
 **Où le placer :** à la **racine du repo**, toujours - c'est l'endroit où tous les harness le cherchent par défaut, sans configuration supplémentaire.
 
-- **Claude Code lit `AGENTS.md` nativement depuis la v2.1.277** ([doc officielle](https://code.claude.com/docs/en/memory#agents-md)), mais seulement au niveau **projet** (répertoire de travail et parents) - pas au niveau utilisateur/global, qui ne connaît que `CLAUDE.md`. Précédence par défaut : si un `CLAUDE.md` (ou `CLAUDE.local.md`) existe dans l'arborescence du projet, il est lu à la place d'`AGENTS.md`, pas en plus. Pour le scope global, la seule option reste un `CLAUDE.md` qui importe l'autre (`@AGENTS.md`), ou un symlink `ln -s AGENTS.md CLAUDE.md`.
+- **Claude Code lit `AGENTS.md` nativement depuis la v2.1.277** ([doc officielle](https://code.claude.com/docs/en/memory#agents-md)), mais seulement au niveau **projet** (répertoire de travail et parents) - pas au niveau utilisateur/global, qui ne connaît que `CLAUDE.md`. Précédence par défaut : si un `CLAUDE.md` (ou `CLAUDE.local.md`) existe dans l'arborescence du projet, il est lu à la place d'`AGENTS.md`, pas en plus ; le réglage `claude-md-and-agents-md` (`/config`, *Project instructions*) permet de lire les deux. Pour le scope global, la seule option reste un `CLAUDE.md` qui importe l'autre (`@AGENTS.md`), ou un symlink `ln -s AGENTS.md CLAUDE.md`.
 
 **Contenu typique** (ce n'est pas une doc générale du projet - ça, c'est le rôle du `README.md`) :
 
@@ -491,8 +496,8 @@ Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un
 | `.claude/settings.json` | Config partagée avec l'équipe : permissions d'outils, hooks | Oui |
 | `.claude/settings.local.json` | Overrides personnels (souvent générés par les prompts d'autorisation) | Non - à gitignorer |
 | `.claude/agents/*.md` | Subagents (section 2) : un fichier par agent, frontmatter `name` / `description` / `model` / `color` | Oui |
-| `.claude/skills/*.md` (ou `skills/<nom>/SKILL.md`) | Skills projet (section 2), invocables via `/nom` | Oui |
-| `.claude/commands/*.md` | Slash commands custom | Oui |
+| `.claude/skills/<nom>/SKILL.md` | Skills projet (section 2), invocables via `/nom` | Oui |
+| `.claude/commands/*.md` | Ancien format, toujours supporté et fusionné avec les skills ; à nom égal, le skill l'emporte | Oui |
 | `.mcp.json` (à la racine, hors `.claude/`) | Serveurs MCP (section 2) scopés au projet | Oui, sauf secrets en dur |
 
 Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent comme un champ `hooks` dans `settings.json`, qui associe un événement (avant/après un appel d'outil, début/fin de session...) à une commande shell.
@@ -526,7 +531,7 @@ Claude Code remonte l'arborescence depuis le fichier courant et **concatène** c
 ### Bonnes pratiques
 
 - **Un seul fichier d'instructions racine.** Privilégier `AGENTS.md` pour la portabilité multi-outils ; si un outil legacy exige `CLAUDE.md`, importer ou symlinker plutôt que dupliquer - deux fichiers qui divergent au fil des mises à jour sont pires que l'absence de fichier.
-- **Committer la config partagée, gitignorer le perso.** `.claude/settings.json`, `agents/`, `skills/` sont pensés pour l'équipe ; `settings.local.json` et tout fichier contenant un token/clé (ex. l'URL d'un endpoint MCP avec un token en clair, section 4) ne doivent jamais être committés.
+- **Committer la config partagée, gitignorer le perso.** `.claude/settings.json`, `agents/`, `skills/` sont pensés pour l'équipe ; `settings.local.json` et tout fichier contenant un token/clé ne doivent jamais être committés.
 - **Garder le fichier racine court.** Il est relu à chaque session et pèse sur le prompt caching (section 1) - la documentation volumineuse a davantage sa place en fichiers séparés référencés, voire en RAG (section 7), que collée dans `AGENTS.md`.
 - **Sous-dossiers seulement si le contexte diverge vraiment.** Un monorepo avec un vrai frontend et une vraie infra justifie des `CLAUDE.md` locaux ; un repo simple n'en a pas besoin - la complexité doit suivre un besoin réel, pas être ajoutée par précaution.
 - **Centraliser en global ce qui n'est pas spécifique à un projet.** Agents, skills, commandes et plugins/MCP personnels (pas des règles d'équipe) devraient vivre une seule fois dans `~/.claude/` plutôt que d'être dupliqués dans chaque repo - c'est le scope **utilisateur** du tableau ci-dessus, chargé automatiquement à chaque session, tous projets confondus. Chaque nouveau projet n'a alors besoin que d'un `CLAUDE.md`/`AGENTS.md` minimal propre à son contexte (stack, conventions, contraintes) : tout le reste de l'outillage suit déjà, sans rien reconfigurer. En cas de nom identique en projet et en global (ex. un agent `obsidian-expert` dans les deux), la version **projet** prend le dessus - pratique pour surcharger ponctuellement un agent global sur un repo précis sans toucher à la config personnelle.
@@ -565,9 +570,9 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **LM Studio** | lmstudio.ai | Équivalent d'Ollama avec interface graphique - pratique pour tester des modèles locaux sans terminal. |
 | **Artificial Analysis** | artificialanalysis.ai | Comparateur indépendant de perf/prix/latence entre fournisseurs et modèles (frontier et open-weights) - pour choisir sur des critères objectifs plutôt que sur la réputation. |
 | **llm-stats.com** | llm-stats.com | Équivalent d'Artificial Analysis, avec en plus un flux de nouveautés modèles tenu à jour (`llm-stats.com/ai-news`). |
-| **LMArena** | lmarena.ai | Classement par préférence humaine en aveugle (deux réponses comparées, l'utilisateur vote pour la meilleure) - complète les benchmarks académiques (section 5) par une mesure d'usage réel. |
+| **Arena** (ex-LMArena) | arena.ai | Classement par préférence humaine en aveugle (deux réponses comparées, l'utilisateur vote pour la meilleure) - complète les benchmarks académiques (section 5) par une mesure d'usage réel. |
 | **MCP - doc officielle** | modelcontextprotocol.io | Spec officielle du protocole MCP (section 2) - pour trouver un serveur MCP existant ou comprendre le protocole avant d'en coder un. |
-| **Docs officielles fournisseurs** | docs.anthropic.com / platform.openai.com/docs / ai.google.dev | Première source pour tout détail précis d'API (pricing exact, limites, nouveaux paramètres) - toujours préférer à un article tiers qui peut dater vite. |
+| **Docs officielles fournisseurs** | platform.claude.com/docs / platform.openai.com/docs / ai.google.dev | Première source pour tout détail précis d'API (pricing exact, limites, nouveaux paramètres) - toujours préférer à un article tiers qui peut dater vite. |
 | **Veille communautaire** | r/LocalLLaMA · simonwillison.net · latent.space | Suivi qualitatif de l'IA locale, des patterns agentiques et des retours d'expérience terrain, en complément du briefing `ai-news`. |
 
 > **OpenRouter en particulier** mérite d'être dans les favoris dès qu'on développe avec des LLM : c'est le moyen le plus rapide de comparer deux modèles sur une vraie tâche (même code, juste l'URL/modèle qui change) sans devoir ouvrir un compte chez chaque fournisseur.
@@ -593,7 +598,10 @@ Au-delà des concepts, quelques sites reviennent en permanence dès qu'on travai
 | **Hallucination** | Réponse générée avec assurance mais factuellement fausse |
 | **Temperature / top-p** | Paramètres qui contrôlent le degré d'aléatoire/créativité de la génération |
 | **Harness** | Logiciel qui entoure un LLM pour lui donner des outils, une mémoire et une boucle d'exécution |
+| **Harness engineering** | Conception de ce qui encadre un agent de code : règles, outils, garde-fous et vérifications automatiques |
 | **Agent** | Système qui exécute une tâche de façon autonome via une boucle observer/agir |
+| **Agentic engineering** | Développement logiciel piloté avec des agents de code, en gardant les exigences d'ingénierie : architecture, tests, revue. S'oppose au simple usage ponctuel de l'autocomplétion |
+| **Spec-driven development** | Méthode où une spec détaillée et testable précède le code, puis pilote les agents dans une boucle spec, génération, tests, correction |
 | **ReAct** | Pattern où l'agent alterne raisonnement explicite et appel d'outil - nom donné à la boucle agentique de base |
 | **Prompt Chaining** | Décomposition d'une tâche en une séquence fixe d'étapes, la sortie de l'une nourrissant l'entrée de la suivante |
 | **Routing** | Dispatch d'une requête vers un LLM ou un chemin de traitement spécialisé parmi plusieurs, selon sa nature |
