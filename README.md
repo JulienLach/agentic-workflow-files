@@ -60,7 +60,7 @@ agentic-workflow-files/
 │   └── skills/                      ← un sous-dossier par skill, `<nom>/SKILL.md` (format standard, aucun fichier plat) :
 │                                       stack-review, debug, refactor, add-entity, write-tests,
 │                                       security-audit, prep, prep-check, roast, competitor-benchmark,
-│                                       ai-news, learn, pulse (fourni par le plugin Claude Pulse, pas écrit à la main)
+│                                       ai-news, learn
 │                                       - 10 d'entre eux ont une suite `evals/` (voir Évaluer un skill, plus bas)
 │                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
@@ -195,8 +195,6 @@ Statusline personnalisable (thèmes, couleurs, animations, coût de session en t
 ```bash
 claude plugin install claude-pulse@anthropic-plugin-directory
 ```
-
-> Ce plugin installe aussi un skill `/pulse` (visible dans `.claude/skills/pulse/`) qui pilote sa config - distinct des skills métier de ce repo listés dans [Skills disponibles](#skills-disponibles), il vient avec le plugin plutôt qu'écrit à la main.
 
 ---
 
@@ -413,7 +411,7 @@ cd .claude/skills/<nom-du-skill>
 claude plugin eval . --runs 1 --trust-plugin --no-publish
 ```
 
-`ai-news`, `competitor-benchmark` et `pulse` n'en ont pas : ils dépendent du web en temps réel (non-déterministe, coûteux) ou modifient une vraie config (`pulse`), pas adaptés à ce genre de test automatisé.
+`ai-news` et `competitor-benchmark` n'en ont pas : ils dépendent du web en temps réel (non-déterministe, coûteux), pas adaptés à ce genre de test automatisé.
 
 ---
 
