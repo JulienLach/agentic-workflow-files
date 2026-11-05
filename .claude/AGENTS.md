@@ -33,7 +33,8 @@ Les skills, agents et commandes transverses à tous les projets vivent dans `~/.
 
 - **Backend** : Node.js, Express, TypeScript, PostgreSQL (`pg` raw SQL), Zod, Vitest, Winston
 - **Frontend** : React, Vite, TypeScript, React Router, Zod, Chart.js
-- **Structure** : Monorepo avec dossiers `backend/` et `frontend/`
+- **Structure** : Monorepo avec dossiers `backend/`, `frontend/` et `docs/` (architecture, runbook)
+- **Déploiement** : Docker Compose, CI/CD GitHub Actions
 - **Auth** : JWT (httpOnly cookie) + middleware `authenticateToken`
 - **Documentation** : Context7 MCP pour toute la documentation des libs/frameworks
 
@@ -50,6 +51,7 @@ npm run build        # Compilation TypeScript
 npm test             # Tests Vitest
 npm run test:ui      # Tests avec interface graphique
 npm run test:ui:coverage  # Tests avec rapport de couverture
+npm run lint         # oxlint
 ```
 
 ### Frontend
@@ -58,7 +60,7 @@ npm run test:ui:coverage  # Tests avec rapport de couverture
 cd frontend
 npm run dev          # Serveur Vite
 npm run build        # Build de production
-npm run lint         # ESLint
+npm run lint         # oxlint
 npm run preview      # Prévisualisation du build
 ```
 
@@ -82,8 +84,10 @@ backend/
 ├── auth/               ← Logique JWT
 ├── config/             ← Pool de connexion PostgreSQL
 ├── data/               ← Modèles de données (classes représentant les entités DB)
+├── emails/             ← Templates et envoi des emails
 ├── interfaces/         ← Interfaces TypeScript partagées
-├── middleware/         ← auth, sanitization, erreurs, CORS, rate limiting
+├── jobs/               ← Tâches planifiées (cron)
+├── middleware/         ← auth, validation, erreurs, headers de sécurité, rate limiting
 ├── routes/             ← Handlers Express par entité (ex: user.routes.ts)
 ├── services/           ← Couche métier appelée par les routes
 ├── validators/         ← Schémas Zod pour la validation des requêtes
@@ -97,7 +101,7 @@ backend/
 ```
 frontend/src/
 ├── main.tsx / App.tsx  ← Point d'entrée, routing
-├── components/         ← Composants réutilisables (Charts/, Forms/, Layout/, Table/)
+├── components/         ← Composants réutilisables (Charts/, forms/, Layout/)
 ├── contexts/           ← React Context providers (AuthContext, etc.)
 ├── hooks/              ← Custom hooks React
 ├── interfaces/         ← Interfaces TypeScript
@@ -109,7 +113,7 @@ frontend/src/
 
 ### Flux de données
 
-**Backend** : `Route → Middleware (auth, sanitize) → Validator (Zod) → Service → Data model → PostgreSQL`
+**Backend** : `Route → Middleware (auth) → Validator (Zod) → Service → Data model → PostgreSQL`
 
 **Frontend** : `Composant → Hook → services/api.ts → Backend`
 
@@ -119,20 +123,25 @@ frontend/src/
 
 ### Authentification & Autorisation
 
-- JWT vérifié par `authenticateToken` sur toutes les routes protégées (appliqué globalement dans `server.ts`)
-- Routes admin : `requireRole(1)` sur les méthodes POST/PUT/DELETE
+- JWT vérifié par `authenticateToken` sur toutes les routes protégées (monté route par route dans `server.ts`, car certaines routes sont publiques)
+- Routes admin : `requireRole(1)` selon la route (écritures et lectures sensibles)
 - `useAuth()` hook côté frontend pour accéder à `user` et `isAdmin`
-- Token JWT en cookie httpOnly ; userId dans localStorage
+- Token JWT en cookie httpOnly. Jamais de token ni d'identifiant utilisateur dans `localStorage`
 
-### Protection IDOR
+### Protection IDOR et isolation des données
 
-- Les endpoints GET par ID vérifient toujours que la ressource appartient à l'utilisateur/contexte courant
+- Toute opération sur une ressource (lecture, modification, suppression) vérifie qu'elle appartient à l'utilisateur/contexte courant
 - Retourner 404 (pas 403) si la ressource n'appartient pas à l'utilisateur/contexte courant
+- Le contexte (utilisateur, tenant) se résout toujours côté serveur, jamais depuis un paramètre envoyé par le client
 
 ### Validation
 
-- Zod utilisé côté **backend** (`backend/validators/`) ET **frontend** (`frontend/src/validators/`)
+- Zod utilisé côté **backend** (`backend/validators/`) ET **frontend** (`frontend/src/validators/`). La validation du backend fait foi
 - Valider uniquement aux frontières du système (entrée utilisateur, APIs externes)
+
+### Transactions
+
+- Le service ouvre la transaction et passe son `client` aux méthodes de `backend/data/`
 
 ### Appels API
 
@@ -208,12 +217,12 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 ## Sécurité
 
 - **SQL injection** : toujours utiliser des requêtes paramétrées (`$1, $2, ...`)
-- **XSS** : tous les inputs passent par `sanitizeInputs` middleware (DOMPurify via jsdom)
+- **XSS** : valider les entrées avec Zod. React échappe l'affichage ; tout HTML généré côté serveur (emails...) s'échappe à la sortie. Éviter `dangerouslySetInnerHTML`
 - **Auth** : `authenticateToken` présent sur toutes les routes protégées
-- **IDOR** : vérifier que la ressource appartient à l'utilisateur/contexte dans toutes les requêtes GET par ID
+- **IDOR** : vérifier que la ressource appartient à l'utilisateur/contexte dans toutes les requêtes par ID, en lecture comme en écriture
 - **Données sensibles** : jamais de tokens, mots de passe, ou clés dans les logs ou réponses
 - **Mots de passe** : hachage scrypt via `utils/password.ts` (`hashPassword` / `verifyPassword`)
-- **Rate limiting** : sur `/login` via express-rate-limit
+- **Rate limiting** : sur les routes sensibles (`/login`, routes publiques) et sur l'API, via express-rate-limit
 - **Headers de sécurité** : middleware dédié (CSP, HSTS, etc.)
 
 ---
@@ -225,6 +234,7 @@ Règles de base à respecter dans toutes les classes (`backend/data/`, mais auss
 - Ajouter des tests unitaires et d'intégration pour toute nouvelle fonctionnalité
 - Préférer les tests sur les **services** et les **data models** (logique métier)
 - Ne pas mocker la base de données dans les tests d'intégration
+- Si les données sont isolées par client (tenant) : un test d'isolation par entité, qui vérifie qu'un client ne peut ni lire, ni modifier, ni supprimer la ressource d'un autre (404 attendu)
 
 ---
 
@@ -329,16 +339,7 @@ refactor/scope-du-refacto
 
 ## Workflow - Ajouter une nouvelle entité
 
-1. Créer le modèle de données dans `backend/data/EntityName.ts`
-2. Créer le service dans `backend/services/entityName.services.ts`
-3. Créer le validator Zod dans `backend/validators/entityNameSchema.ts`
-4. Créer les routes dans `backend/routes/entityName.routes.ts`
-5. Enregistrer la route dans `backend/server.ts`
-6. Ajouter les fonctions API dans `frontend/src/services/api.ts`
-7. Créer le composant formulaire dans `frontend/src/components/Forms/EntityNameForm.tsx`
-8. Créer les pages dans `frontend/src/pages/EntityNamePage/`
-9. Ajouter les routes dans `frontend/src/App.tsx`
-10. Créer le validator Zod frontend dans `frontend/src/validators/entityNameSchema.ts`
+Utiliser le skill `/add-entity`, qui contient la checklist complète.
 
 ---
 
