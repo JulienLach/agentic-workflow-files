@@ -25,10 +25,10 @@ Confirmer la date depuis le contexte systeme. Ne jamais l'improviser.
 ### Source principale : BuildFastWithAI
 
 Fetcher LES DEUX formats d'URL en parallele (l'un d'eux retournera le contenu) :
-- Format texte : https://www.buildfastwithai.com/blogs/ai-news-today-[mois-en]-[j]-[annee]
-  Exemple pour le 8 juin 2026 : https://www.buildfastwithai.com/blogs/ai-news-today-june-8-2026
-- Format ISO  : https://www.buildfastwithai.com/blogs/ai-news-today-[YYYY-MM-DD]
-  Exemple pour le 8 juin 2026 : https://www.buildfastwithai.com/blogs/ai-news-today-2026-06-08
+- Format texte : https://blog.buildfastwithai.com/ai-news-today-[mois-en]-[j]-[annee]
+  Exemple pour le 8 juin 2026 : https://blog.buildfastwithai.com/ai-news-today-june-8-2026
+- Format ISO  : https://blog.buildfastwithai.com/ai-news-today-[YYYY-MM-DD]
+  Exemple pour le 8 juin 2026 : https://blog.buildfastwithai.com/ai-news-today-2026-06-08
 - Si les deux echouent, essayer J-1 avec les memes deux formats.
 
 Noms de mois en anglais : january, february, march, april, may, june, july, august, september, october, november, december.
@@ -214,7 +214,7 @@ Vitesse en tokens/seconde = estimation sur le materiel min indique.
 |---------------------|---------------|--------------|--------|--------------------------|
 | ...                 |               |              |        |                          |
 
-* MoE (Mixture of Experts) : seuls les params actifs comptent pour la VRAM
+* MoE (Mixture of Experts) : tous les params (totaux) doivent tenir en VRAM/RAM ; les params actifs determinent la vitesse (tok/s)
 * Quantization Q4 : reduit la VRAM d'~50% avec degradation mineure des perfs
 * Mac M-series : RAM unifiee = pas de VRAM separee, compter la RAM totale
 
