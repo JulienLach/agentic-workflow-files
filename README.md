@@ -347,7 +347,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 | `/refactor`       | Refacto sécurisé : plan avant action, vérification que le comportement ne change pas   |
 | `/add-entity`     | Création d'une entité full-stack avec checklist complète                               |
 | `/write-tests`    | Rédaction de tests unitaires et d'intégration Vitest                                   |
-| `/security-audit` | Audit de sécurité OWASP : injection, auth, IDOR, exposition de données                 |
+| `/security-audit` | Audit de sécurité OWASP Top 10:2025 : injection, auth, IDOR, supply chain, erreurs     |
 | `/prep`           | Prépare une tâche complexe (doc, remise en question, angles morts) avant le plan       |
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                            |
 | `/roast`          | Revue de code sans complaisance, façon senior - au-delà de la checklist `/stack-review` |
