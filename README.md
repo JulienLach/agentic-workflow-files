@@ -23,7 +23,6 @@ Ce repo est la **sauvegarde versionnée** de la config en scope utilisateur de p
     - [Agents personnalisés](#agents-personnalisés)
     - [Agent orchestrateur](#agent-orchestrateur)
 - [Design - maquette client avant le code](#design---maquette-client-avant-le-code)
-- [Runbook - procédure d'incident en prod](#runbook---procédure-dincident-en-prod)
 - [Workflow bout-en-bout : Sprint Obsidian → Code → PR GitHub](#workflow-bout-en-bout--sprint-obsidian--code--pr-github)
 - [Écrire l'AGENTS.md d'un projet](#écrire-lagentsmd-dun-projet)
 - [Skills disponibles](#skills-disponibles)
@@ -50,8 +49,6 @@ agentic-workflow-files/
 ├── design/
 │   ├── design.md                    ← Charte graphique (Brand Guide) à remplir pour le client
 │   └── instructions-maquette.md     ← Instructions de maquettage (écrans, navigation, règles UX)
-├── runbook/
-│   └── runbook.md                   ← Procédure d'incident en prod à remplir par projet (rollback, restauration, RGPD, post-mortem)
 ├── .claude/                         ← backup de ~/.claude/ (scope utilisateur Claude Code)
 │   ├── AGENTS.md                    ← Guidelines de dev communes à tous les projets (stack, conventions, sécurité, git)
 │   ├── CLAUDE.md                    ← Import `@AGENTS.md`
@@ -303,18 +300,6 @@ cp agentic-workflow-files/design/instructions-maquette.md mon-projet/instruction
 ```
 
 Remplir (placeholders `{{...}}`) → donner en contexte à Claude pour générer la maquette → une fois validée par le client, elle sert de référence pour l'implémentation (étape 4 du [`WORKFLOW.md`](./WORKFLOW.md)).
-
----
-
-## Runbook - procédure d'incident en prod
-
-Avant la mise en production, copier [`runbook/runbook.md`](./runbook/runbook.md) dans le projet et le remplir (placeholders `{{...}}`) : c'est la marche à suivre quand la prod tombe (confirmer, qualifier la gravité, prévenir, rollback, vérifier, post-mortem), avec les commandes prêtes à l'emploi, la restauration de la base et le circuit RGPD en cas de fuite.
-
-```bash
-cp agentic-workflow-files/runbook/runbook.md mon-projet/docs/runbook.md
-```
-
-Pas de secret dans ce fichier, seulement où les trouver. Tester le rollback et la restauration sur l'instance de test tous les 3 mois.
 
 ---
 
