@@ -253,7 +253,7 @@ Concept et structure de fichier détaillés dans [`CONCEPTS-IA.md`](./CONCEPTS-I
 
 | Agent             | Rôle                                                                                                           |
 | ----------------- | -------------------------------------------------------------------------------------------------------------- |
-| `obsidian-expert` | Expert Obsidian : notes structurées, plugins (Dataview, Tasks, Advanced Canvas...), templates, organisation du vault |
+| `obsidian-expert` | Expert Obsidian : notes structurées, vues Bases (natif), plugins (Tasks, Advanced Canvas...), templates, organisation du vault |
 | `deep-review`     | Orchestrateur de revue de code : délègue 3 passes parallèles (sécurité, perf, tests) à des workers puis synthétise. Voir [Agent orchestrateur](#agent-orchestrateur). |
 
 > Le champ `memory: user` dans le frontmatter (utilisé par `obsidian-expert`) active une mémoire persistante propre à l'agent (dans `~/.claude/agent-memory/<nom-agent>/`), distincte de la mémoire de la session principale - une particularité Claude Code non couverte dans le glossaire général.

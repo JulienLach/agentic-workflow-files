@@ -14,17 +14,19 @@ flowchart TD
         direction TB
         NOTES["Notes<br/>réunions, recettes"]
         PROJETS["Projets"]
-        INDEX["Index"]
-        RESSOURCES["Ressources"]
+        BASE["Projets.base<br/>vue d'ensemble (Bases)"]
+        PROJET["Projet"]
         BACKLOG["Backlog"]
         SPRINTS["Sprints"]
         TACHES["Tâches"]
 
-        PROJETS --> INDEX
-        INDEX --> RESSOURCES
-        INDEX --> BACKLOG
+        PROJETS --> BASE
+        PROJETS --> PROJET
+        PROJET --> NOTES
+        PROJET --> BACKLOG
         NOTES -->|"Étape 1 : capturer"| BACKLOG
-        PROJETS --> SPRINTS
+        PROJET --> SPRINTS
+        SPRINTS --> BASE
         SPRINTS --> TACHES
     end
 
@@ -42,7 +44,7 @@ flowchart TD
 
     REPO["Repo de code<br/>branche feat/xxx"]
     GITHUB["GitHub<br/>Pull Request"]
-    SUIVI["Étape 8 : retour au vault<br/>cocher la tâche, mettre à jour la progression"]
+    SUIVI["Étape 8 : retour au vault<br/>cocher la tâche, clôturer le sprint"]
 
     TACHES -->|"Étape 2 : choisir une tâche"| HUB
     HUB -->|"Étape 4 : implémentation"| REPO
@@ -91,15 +93,15 @@ Après une réunion (point dev interne, recette client), transformer les échang
     ```
     ou une note dédiée :
     ```bash
-    obsidian create name="Recette client 2026-07-15" content="- Retour client: ..." folder="Projets/Mon Projet/notes"
+    obsidian create name="Recette client 2026-07-15" content="- Retour client: ..." folder="Projets/Mon Projet/Notes"
     ```
 2. **Demander à Claude Code de structurer** : « transforme les notes de la réunion du 15/07 en tâches dans le Sprint courant ». Claude :
     - lit la note de réunion (`obsidian read file="..."` ou lecture directe) ;
     - lit le sprint courant pour repérer le bon sous-titre (ex. `#### API`) ;
     - insère les nouvelles lignes `- [ ] ...` **sous ce sous-titre précis**, via édition directe du fichier (le CLI `append` ajouterait à la fin du fichier entier, pas sous la bonne section).
-3. Vérifier le résultat (`obsidian read path="Projets/<Projet>/sprints/Sprint NN.md"`) avant de passer à l'implémentation.
+3. Vérifier le résultat (`obsidian read path="Projets/<Projet>/Sprints/Sprint NN.md"`) avant de passer à l'implémentation.
 
-Les notes de réunion et les tâches ponctuelles alimentent aussi le **Backlog** du projet (`Index` → `Backlog`) - utile pour tout ce qui n'est pas encore priorisé dans un sprint actif ; l'`Index` d'un projet pointe également vers ses **Ressources** (docs, liens, comptes-rendus).
+Les notes de réunion et les tâches ponctuelles alimentent aussi le **Backlog** du projet (`Projet` → `Backlog`) - utile pour tout ce qui n'est pas encore priorisé dans un sprint actif. Une ressource de projet (doc, lien, compte-rendu) se range comme une note dans `Notes/`.
 
 > Si `obsidian: command not found` : vérifier qu'Obsidian est ouvert et que `~/.local/bin` est dans le `PATH`. À défaut, revenir à la lecture/écriture directe des fichiers du vault (équivalente pour cet usage).
 
@@ -107,18 +109,33 @@ Les notes de réunion et les tâches ponctuelles alimentent aussi le **Backlog**
 
 ## 2. Suivi des tâches dans Obsidian
 
-Chaque projet a ses sprints dans `Projets/<Projet>/sprints/Sprint NN.md`, avec un frontmatter commun :
+Le vault est organisé sans plugin de requête (Dataview a été remplacé par **Bases**, natif) :
+
+```
+Projets/
+├── Projets.base          ← vue d'ensemble : Roadmap, Sprints actifs, Projets en cours
+└── <Projet>/
+    ├── Projet.md         ← porte d'entrée (type: projet) : vues Sprints et Notes
+    ├── Backlog.md
+    ├── Sprints/Sprint NN.md
+    ├── Notes/            ← chaque note a `créé le` en première propriété et `sprint: Sprint NN`
+    ├── Architecture/
+    └── Dossier de conception/
+```
+
+Les vues sont des blocs ` ```base ` qui utilisent `this` (la note qui les contient) au lieu d'un chemin en dur : le même bloc fonctionne dans tous les projets. En bas de chaque sprint, « Notes liées » liste les notes dont `sprint` vaut le nom du sprint. Conventions : dossiers et fichiers avec une majuscule, propriétés en minuscule et en français.
+
+Chaque sprint a un frontmatter commun :
 
 ```yaml
 ---
-numero: 10
+numéro: 10
 titre: Titre du sprint
-statut: active # planifié | active | done
-debut: 2026-06-18
+statut: actif # backlog | actif | en pause | terminé
+début: 2026-06-18
 fin: 2026-07-31
-progression: 60 # % - mis à jour à la main
 type: sprint
-tags: [project, sprint]
+tags: [projet, sprint]
 ---
 ```
 
@@ -243,10 +260,10 @@ Une tâche n'est considérée **terminée** que lorsque :
     - [x] Tâche faite ✅ 2026-07-13
     ```
     ```bash
-    obsidian task path="Projets/<Projet>/sprints/Sprint NN.md" line=<n> done
+    obsidian task path="Projets/<Projet>/Sprints/Sprint NN.md" line=<n> done
     ```
 
-Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian comme source de vérité à jour sur l'avancement réel du sprint (`progression` du frontmatter à ajuster en conséquence, et `statut: done` quand toutes les tâches du sprint sont traitées ou reportées au sprint suivant).
+Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian comme source de vérité à jour sur l'avancement réel du sprint (`statut: terminé` quand toutes les tâches du sprint sont traitées ou reportées au sprint suivant).
 
 ---
 
@@ -262,4 +279,4 @@ Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian c
 | 5     | Repo de code                 | Commit (manuel ou via prompt Claude, Conventional Commits, anglais, sans `Co-Authored-By`) + push       |
 | 6     | GitHub (`gh` CLI)            | `gh pr create`                                                                                          |
 | 7     | Repo de code / GitHub        | Revue solo dev (`/code-review`) puis `gh pr merge`                                                      |
-| 8     | Vault Obsidian               | Cocher la tâche `- [x] ... ✅ date`, mettre à jour `progression`/`statut`                               |
+| 8     | Vault Obsidian               | Cocher la tâche `- [x] ... ✅ date`, passer le sprint en `statut: terminé` à sa clôture                 |
