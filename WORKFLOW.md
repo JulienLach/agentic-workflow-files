@@ -52,10 +52,10 @@ flowchart TD
 
 Le vault Obsidian et le repo de code sont deux répertoires distincts sur la même machine. Claude Code peut passer de l'un à l'autre de deux façons :
 
-- **Obsidian skills** (plugin `obsidian:*` - `obsidian-cli`, `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `defuddle`) : ce sont les skills que Claude invoque pour lire/écrire dans le vault, y compris via le binaire CLI (`obsidian ...`, dans `~/.local/bin/obsidian`) - nécessite qu'Obsidian soit **lancé** (communication via socket local).
+- **Obsidian skills** (plugin `obsidian:*` - `obsidian-cli`, `obsidian-markdown`, `obsidian-bases`, `json-canvas`, `defuddle`, `obsidian-headless`, `knap`) : ce sont les skills que Claude invoque pour lire/écrire dans le vault, y compris via le binaire CLI (`obsidian ...`, dans `~/.local/bin/obsidian`) - nécessite qu'Obsidian soit **lancé** (communication via socket local).
 - **Lecture/écriture directe des fichiers** (`Read`, `Edit`, `Write`) via le chemin absolu du vault (`~/Documents/vault/...`) - toujours possible, même si Obsidian n'est pas lancé. Indispensable pour les insertions précises **sous un sous-titre donné**, que le CLI ne gère pas (`append`/`prepend` n'agissent que sur le début/la fin du fichier entier).
 
-> Ce workflow n'utilise pas de MCP Obsidian : les **Obsidian skills** ([kepano/obsidian-skills](https://github.com/kepano/obsidian-skills), voir `README.md`) sont un plugin de skills Claude Code qui enveloppe le CLI natif `obsidian` - c'est la seule brique utilisée ici pour interagir avec le vault.
+> Ce workflow n'utilise pas de MCP Obsidian : les **Obsidian skills** ([obsidianmd/obsidian-skills](https://github.com/obsidianmd/obsidian-skills), voir `README.md`) sont un plugin de skills Claude Code qui enveloppe le CLI natif `obsidian` - c'est la seule brique utilisée ici pour interagir avec le vault.
 
 ---
 

@@ -224,19 +224,24 @@ Utilisé automatiquement par Claude, ou explicitement : `Utilise context7 pour..
 
 ### Obsidian skills - gestion des notes de projet
 
-Pas de MCP Obsidian : la gestion du vault passe par le plugin **[obsidian-skills de kepano](https://github.com/kepano/obsidian-skills)**.
+Pas de MCP Obsidian : la gestion du vault passe par le plugin officiel **[obsidian-skills](https://github.com/obsidianmd/obsidian-skills)** (anciennement `kepano/obsidian-skills`).
 
 ```bash
-claude plugin install https://github.com/kepano/obsidian-skills
+claude plugin marketplace add obsidianmd/obsidian-skills
+claude plugin install obsidian@obsidian-skills
+# plus tard, pour récupérer les nouveaux skills :
+claude plugin update obsidian@obsidian-skills
 ```
 
 | Skill                        | Usage                                                       |
 | ---------------------------- | ----------------------------------------------------------- |
 | `obsidian:obsidian-cli`      | Lire/créer/rechercher notes et tâches via le CLI `obsidian` |
 | `obsidian:obsidian-markdown` | Wikilinks, embeds, callouts, frontmatter                    |
-| `obsidian:obsidian-bases`    | Fichiers `.base` (vues type BDD)                            |
+| `obsidian:obsidian-bases`    | Fichiers `.base` (vues type BDD, kanban)                    |
 | `obsidian:json-canvas`       | Fichiers `.canvas` (mind maps, flowcharts)                  |
 | `obsidian:defuddle`          | Extraction web → Markdown propre                            |
+| `obsidian:obsidian-headless` | Obsidian Sync / Publish en ligne de commande (`ob`)         |
+| `obsidian:knap`              | Générer des notes Markdown depuis templates + JSON/CSV      |
 
 > Utilise le [CLI natif `obsidian`](https://help.obsidian.md/cli) via socket local - l'app doit être **lancée**. Sinon, Claude lit/écrit le vault directement (`Read`/`Edit`/`Write`).
 

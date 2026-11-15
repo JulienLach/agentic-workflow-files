@@ -27,7 +27,7 @@
     "obsidian-skills": {
       "source": {
         "source": "github",
-        "repo": "kepano/obsidian-skills"
+        "repo": "obsidianmd/obsidian-skills"
       }
     }
   },
