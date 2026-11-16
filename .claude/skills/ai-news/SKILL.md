@@ -1,275 +1,71 @@
 ---
 name: ai-news
-description: Synthese des actualites IA du jour - grandes entreprises, modeles locaux, economie, robotique, cybersecurite, regulation.
+description: Veille IA quotidienne orientée dev, en un écran - IA locale et inférence (gros modèles sur petit matériel), harness et agents de code, modèles frontier/API, sécurité des outils LLM. Utiliser quand l'utilisateur demande les news IA, la veille du jour ou lance /ai-news [heures].
 ---
 
----
+# /ai-news - veille IA dev, sans bruit
 
-## OBJECTIF
+Objectif : **un écran, 8 items maximum**, uniquement ce qui change ce qu'un dev peut lancer, utiliser ou doit patcher. En cas de doute, couper.
 
-Produire un briefing IA quotidien complet, en francais, structure par sections, avec contexte technique explique, sources verifiees <=48h. Format: dense mais lisible en 5 minutes. Pas d'emoji (incompatible avec le terminal de l'utilisateur) - utiliser des symboles texte: *, ->, [OK], [~], [!], --, •.
+Fenêtre : `$ARGUMENTS` en heures si fourni (ex. `/ai-news 168` pour une semaine), sinon 48 h. Date du jour : celle du contexte système, jamais improvisée.
 
----
+## Périmètre (4 thèmes, rien d'autre)
 
-## ETAPE 1 - VERIFIER LA DATE DU JOUR
+1. **LOCAL** (prioritaire) : nouveaux modèles open-weight utilisables, et surtout les **techniques qui font tourner plus gros sur moins de matériel** (streaming SSD des experts, offload, nouvelles quantizations, speculative decoding, runtimes llama.cpp / MLX / Ollama / vLLM). Exemple type à ne jamais rater : "un modèle de 125B sur une RTX de 12 Go".
+2. **AGENTS** : releases de harness (Claude Code, Codex CLI, opencode, OpenHands, aider), nouveaux outils/serveurs MCP qui ont de la traction, workflows agentiques **avec des résultats chiffrés**.
+3. **MODÈLES** : sorties frontier disponibles via API, avec prix ($/M tokens) et un benchmark indépendant (Artificial Analysis, LLM Stats, SWE-bench, Terminal-Bench).
+4. **SÉCU** : CVE/GHSA sur des outils LLM (gateways, MCP, CLI, extensions d'IDE), supply chain (modèles ou paquets piégés), prompt injection exploitée sur des agents.
 
-Confirmer la date depuis le contexte systeme. Ne jamais l'improviser.
-- J = aujourd'hui | J-1 = hier → section principale
-- J-2 a J-5 → section "Cette semaine" uniquement
-- J-6 et au-dela → rejeter sans exception
+**Hors périmètre** : levées de fonds, IPO, drama de dirigeants, politique et régulation, robotique, sondages, tribunes, "X affirme que". Au maximum une ligne `Ailleurs :` à la fin, avec 3 titres sans explication, seulement si c'est vraiment majeur.
 
----
+## Collecte (tout en parallèle, en un seul tour)
 
-## ETAPE 2 - COLLECTE (lancer TOUT en parallele)
+1. Script de signal : `node ~/.claude/skills/ai-news/collect.ts <heures>` (Node >= 23.6 exécute le TypeScript nativement). Il remonte les stories Hacker News filtrées par points et par mots-clés de titre, plus les releases GitHub stables des outils suivis. Le score HN est le meilleur filtre anti-bruit dont on dispose : un item à plus de 100 points dans le périmètre mérite presque toujours sa place.
+2. WebSearch en mode `standard` (passer en `extended` seulement si un thème revient vide). Remplacer `[date]` par "jour mois année" en anglais :
+   - `site:reddit.com/r/LocalLLaMA [mois année]`
+   - `run large model consumer GPU VRAM offload OR quantization OR SSD [mois année]`
+   - `new open-weight model Hugging Face release [date]`
+   - `coding agent CLI release OR update [date]`
+   - `new LLM API release pricing benchmark [date]`
+   - `CVE OR GHSA LLM OR MCP OR "AI agent" vulnerability [date]`
+3. Un seul agent `web-fetch` (si l'outil WebFetch n'est pas disponible directement), effort `lower`, sur https://llm-stats.com/llm-updates et https://theopenweights.com/. Lui demander uniquement les items datés dans la fenêtre, avec date, paramètres, licence et prix.
+4. Pour chaque release d'outil remontée par le script : `gh release view <tag> -R <repo>`, puis ne garder que la ou les 1-2 nouveautés qui comptent.
 
-### Source principale : BuildFastWithAI
+Reddit renvoie une erreur 403 en curl : passer par WebSearch. BuildFastWithAI et les digests généralistes (The Neuron, Techmeme) ne sont plus des sources : trop de bruit.
 
-Fetcher LES DEUX formats d'URL en parallele (l'un d'eux retournera le contenu) :
-- Format texte : https://blog.buildfastwithai.com/ai-news-today-[mois-en]-[j]-[annee]
-  Exemple pour le 8 juin 2026 : https://blog.buildfastwithai.com/ai-news-today-june-8-2026
-- Format ISO  : https://blog.buildfastwithai.com/ai-news-today-[YYYY-MM-DD]
-  Exemple pour le 8 juin 2026 : https://blog.buildfastwithai.com/ai-news-today-2026-06-08
-- Si les deux echouent, essayer J-1 avec les memes deux formats.
+## Filtre (chaque item doit passer les 4 critères)
 
-Noms de mois en anglais : january, february, march, april, may, june, july, august, september, october, november, december.
+1. **Dans le périmètre** ci-dessus.
+2. **Daté dans la fenêtre**, vérifié sur la source (URL datée, byline, date de la release). Sans date confirmée, l'item est rejeté.
+3. **Actionnable** : on peut le lancer, l'installer, l'appeler, ou on doit patcher. Une annonce sans disponibilité est rejetée.
+4. **Source primaire ou chiffre vérifiable** (blog officiel, repo, model card, advisory). Un agrégateur seul donne `[~]` au mieux, avec un maximum d'un item `[~]` par briefing.
 
-### Sources complementaires par section (lancer en parallele avec BuildFastWithAI) :
+Classer ensuite par impact pour un dev, puis par score HN. Couper à 8 items, avec au maximum 3 par section.
 
-**Grandes entreprises (Microsoft, Google, Meta, Nvidia, DeepSeek, OpenAI, Anthropic, xAI)**
-- Recherche: `AI news today [jour] [mois] [annee]`
-- Recherche: `[entreprise] AI announcement [mois] [annee]`
-- Sources: TechCrunch, The Verge, CNBC, VentureBeat, Ars Technica, Reuters
-- Blogs officiels: ai.meta.com, blogs.microsoft.com, blog.google, nvidianews.nvidia.com, anthropic.com/news
+## Format de sortie (exact)
 
-**Cybersecurite & menaces IA**
-- Recherche: `AI cybersecurity threat attack vulnerability [mois] [annee]`
-- Recherche: `AI malware phishing deepfake cyberattack [mois] [annee]`
-- Recherche: `LLM jailbreak exploit security [mois] [annee]`
-- Sources: Krebs on Security, Bleeping Computer, The Record (recordedfuture.com), Dark Reading,
-  Wired Security, CISA advisories (cisa.gov), CVE MITRE, Schneier on Security
-
-**Modeles locaux & outils dev**
-- Recherche: `local LLM small model release [mois] [annee]`
-- Recherche: `Ollama new model [mois] [annee]`
-- Sources: Hugging Face blog, llm-stats.com, latent.space, ollama.com/library, Simon Willison's blog
-
-**Economie de l'IA**
-- Recherche: `AI startup funding IPO acquisition [mois] [annee]`
-- Sources: TechCrunch Funding, Crunchbase News, Bloomberg, Reuters
-
-**Regulation**
-- Recherche: `AI regulation law bill [mois] [annee]`
-- Sources: Axios, The Verge Policy, EFF, Politico
-
-**Robotique**
-- Recherche: `humanoid robot AI announcement [mois] [annee]`
-- Sources: IEEE Spectrum, TechCrunch, The Verge
-
-**Harness open source & agentic workflows**
-- Recherche: `open source AI coding agent harness [mois] [annee]`
-- Recherche: `opencode OR aider OR OpenHands OR "claude code" agentic release [mois] [annee]`
-- Recherche: `AI agent workflow pattern benchmark [mois] [annee]`
-- Recherche: `multi-agent orchestration framework release [mois] [annee]`
-- Sources: github.com/sst/opencode, github.com/All-Hands-AI/OpenHands, github.com/Aider-AI/aider,
-  github trending (topics: ai-agents, agentic-coding, llm-agents), Simon Willison's blog,
-  latent.space, LangGraph blog, r/LocalLLaMA, Hacker News, terminal-bench.com, SWE-bench.com
-
----
-
-## ETAPE 3 - VERIFICATION STRICTE DES DATES (CRITIQUE)
-
-Pour chaque story :
-1. Verifier la date dans les metadonnees de l'article (URL avec date, balise datePublished, byline)
-2. Si doute: recherche `"titre" site:source.com [date]` pour confirmer
-3. Rejeter toute story sans date confirmee
-4. Trier : J/J-1 = section principale | J-2 a J-5 = "Cette semaine" | J-6+ = ignorer
-
----
-
-## ETAPE 4 - FORMAT DE SORTIE EXACT
-
-Produire dans ce format (pas d'emoji, texte brut + symboles ASCII) :
+Texte brut, pas d'emoji, pas de tableau, pas de liste de sources en fin (les liens sont en ligne). Français avec accents, termes techniques en anglais. N'expliquer un sigle que s'il n'est pas courant pour un dev.
 
 ```
-Synthese IA - [JJ mois YYYY] | Sources verifiees <=48h
-================================================================
+IA dev - [JJ mois AAAA] ([fenêtre] h)
 
-FAITS MAJEURS DU JOUR
----------------------
-[3 a 4 stories les plus importantes, avec contexte complet]
+LOCAL
+- [Nom] ([acteur], [date]) : [ce qui change, avec le chiffre clé]. -> [url]
+  à tester : [commande ou condition matérielle, seulement si utile]
 
-• [Titre court] - [Acteur], [date] -- [URL source directe]
-  [2-3 phrases. Ce qui change concretement.
-  Expliquer les termes techniques entre parentheses si necessaire.
-  Implications pratiques. C'est encore [stade] si applicable.]
-
-• ...
-
-================================================================
-PAR ACTEUR
-----------
-
-[Anthropic / OpenAI / Google / Microsoft / Nvidia / Meta / xAI / Apple / DeepSeek]
-(n'inclure que les acteurs avec news J ou J-1)
-
-[Nom acteur]
-* [Titre court] ([date]) - [1-2 phrases. Chiffres concrets si dispo.]
-* [~] [Titre] ([date]) - [Rumeur/leak: preciser le niveau de credibilite.]
-* ...
-
-================================================================
-CYBERSECURITE & MENACES IA
---------------------------
-[Attaques, vulnerabilites, exploits, armes IA, deepfakes offensifs,
- jailbreaks notables, rapports CISA/MITRE, alertes sectorielles]
-
-• [Titre] - [Acteur/Victime], [date] -- [URL]
-  [2-3 phrases. Vecteur d'attaque concret. Qui est expose. Mitigation si connue.]
-  Severite: [Critique / Haute / Moyenne] | CVE: [numero si applicable]
-
-• ...
-
-================================================================
-RECHERCHE & SCIENCE
--------------------
-[Publications, benchmarks, declarations de chercheurs]
-• ...
-
-================================================================
-REGULATION & SOCIETE
---------------------
-[Lois, projets de loi, politiques, controverses]
-• ...
-
-================================================================
-OPEN SOURCE
------------
-[Nouveaux modeles open-weight, releases notables]
-• [Modele] ([organisation]) - Architecture: [details]. Licence: [MIT/Apache/autre].
-  Benchmarks: [chiffres cles]. Disponible sur: [Ollama/HuggingFace/etc.]
-• ...
-
-================================================================
-HARNESS OPEN SOURCE & AGENTIC WORKFLOWS
------------------------------------------
-[Nouveaux harness/CLI agentiques open source (concurrents ou alternatives a
- Claude Code : opencode, aider, OpenHands, SWE-agent, Continue, etc.),
- releases notables, changements de licence, forks importants, et patterns
- de workflow agentique qui montrent de bons resultats en pratique]
-
---- HARNESS & CLI AGENTIQUES ---
-• [NEW?] [Nom] ([mainteneur/organisation]) - Licence: [MIT/Apache/autre]
-  [1-2 phrases: ce que ca fait, en quoi ca differe des harness existants
-  (multi-modele, sandboxing, sub-agents, TUI vs IDE, etc.)]
-  Repo: [URL github] -- [etoiles/traction si notable]
-
-• ...
-
---- WORKFLOWS AGENTIQUES QUI FONCTIONNENT ---
-[Patterns/architectures rapportes efficaces : plan-then-execute, sub-agents
- paralleles, verification loops, RAG+agent, memoire persistante, etc.
- Prioriser les retours avec resultats chiffres (benchmark, taux de succes,
- gain de temps) plutot que les opinions non etayees]
-• [Pattern/technique] - [Source/Acteur], [date] -- [URL]
-  [2-3 phrases: en quoi consiste le workflow, sur quel type de tache il a
-  ete teste, resultats concrets si disponibles.]
-
-• ...
-
-================================================================
-COIN DEV - MODELES & OUTILS
-----------------------------
-
-Pour remplir cette section, consulter en parallele :
-llm-stats.com/llm-updates | llm-stats.com/ai-news | artificialanalysis.ai | openrouter.ai/models
-
---- MEILLEURS MODELES FRONTIER (via API) ---
-
-Lister les 5-6 modeles les plus capables actuellement disponibles via API.
-Marquer [NEW] si sorti dans les 7 derniers jours. Mettre a jour a chaque briefing.
-
-| Modele                | Editeur    | In / Out ($/M tok) | Points forts               |
-|-----------------------|------------|--------------------|----------------------------|
-| [NEW?] [nom]          | [editeur]  | $X.XX / $X.XX      | [codage / raisonnement / …] |
-| ...                   |            |                    |                            |
-
---- MODELES LOCAUX - PAR PALIER MATERIEL ---
-
-Inclure tous les modeles notables pour chaque palier. Mettre [NEW] si sorti cette semaine.
-Vitesse en tokens/seconde = estimation sur le materiel min indique.
-
-[PALIER 1 - PC GAMER / MAC M-SERIES] 8-24 Go VRAM ou RAM unifiee
-| Modele              | Params actifs | VRAM/RAM min | ~tok/s | Usage ideal              |
-|---------------------|---------------|--------------|--------|--------------------------|
-| [NEW?] [nom]        | [xB actifs]   | [x Go]       | ~[x]   | [chat / code / RAG / …]  |
-| ...                 |               |              |        |                          |
-
-[PALIER 2 - WORKSTATION / RTX 4090] 24-48 Go VRAM
-| Modele              | Params actifs | VRAM/RAM min | ~tok/s | Usage ideal              |
-|---------------------|---------------|--------------|--------|--------------------------|
-| ...                 |               |              |        |                          |
-
-[PALIER 3 - DATACENTER / MULTI-GPU] 80 Go+ VRAM
-| Modele              | Params actifs | VRAM/RAM min | ~tok/s | Usage ideal              |
-|---------------------|---------------|--------------|--------|--------------------------|
-| ...                 |               |              |        |                          |
-
-* MoE (Mixture of Experts) : tous les params (totaux) doivent tenir en VRAM/RAM ; les params actifs determinent la vitesse (tok/s)
-* Quantization Q4 : reduit la VRAM d'~50% avec degradation mineure des perfs
-* Mac M-series : RAM unifiee = pas de VRAM separee, compter la RAM totale
-
---- OUTILS & INTEGRATIONS ---
-• [Outil] ([date si nouveau]) - [1 phrase. Ce que ca fait concretement pour un dev.]
-• ...
-
-TIP DU JOUR:
-[1 commande ou astuce pratique concrete - ollama run X, snippet Python, appel API, etc.]
-
-================================================================
-CETTE SEMAINE (J-2 a J-5)
---------------------------
-[Stories importantes mais hors fenetre 48h - dater chaque item precisement]
-• [date] - [Acteur] - [1-2 phrases.]
-• ...
-
-================================================================
-A SURVEILLER
-------------
-• [date] - [Evenement attendu]
-• ...
-
-================================================================
-INTENSITE DU JOUR
------------------
-[Calme / Actif / Agite / Tres agite / Historique]
-[1-2 phrases resumant pourquoi cette journee est notable ou non]
-
-================================================================
-Sources:
-- [Titre] ([date]) - [URL]
+AGENTS
 - ...
 
-* Baked for [X]m [Y]s
+MODÈLES
+- ...
+
+SÉCU
+- [!] [CVE/GHSA] [outil] : [impact en 1 phrase]. Corrigé en [version]. -> [url]
+
+Ailleurs : [titre 1] / [titre 2] / [titre 3]
 ```
 
----
-
-## REGLES DE STYLE
-
-- Francais pour tout le texte. Termes techniques en anglais avec traduction entre parentheses a la premiere occurrence
-- Phrases courtes: sujet-verbe-complement
-- Pas de jargon marketing: pas de "revolutionnaire", "game-changer", "pionnier"
-- Chiffres concrets partout: params en milliards, montants en USD/EUR, dates precises
-- Expliquer les acronymes au premier usage: MoE (Mixture of Experts: seule une partie du modele s'active selon la tache), SWE-Bench (mesure la capacite a resoudre de vraies issues GitHub), CVE (Common Vulnerabilities and Exposures: identifiant standardise de vulnerabilite), etc.
-- Section vide = "Rien de confirme ce jour." Ne pas remplir avec du contenu non verifie
-- [OK] = confirme officiellement | [~] = rumeur/leak (preciser credibilite) | [!] = attention/alerte
-
----
-
-## PIEGES A EVITER
-
-- Ne jamais inclure une story J-6+ dans les sections principales (ni dans PAR ACTEUR, ni dans CYBERSECURITE)
-- Ne jamais confondre popularite (trending) et recence
-- Ne jamais improviser la date du jour
-- Ne pas abreger les explications techniques au point de les rendre incomprehensibles
-- Si BuildFastWithAI retourne 404 sur le format ISO, essayer immediatement le format texte avant de chercher ailleurs
+- Un item = 1 ligne (environ 160 caractères maximum), plus une ligne `à tester :` / `à faire :` optionnelle.
+- Une section vide est omise (pas de "rien ce jour"). Si tout est vide : `Journée calme sur le périmètre.` puis la ligne `Ailleurs`.
+- Marqueurs : `[!]` à patcher ou à surveiller, `[~]` non confirmé par une source primaire.
+- Pas d'introduction, pas de conclusion, pas d'"intensité du jour".
