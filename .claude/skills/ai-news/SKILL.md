@@ -1,11 +1,11 @@
 ---
 name: ai-news
-description: Veille IA quotidienne orientée dev, en un écran - IA locale et inférence (gros modèles sur petit matériel), harness et agents de code, modèles frontier/API, sécurité des outils LLM. Utiliser quand l'utilisateur demande les news IA, la veille du jour ou lance /ai-news [heures].
+description: Veille IA quotidienne orientée dev, expliquée et sans bruit - IA locale et inférence (gros modèles sur petit matériel), harness et agents de code, modèles frontier/API, sécurité des outils LLM. Utiliser quand l'utilisateur demande les news IA, la veille du jour ou lance /ai-news [heures].
 ---
 
 # /ai-news - veille IA dev, sans bruit
 
-Objectif : **un écran, 8 items maximum**, uniquement ce qui change ce qu'un dev peut lancer, utiliser ou doit patcher. En cas de doute, couper.
+Objectif : **lisible en 3 minutes (environ 2 écrans)**. Le cœur du briefing, ce sont les items qui changent ce qu'un dev peut lancer, utiliser ou doit patcher, chacun **expliqué** : quoi, chiffres, pourquoi ça compte. Couper le bruit, pas le contexte.
 
 Fenêtre : `$ARGUMENTS` en heures si fourni (ex. `/ai-news 168` pour une semaine), sinon 48 h. Date du jour : celle du contexte système, jamais improvisée.
 
@@ -16,7 +16,7 @@ Fenêtre : `$ARGUMENTS` en heures si fourni (ex. `/ai-news 168` pour une semaine
 3. **MODÈLES** : sorties frontier disponibles via API, avec prix ($/M tokens) et un benchmark indépendant (Artificial Analysis, LLM Stats, SWE-bench, Terminal-Bench).
 4. **SÉCU** : CVE/GHSA sur des outils LLM (gateways, MCP, CLI, extensions d'IDE), supply chain (modèles ou paquets piégés), prompt injection exploitée sur des agents.
 
-**Hors périmètre** : levées de fonds, IPO, drama de dirigeants, politique et régulation, robotique, sondages, tribunes, "X affirme que". Au maximum une ligne `Ailleurs :` à la fin, avec 3 titres sans explication, seulement si c'est vraiment majeur.
+**Hors périmètre** : levées de fonds, IPO, drama de dirigeants, politique et régulation, robotique. Ces sujets ne sont pas dans le cœur du briefing, mais les 3 à 5 plus gros de la fenêtre vont dans la section `AILLEURS`, à raison d'une phrase de contexte chacun, pour rester informé. Toujours exclus : sondages, tribunes, "X affirme que".
 
 ## Collecte (tout en parallèle, en un seul tour)
 
@@ -40,32 +40,51 @@ Reddit renvoie une erreur 403 en curl : passer par WebSearch. BuildFastWithAI et
 3. **Actionnable** : on peut le lancer, l'installer, l'appeler, ou on doit patcher. Une annonce sans disponibilité est rejetée.
 4. **Source primaire ou chiffre vérifiable** (blog officiel, repo, model card, advisory). Un agrégateur seul donne `[~]` au mieux, avec un maximum d'un item `[~]` par briefing.
 
-Classer ensuite par impact pour un dev, puis par score HN. Couper à 8 items, avec au maximum 3 par section.
+Classer ensuite par impact pour un dev, puis par score HN. Garder au maximum 12 items dans les sections du cœur, avec 4 par section au plus.
+
+Les items J-2 à J-5 qui passent le filtre, mais qu'une fenêtre de 48 h exclut, vont dans `CETTE SEMAINE` (3 à 5 lignes datées). Ne jamais inclure d'item de plus de 5 jours, sauf comme rappel daté d'une section vide (voir le format).
 
 ## Format de sortie (exact)
 
-Texte brut, pas d'emoji, pas de tableau, pas de liste de sources en fin (les liens sont en ligne). Français avec accents, termes techniques en anglais. N'expliquer un sigle que s'il n'est pas courant pour un dev.
+Texte brut dans un bloc de code, pas d'emoji, pas de tableau, pas de liste de sources en fin (les liens sont en ligne). Français avec accents, termes techniques en anglais. Expliquer entre parenthèses, à la première occurrence, tout terme non évident (ex. "patch diffing (comparer un correctif à l'ancienne version pour retrouver la faille)").
 
 ```
 IA dev - [JJ mois AAAA] ([fenêtre] h)
 
+EN BREF
+[2-3 phrases : les 2-3 choses à retenir aujourd'hui et pourquoi.]
+
 LOCAL
-- [Nom] ([acteur], [date]) : [ce qui change, avec le chiffre clé]. -> [url]
-  à tester : [commande ou condition matérielle, seulement si utile]
+- [Nom] ([acteur], [date]) -> [url]
+  [2-3 phrases : ce que c'est, chiffres clés (params totaux/actifs, VRAM,
+  tok/s, licence), en quoi ça change ce qu'on peut faire tourner.]
+  à tester : [commande ou condition matérielle, si utile]
 
 AGENTS
-- ...
+- [Nom] ([acteur], [date]) -> [url]
+  [2-3 phrases : ce que ça fait, ce qui le distingue, traction (stars, pts HN).]
 
 MODÈLES
-- ...
+- [Nom] ([éditeur], [date]) -> [url]
+  [2-3 phrases : archi, contexte, prix in/out $/M, benchmark indépendant et
+  comparaison avec le meilleur modèle actuel, disponibilité (API, poids).]
 
 SÉCU
-- [!] [CVE/GHSA] [outil] : [impact en 1 phrase]. Corrigé en [version]. -> [url]
+- [!] [CVE/GHSA] [outil] ([source], [date]) -> [url]
+  [2-3 phrases : vecteur d'attaque, qui est exposé, exploité ou non.]
+  à faire : [version corrigée ou mitigation concrète]
 
-Ailleurs : [titre 1] / [titre 2] / [titre 3]
+CETTE SEMAINE
+- [date] - [acteur] - [1 phrase, dans le périmètre]
+
+AILLEURS
+- [sujet] ([date]) : [1 phrase de contexte factuelle] -> [url]
+
+TIP DU JOUR
+[1 commande ou astuce concrète, liée si possible à un item ci-dessus]
 ```
 
-- Un item = 1 ligne (environ 160 caractères maximum), plus une ligne `à tester :` / `à faire :` optionnelle.
-- Une section vide est omise (pas de "rien ce jour"). Si tout est vide : `Journée calme sur le périmètre.` puis la ligne `Ailleurs`.
-- Marqueurs : `[!]` à patcher ou à surveiller, `[~]` non confirmé par une source primaire.
-- Pas d'introduction, pas de conclusion, pas d'"intensité du jour".
+- Un item du cœur = une ligne de titre avec le lien, plus 2 à 3 phrases de contexte, plus une ligne `à tester :` / `à faire :` optionnelle.
+- Une section du cœur vide : une ligne `Rien de daté dans la fenêtre.`, suivie si possible du dernier item notable avec sa date en rappel (ex. `Rappel : [nom] ([date]) - [1 phrase]`).
+- Marqueurs : `[!]` à patcher ou à surveiller, `[~]` non confirmé par une source primaire (préciser la crédibilité).
+- Pas de conclusion ni d'"intensité du jour".
