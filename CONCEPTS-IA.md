@@ -4,7 +4,7 @@ Un document de référence pour comprendre le vocabulaire, les concepts et les o
 
 Chaque section combine **le concept** et **des outils concrets** qui l'illustrent, pour ancrer la théorie dans des choses que tu utilises déjà (notamment via ce repo).
 
-> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) - ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 5 novembre 2026.
+> **Document vivant.** Le domaine évolue vite (nouveaux modèles, évolutions de MCP, nouveaux patterns, nouveaux outils) - ce fichier peut devenir obsolète en quelques mois. À relire et mettre à jour périodiquement plutôt qu'à considérer comme figé. Dernière vérification de fraîcheur : 21 novembre 2026.
 
 ---
 
@@ -91,7 +91,7 @@ Depuis 2017 (article de recherche *"Attention Is All You Need"*), la quasi-total
 
 Les **paramètres** sont les poids numériques ajustés pendant l'entraînement - ce sont eux qui "encodent" ce que le modèle a appris. Plus il y en a, plus le modèle peut représenter des relations complexes dans les données.
 
-- **Petits modèles** (quelques milliards de paramètres, ex. la gamme Haiku, les modèles "mini"/"nano"/"flash" chez les autres fournisseurs) : rapides, peu coûteux, parfaits pour des tâches simples, répétitives, ou à très fort volume.
+- **Petits modèles** (ex. la gamme Haiku, les modèles "mini"/"nano"/"flash" chez les autres fournisseurs - les fournisseurs propriétaires ne publient pas leur nombre de paramètres) : rapides, peu coûteux, parfaits pour des tâches simples, répétitives, ou à très fort volume.
 - **Modèles "frontier"** (des centaines de milliards à plus de mille milliards de paramètres estimés) : les plus capables tous domaines, mais plus lents et plus chers à l'inférence.
 - Le nombre de paramètres seul ne dit pas tout : l'architecture, les données d'entraînement et le post-training (RLHF, etc.) comptent autant que la taille brute. Un modèle plus petit mais mieux entraîné peut battre un plus gros modèle mal optimisé sur une tâche donnée.
 
@@ -183,6 +183,7 @@ Standard ouvert créé par Anthropic pour connecter un LLM à des sources de don
 
 - Exemple dans ce repo : **Context7** (documentation de librairies à jour, servie via MCP).
 - **Le protocole aujourd'hui** (spec du 28 juillet 2026) : un cœur **stateless** (un serveur MCP distant peut tourner derrière un simple load balancer round-robin), un **framework d'Extensions** (`MCP Apps` pour des UI servies par le serveur, `Tasks` pour du travail longue durée) et une auth alignée sur OAuth 2.0/OIDC, avec les **Client ID Metadata Documents** pour identifier les clients.
+- Parmi les extensions, **Skills over MCP** permet à un serveur MCP de distribuer des skills (instructions structurées pour un workflow) en plus de ses outils.
 - Le transport distant est **Streamable HTTP** (voir section 4).
 
 ### Skills, plugins et subagents
@@ -349,12 +350,13 @@ Avant de choisir un modèle, on s'appuie sur des **benchmarks** - des jeux de te
 
 | Benchmark | Ce qu'il mesure |
 | --- | --- |
-| **MMLU** | Culture générale et connaissances multi-domaines (questions à choix multiples) |
-| **HumanEval** | Génération de code Python à partir d'un énoncé |
-| **SWE-bench Pro** | Résolution de vraies issues GitHub, en plusieurs langages - le plus proche d'un usage "agent de code" |
+| **MMLU-Pro** | Connaissances multi-domaines - version plus difficile de MMLU, avec plus de choix de réponses et davantage de raisonnement |
+| **Humanity's Last Exam (HLE)** | Questions de niveau expert, tous domaines, conçues pour rester difficiles pour les modèles frontier |
+| **SWE-bench Pro** | Résolution de vraies issues GitHub, en plusieurs langages - le plus proche d'un usage "agent de code". Préféré à SWE-bench Verified, dont OpenAI a montré en 2026 qu'il était contaminé |
 | **GPQA** | Questions scientifiques de niveau expert |
 | **MATH** | Raisonnement mathématique |
 
+- **Saturation** : un benchmark que tous les modèles frontier réussissent presque parfaitement ne permet plus de les départager. C'est le cas de MMLU et HumanEval, longtemps les références : une étude présentée à ICML 2026 classe 29 benchmarks sur 60 comme saturés. D'où leur remplacement par des variantes plus difficiles (MMLU-Pro, HLE).
 - Limite connue des benchmarks publics : les fournisseurs peuvent avoir vu ces données (volontairement ou non) pendant l'entraînement, ce qui gonfle artificiellement les scores - à prendre comme un indicateur, pas une vérité absolue.
 - **LLM-as-judge** : pour évaluer des tâches sans réponse unique correcte (qualité rédactionnelle, pertinence d'une réponse ouverte), on utilise souvent un autre LLM - généralement plus gros - comme "juge", qui note la réponse selon des critères donnés. Pratique courante côté équipes produit IA.
 - **Evals maison** : au-delà des benchmarks publics, l'essentiel pour un usage réel est de construire ses propres tests sur ses cas d'usage précis (un jeu de tâches représentatives de ton propre repo/produit) - un benchmark générique ne prédit pas forcément la performance sur un besoin spécifique.
@@ -372,9 +374,9 @@ Avant de choisir un modèle, on s'appuie sur des **benchmarks** - des jeux de te
 
 ### Le "raisonnement étendu" (adaptive thinking / reasoning models)
 
-Certains modèles (ou certains modes de modèles existants) peuvent "réfléchir" plus longtemps avant de répondre - générer une chaîne de raisonnement interne, explorer plusieurs pistes, avant de produire la réponse finale. Ça améliore nettement les résultats sur les tâches complexes (maths, debug difficile, architecture), au prix d'une latence et d'un coût plus élevés. À réserver aux tâches qui le justifient, pas en usage systématique.
+Les modèles actuels peuvent "réfléchir" avant de répondre - générer une chaîne de raisonnement interne, explorer plusieurs pistes, puis produire la réponse finale. Ça améliore nettement les résultats sur les tâches complexes (maths, debug difficile, architecture), au prix d'une latence et d'un coût plus élevés.
 
-Chez Anthropic, c'est l'**adaptive thinking**, dont on règle la profondeur avec le paramètre `effort`.
+Chez Anthropic, c'est l'**adaptive thinking** : le modèle décide lui-même quand réfléchir et combien. Sur les modèles les plus récents (Opus 5.5, Fable 5.2), il ne peut plus être désactivé, et l'ancien budget fixe de tokens de réflexion (`budget_tokens`) est supprimé. Le seul réglage est le paramètre `effort` (`low`, `medium`, `high`, `xhigh`, `max`) : `low` pour les tâches simples ou les subagents, `high` et au-delà pour le code et les tâches agentiques longues. La question n'est donc plus "avec ou sans raisonnement", mais "quel niveau d'effort pour cette tâche".
 
 ### Modèles de décision (System One)
 
@@ -442,6 +444,7 @@ Au-delà du contexte bien géré, quelques techniques reviennent, à mesurer sur
 - **Déléguer les décisions fermées** à un modèle de décision (section 5) plutôt qu'à un LLM.
 - **Charger à la demande** : l'agent ne voit d'abord que le nom et la description des skills et des outils, et ne charge le détail que s'il en a besoin.
 - **Filtrer les sorties d'outils** avant qu'elles n'entrent dans le contexte, pour ne garder que ce qui sert à la tâche.
+- **Faire appeler les outils par du code** (*programmatic tool calling*) : l'agent écrit un script qui enchaîne les appels d'outils et ne récupère que le résultat final, sans que les résultats intermédiaires passent par son contexte. Le "Code Mode" de Claude Code applique ce principe.
 - **Écrire des prompts courts mais cadrés** : une demande brève suffit souvent si les critères de réussite sont clairs.
 - **Imposer un style télégraphique** à l'agent, comme le fait le plugin Caveman. Cela réduit la sortie, mais une simplification trop forte peut faire perdre des détails.
 - **Minifier le code envoyé** : [une étude de la TU Wien](https://arxiv.org/pdf/2606.01326) mesure 42 % de tokens d'entrée en moins, mais 12 points de résolution de tâches en moins. Toute économie a un coût en qualité, à vérifier.
@@ -483,7 +486,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **Fine-tunes communautaires** | Nous Hermes (Nous Research) |
 | **Harnais CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe |
 | **IDE avec agent intégré** | GitHub Copilot (mode agent), Zed |
-| **Agents autonomes cloud** | Claude Code (mode cloud/remote), Jules (Google) |
+| **Agents autonomes cloud** | Claude Code (mode cloud/remote), Claude Managed Agents (Anthropic héberge la boucle agentique et le sandbox d'exécution), Jules (Google) |
 | **Protocoles / standards** | MCP (Model Context Protocol), A2A, Agent Skills, function calling / tool use |
 | **Orchestration multi-agents (frameworks)** | LangChain, LangGraph, Claude Agent SDK, LlamaIndex, CrewAI, Microsoft Agent Framework |
 | **Chapeautage multi-harnais (ADE)** | Orca (Stably AI) - fait tourner Claude Code, Codex, OpenCode, Pi... côte à côte, chacun isolé dans son worktree git ; desktop + app mobile |
@@ -492,7 +495,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 | **Bases vectorielles (RAG)** | Pinecone, Weaviate, Chroma, pgvector |
 | **Exécution locale** | Ollama, LM Studio |
 | **Observabilité / évaluation** | LangSmith, Langfuse, evals maison |
-| **Benchmarks connus** | MMLU, HumanEval, SWE-bench Pro, GPQA, MATH |
+| **Benchmarks connus** | MMLU-Pro, Humanity's Last Exam, SWE-bench Pro, GPQA, MATH (MMLU et HumanEval, saturés, ne départagent plus les modèles frontier) |
 
 ---
 
@@ -505,7 +508,7 @@ Au-delà des concepts (section 2) et des patterns (section 3), une question trè
 Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un repo porte des noms différents selon l'outil :
 
 - **`CLAUDE.md`** : le nom historique propre à Claude Code.
-- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, Gemini CLI, OpenCode, Copilot, Zed...).
+- **`AGENTS.md`** : un standard ouvert, sans frontmatter ni syntaxe imposée - juste du Markdown avec des titres et des listes - formalisé en 2025 (porté à l'origine par OpenAI, avec Google, Cursor, Factory) puis confié à l'Agentic AI Foundation (Linux Foundation) fin 2025. Il vise explicitement à remplacer le patchwork `CLAUDE.md` / `.cursorrules` / `GEMINI.md` par **un seul fichier lu par tous les outils** (Claude Code, Codex, OpenCode, Copilot, Zed...).
 
 **Où le placer :** à la **racine du repo**, toujours - c'est l'endroit où tous les harnais le cherchent par défaut, sans configuration supplémentaire.
 
@@ -535,11 +538,12 @@ Le fichier qui joue le rôle de **system prompt persistant** (section 6) pour un
 | `.claude/agents/*.md` | Subagents (section 2) : un fichier par agent, frontmatter `name` / `description` / `model` / `color` | Oui |
 | `.claude/skills/<nom>/SKILL.md` | Skills projet (section 2), invocables via `/nom` | Oui |
 | `.claude/commands/*.md` | Commandes custom (`/nom`), équivalentes à un skill ; à nom égal, le skill l'emporte | Oui |
+| `.claude/rules/*.md` | Règles thématiques, en complément du fichier racine ; avec un champ `paths`, une règle ne se charge que quand l'agent travaille sur les fichiers correspondants | Oui |
 | `.mcp.json` (à la racine, hors `.claude/`) | Serveurs MCP (section 2) scopés au projet | Oui, sauf secrets en dur |
 
 Les **hooks** (section 2) ne sont pas des fichiers séparés : ils se déclarent comme un champ `hooks` dans `settings.json`, qui associe un événement (avant/après un appel d'outil, début/fin de session...) à une commande shell.
 
-**Claude Code - `~/.claude/` (utilisateur, global) :** même logique de structure (`settings.json`, `agents/`, `skills/`, `commands/`, plugins installés) mais appliquée à **toutes** les sessions, tous projets confondus - pour des préférences personnelles plutôt que des règles d'équipe.
+**Claude Code - `~/.claude/` (utilisateur, global) :** même logique de structure (`settings.json`, `agents/`, `skills/`, `commands/`, `rules/`, plugins installés) mais appliquée à **toutes** les sessions, tous projets confondus - pour des préférences personnelles plutôt que des règles d'équipe.
 
 **OpenCode - `.opencode/` (projet) :** structure équivalente mais nommée différemment - `.opencode/agent/` (au singulier), où le chemin devient l'id de l'agent (`.opencode/agent/team/reviewer.md` → agent `team/reviewer`), `.opencode/command/`, et `opencode.json` pour la config générale (modèles, outils, MCP). Contrairement à ce qu'on pourrait croire, OpenCode ne se limite pas à `AGENTS.md` : au niveau projet il cherche `AGENTS.md` en priorité, mais lit `CLAUDE.md` en repli si aucun `AGENTS.md` n'existe dans le dossier - si les deux existent, seul `AGENTS.md` est pris en compte ([doc officielle](https://opencode.ai/docs/rules/)). Global et projet se **combinent** (pas de remplacement). Le pendant global est `~/.config/opencode/`.
 
@@ -560,7 +564,7 @@ Un fichier d'instructions n'a pas une seule portée possible - plusieurs coexist
 | Organisation | Fichier managé côté entreprise (politique commune) | Toujours, avant tout le reste |
 | Utilisateur (global) | `~/.claude/CLAUDE.md` | Toujours, toutes sessions, tous projets |
 | Projet (racine) | `./CLAUDE.md` ou `./AGENTS.md` | À l'ouverture de session dans ce repo |
-| Sous-dossier (monorepo) | `./frontend/CLAUDE.md`, `./infra/CLAUDE.md`... | À la demande, seulement quand l'agent lit/édite un fichier de ce sous-dossier |
+| Sous-dossier (monorepo) | `./frontend/CLAUDE.md`, `./infra/CLAUDE.md`... (ou un `AGENTS.md`, lu si le sous-dossier n'a pas de `CLAUDE.md`) | À la demande, seulement quand l'agent lit/édite un fichier de ce sous-dossier |
 | Local, non partagé | `./CLAUDE.local.md` (gitignoré) | À l'ouverture de session, notes perso non versionnées |
 
 Claude Code remonte l'arborescence depuis le fichier courant et **concatène** ce qu'il trouve à chaque niveau - c'est ce qui permet, dans un monorepo, de garder des règles Terraform dans `/infra/CLAUDE.md` sans polluer le contexte quand on travaille sur `/frontend/` : une application concrète du context engineering (section 6).
