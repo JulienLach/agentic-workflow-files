@@ -1,12 +1,12 @@
 /**
- * Collecte déterministe pour /veille : failles récentes qui touchent MA stack (stack.txt),
+ * Collecte déterministe pour /veille-cve : failles récentes qui touchent MA stack (stack.txt),
  * depuis les flux officiels (pas de moteur de recherche : ils ont des heures de retard).
  *   - CISA KEV      : CVE exploitées activement (toujours gardées si elles matchent la stack)
  *   - NVD API 2.0   : toutes les CVE publiées dans la fenêtre, filtrées stack + CVSS >= 7
  *   - GitHub GHSA   : advisories npm high/critical sur les paquets listés en "npm:"
  *   - CERT-FR       : alertes et avis (RSS), filtrés sur la stack
  *
- * Usage : node ~/.claude/skills/veille/collect.ts [heures]   (défaut : 48)
+ * Usage : node ~/.claude/skills/veille-cve/collect.ts [heures]   (défaut : 48)
  */
 
 import { execFile } from "node:child_process";

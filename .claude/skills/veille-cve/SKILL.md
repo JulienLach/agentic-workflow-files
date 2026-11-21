@@ -1,15 +1,15 @@
 ---
-name: veille
-description: Veille du jour en un appel - CVE et failles qui touchent MA stack (Node, nginx, Apache, PostgreSQL, Docker, paquets npm...) depuis les flux officiels à jour à l'heure près, puis la veille IA (/ai-news). Utiliser quand l'utilisateur lance /veille [heures], demande les dernières CVE, les failles du jour ou sa veille complète.
+name: veille-cve
+description: Veille sécurité du jour - CVE et failles qui touchent MA stack (Node, nginx, Apache, PostgreSQL, Docker, paquets npm...) depuis les flux officiels à jour à l'heure près. Utiliser quand l'utilisateur lance /veille-cve [heures], demande les dernières CVE, les failles du jour ou si sa stack est touchée par une vulnérabilité.
 ---
 
-# /veille - failles de ma stack + veille IA
+# /veille-cve - failles de ma stack
 
 Fenêtre : `$ARGUMENTS` en heures si fourni, sinon 48 h (la veille + le jour même). Date du jour : celle du contexte système.
 
 ## 1. Collecte CVE (une seule commande)
 
-`node ~/.claude/skills/veille/collect.ts <heures>`
+`node ~/.claude/skills/veille-cve/collect.ts <heures>`
 
 Le script interroge directement CISA KEV, NVD, GitHub Advisories (npm) et CERT-FR, puis filtre sur `stack.txt`. Ne pas chercher de CVE par WebSearch : les moteurs ont des heures de retard sur ces flux. Une source `[!] en échec` se signale en une ligne, sans la remplacer.
 
@@ -39,10 +39,6 @@ Rien d'autre sur ta stack.   <- si la liste est vide, cette seule ligne
 
 Maximum 8 items ; au-delà, regrouper par techno (`nginx : 6 CVE, toutes corrigées en 1.29.4`).
 
-## 4. Veille IA
-
-Ensuite, lire et appliquer `~/.claude/skills/ai-news/SKILL.md` avec la même fenêtre, et afficher son briefing à la suite.
-
 ## Ajuster le périmètre
 
-Éditer `~/.claude/skills/veille/stack.txt` : une techno par ligne, `kev:` pour les technos à gros volume (seulement si exploitée), `npm:` pour un paquet exact.
+Éditer `~/.claude/skills/veille-cve/stack.txt` : une techno par ligne, `kev:` pour les technos à gros volume (seulement si exploitée), `npm:` pour un paquet exact.
