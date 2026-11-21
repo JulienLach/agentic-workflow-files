@@ -29,6 +29,9 @@ Le script fait déjà le filtrage et le tri : produit confirmé par CVE.org, pui
 - Reprendre les CVE de la sortie dans son ordre. Les lignes `(écartées par CVE.org...)` ne s'affichent pas.
 - `produit non confirmé par CVE.org` : garder seulement si la 1re phrase de la description désigne la techno elle-même.
 - Versions : comparer `corrigé :` aux versions en commentaire dans `stack.txt` (ex. `postgres:14-alpine`), et dire si la version utilisée est touchée.
+- Paquet apt du VPS (Debian 13 trixie, voir `stack.txt`) : la version amont ne compte pas, car Debian applique les correctifs sur sa propre version. La seule référence est le Debian Security Tracker :
+  `curl -sL https://security-tracker.debian.org/tracker/<CVE> | sed 's/<[^>]*>/ /g' | tr -s ' \t\n' ' ' | grep -oE 'trixie( \(security\))? [^ ]+ (fixed|vulnerable)'`
+  Donner dans `à faire :` la version Debian corrigée, et la commande `dpkg -l <paquet>` pour comparer.
 - CVE qui dépend d'une option (HTTP/2, TLS, proxy, module...) : lire la config concernée dans les repos de l'utilisateur (`gh api repos/JulienLach/<repo>/contents/<fichier>`) et dire si elle est exposée.
 - Avis CERT-FR noyau Linux : une seule ligne, en ne citant que Fedora/Red Hat.
 

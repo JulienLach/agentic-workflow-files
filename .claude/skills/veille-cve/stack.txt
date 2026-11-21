@@ -1,5 +1,5 @@
 # Ma stack : seules les failles qui touchent ces technos remontent.
-# Source : repos github.com/JulienLach (Guardius, Audit, axelor-mcp, julienlach.ovh, obsidian-budget), relevé le 2026-11-21.
+# Source : repos github.com/JulienLach (Guardius, Audit, axelor-mcp, julienlach.ovh, obsidian-budget), relevé le 2026-11-21 (Dockerfiles + docs/architecture.md de Guardius).
 # Une techno par ligne. Variantes séparées par | (la 1re sert de libellé).
 # Matché en mot entier, insensible à la casse, sur : 1re phrase + CPE NVD, produit KEV, titre CERT-FR.
 # Préfixe "kev:" = techno à gros volume de CVE mineures : remontée seulement si exploitée (KEV) ou alerte CERT-FR.
@@ -7,12 +7,12 @@
 # Les versions en commentaire servent à Claude pour dire si je suis concerné.
 
 # Runtime et serveurs (images Docker en prod)
-Node.js|nodejs|nodejs:node.js             # node:24-alpine
-nginx                                     # nginx:alpine (frontends Audit, Guardius)
+Node.js|nodejs|nodejs:node.js             # node:26-alpine (Guardius), node:24-alpine (Audit)
+nginx                                     # hôte VPS Debian 13 trixie : nginx apt, reverse proxy + TLS certbot (listen 443 ssl, TLSv1.2+1.3, http2 désactivé le 2026-11-20) ; conteneurs : nginx:alpine (frontends, HTTP/1.1 port 80 local)
 PostgreSQL|postgresql:postgresql          # postgres:18-alpine (Guardius), postgres:14-alpine (Audit)
 Alpine Linux|BusyBox|musl                 # base de toutes les images
 OpenSSL
-OpenSSH                                   # déploiement CD par SSH sur le VPS
+OpenSSH                                   # déploiement CD par SSH sur le VPS (paquet apt Debian 13 trixie)
 libvips                                   # moteur natif de sharp (Guardius)
 Apache HTTP Server|apache:http_server|Apache httpd
 kev:Linux kernel|noyau Linux
