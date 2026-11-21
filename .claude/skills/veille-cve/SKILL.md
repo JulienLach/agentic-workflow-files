@@ -5,40 +5,49 @@ description: Veille sécurité du jour - CVE et failles qui touchent MA stack (N
 
 # /veille-cve - failles de ma stack
 
-Fenêtre : `$ARGUMENTS` en heures si fourni, sinon 48 h (la veille + le jour même). Date du jour : celle du contexte système.
+Fenêtre : `$ARGUMENTS` en heures si fourni, sinon 72 h. Une CVE reste donc visible 3 jours, ce qui évite de rater celle de l'avant-veille. Date du jour : celle du contexte système.
 
-## 1. Collecte CVE (une seule commande)
+## 1. Collecte (une seule commande, seule source de données)
 
 `node ~/.claude/skills/veille-cve/collect.ts <heures>`
 
-Le script interroge directement CISA KEV, NVD, GitHub Advisories (npm) et CERT-FR, puis filtre sur `stack.txt`. Ne pas chercher de CVE par WebSearch : les moteurs ont des heures de retard sur ces flux. Une source `[!] en échec` se signale en une ligne, sans la remplacer.
+Sources, toutes officielles et structurées :
 
-## 2. Tri (le script filtre large, toi tu tranches)
+| Source | Rôle |
+|---|---|
+| NVD (NIST) | découverte de toutes les CVE de la fenêtre |
+| CVE.org (CVE Program) | confirmation : produit et versions corrigées déclarés par l'éditeur |
+| CISA KEV + ENISA EUVD | exploitation active (US + UE) |
+| EPSS (FIRST) | probabilité d'exploitation, sert au tri |
+| GitHub Advisories | paquets npm de la stack |
+| CERT-FR (ANSSI) | alertes et avis en français |
 
-Garder une CVE seulement si **le produit vulnérable est la techno elle-même** (nginx, Node.js core, serveur PostgreSQL, Docker Engine...) ou un paquet `npm:` listé. Un produit tiers qui tourne sur ou autour de la techno est rejeté (ex. "Postgres Enterprise Manager", "isomorphic-git ... for Node.js", "plugin X for Claude Code").
+Le script fait déjà le filtrage et le tri : produit confirmé par CVE.org, puis exploitée > EPSS > CVSS. Il donne aussi les versions corrigées. Ne pas chercher de CVE ni de version par WebSearch : ce serait moins à jour et non reproductible. Une source `[!] en échec` se signale en une ligne, sans la remplacer.
 
-- Versions : lire les commentaires de `stack.txt` (ex. `postgres:14-alpine`) et dire dans `à faire :` si la version utilisée est touchée.
-- CVE non scorée : juger sur la description (RCE, contournement d'auth, élévation de privilèges = gardée).
+## 2. Analyse (ce que le script ne sait pas faire)
+
+- Reprendre les CVE de la sortie dans son ordre. Les lignes `(écartées par CVE.org...)` ne s'affichent pas.
+- `produit non confirmé par CVE.org` : garder seulement si la 1re phrase de la description désigne la techno elle-même.
+- Versions : comparer `corrigé :` aux versions en commentaire dans `stack.txt` (ex. `postgres:14-alpine`), et dire si la version utilisée est touchée.
+- CVE qui dépend d'une option (HTTP/2, TLS, proxy, module...) : lire la config concernée dans les repos de l'utilisateur (`gh api repos/JulienLach/<repo>/contents/<fichier>`) et dire si elle est exposée.
 - Avis CERT-FR noyau Linux : une seule ligne, en ne citant que Fedora/Red Hat.
-- Version corrigée absente de la sortie : un WebSearch ciblé sur l'advisory de l'éditeur, sinon `à faire : surveiller le correctif`.
-- Ordre : exploitée (KEV) d'abord, puis par CVSS décroissant.
 
 ## 3. Sortie
 
-Bloc de code texte brut, français avec accents, sans emoji ni tableau. Expliquer tout terme non évident à sa première occurrence (ex. "request smuggling (désynchroniser proxy et backend pour glisser une requête cachée)").
+Bloc de code texte brut, français avec accents, sans emoji ni tableau. Expliquer tout terme non évident à sa première occurrence (ex. "use-after-free (réutilisation d'une zone mémoire déjà libérée)").
 
 ```
 SÉCU STACK - [JJ mois AAAA] ([fenêtre] h)
 
-- [!] [CVE] [techno] [score] ([date], [EXPLOITÉE] si KEV) -> [url]
+- [!] [CVE] [techno] CVSS [score] EPSS [x %] ([date], [EXPLOITÉE] si exploitée) -> [url]
   [1-2 phrases : vecteur d'attaque, qui est exposé concrètement.]
-  à faire : [version corrigée / mitigation / "pas concerné si ..."]
+  à faire : [version corrigée (ligne "corrigé :") / mitigation / "pas concerné : ..."]
 
 Rien d'autre sur ta stack.   <- si la liste est vide, cette seule ligne
 ```
 
-Maximum 8 items ; au-delà, regrouper par techno (`nginx : 6 CVE, toutes corrigées en 1.29.4`).
+Maximum 8 items. Au-delà, ou pour plusieurs CVE d'un même correctif, regrouper par techno (`nginx : 6 CVE, toutes corrigées en 1.30.7 / 1.31.9`).
 
 ## Ajuster le périmètre
 
-Éditer `~/.claude/skills/veille-cve/stack.txt` : une techno par ligne, `kev:` pour les technos à gros volume (seulement si exploitée), `npm:` pour un paquet exact.
+Éditer `~/.claude/skills/veille-cve/stack.txt` : une techno par ligne, `kev:` pour les technos à gros volume (seulement si exploitée), `npm:` pour un paquet exact. Le nom doit correspondre au produit tel que l'éditeur le déclare dans CVE.org (ex. "NGINX Open Source", "PostgreSQL").

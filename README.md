@@ -357,7 +357,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                            |
 | `/roast`          | Revue de code sans complaisance, façon senior - au-delà de la checklist `/stack-review` |
 | `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation                 |
-| `/veille-cve`     | CVE du jour filtrées sur ma stack (`stack.txt`, flux CISA KEV / NVD / GHSA / CERT-FR)  |
+| `/veille-cve`     | CVE des 72 h filtrées sur ma stack (`stack.txt`) : NVD confirmé par CVE.org, exploitation CISA KEV + ENISA EUVD, tri EPSS, GHSA npm, CERT-FR |
 | `/competitor-benchmark` | Benchmark d'une app concurrente (URL) : inventaire de ses features vs celles du projet |
 | `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice      |
 
