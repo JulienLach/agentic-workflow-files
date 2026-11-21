@@ -59,7 +59,7 @@ agentic-workflow-files/
 │   └── skills/                      ← un sous-dossier par skill, `<nom>/SKILL.md` (format standard, aucun fichier plat) :
 │                                       stack-review, debug, refactor, add-entity, write-tests,
 │                                       security-audit, prep, prep-check, roast, competitor-benchmark,
-│                                       ai-news, learn
+│                                       ai-news, veille, learn
 │                                       - 10 d'entre eux ont une suite `evals/` (voir Évaluer un skill, plus bas)
 │                                       (détail de chaque commande dans Skills disponibles, plus bas)
 └── .opencode/                       ← backup de ~/.config/opencode/ (scope utilisateur OpenCode)
@@ -357,6 +357,7 @@ Les guidelines générales (stack, conventions, sécurité, git...) n'ont pas à
 | `/prep-check`     | Vérifie que `/prep` est complet avant d'entrer en mode plan                            |
 | `/roast`          | Revue de code sans complaisance, façon senior - au-delà de la checklist `/stack-review` |
 | `/ai-news`        | Briefing IA quotidien : actus modèles, économie, robotique, régulation                 |
+| `/veille`         | CVE du jour filtrées sur ma stack (`stack.txt`, flux CISA KEV / NVD / GHSA / CERT-FR), puis `/ai-news` |
 | `/competitor-benchmark` | Benchmark d'une app concurrente (URL) : inventaire de ses features vs celles du projet |
 | `/learn`          | Cours express de 10 min sur un sujet dev précis, avec sources fiables et exercice      |
 
@@ -375,6 +376,7 @@ Dans Claude Code, utilise les skills avec `/nom-du-skill` suivi du contexte :
 /roast backend/services/leaveRequest.services.ts
 /competitor-benchmark https://app-concurrente.com
 /learn les principes SOLID
+/veille 168
 ```
 
 ### Évaluer un skill (`claude plugin eval`)
@@ -386,7 +388,7 @@ cd .claude/skills/<nom-du-skill>
 claude plugin eval . --runs 1 --trust-plugin --no-publish
 ```
 
-`ai-news` et `competitor-benchmark` n'en ont pas : ils dépendent du web en temps réel (non-déterministe, coûteux), pas adaptés à ce genre de test automatisé.
+`ai-news`, `veille` et `competitor-benchmark` n'en ont pas : ils dépendent du web en temps réel (non-déterministe, coûteux), pas adaptés à ce genre de test automatisé.
 
 ---
 

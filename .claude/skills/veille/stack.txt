@@ -1,0 +1,79 @@
+# Ma stack : seules les failles qui touchent ces technos remontent.
+# Source : repos github.com/JulienLach (Guardius, Audit, axelor-mcp, julienlach.ovh, obsidian-budget), relevé le 2026-11-21.
+# Une techno par ligne. Variantes séparées par | (la 1re sert de libellé).
+# Matché en mot entier, insensible à la casse, sur : 1re phrase + CPE NVD, produit KEV, titre CERT-FR.
+# Préfixe "kev:" = techno à gros volume de CVE mineures : remontée seulement si exploitée (KEV) ou alerte CERT-FR.
+# Lignes "npm:" = noms EXACTS de paquets (dépendances directes), matchés sur les advisories GitHub (npm).
+# Les versions en commentaire servent à Claude pour dire si je suis concerné.
+
+# Runtime et serveurs (images Docker en prod)
+Node.js|nodejs|nodejs:node.js             # node:24-alpine
+nginx                                     # nginx:alpine (frontends Audit, Guardius)
+PostgreSQL|postgresql:postgresql          # postgres:18-alpine (Guardius), postgres:14-alpine (Audit)
+Alpine Linux|BusyBox|musl                 # base de toutes les images
+OpenSSL
+OpenSSH                                   # déploiement CD par SSH sur le VPS
+libvips                                   # moteur natif de sharp (Guardius)
+Apache HTTP Server|apache:http_server|Apache httpd
+kev:Linux kernel|noyau Linux
+Fedora                                    # poste de dev
+
+# Conteneurs et CI/CD
+Docker|containerd|runc|BuildKit           # Docker Compose sur le VPS, images sur GHCR
+Ofelia                                    # mcuadros/ofelia:0.3.22 (cron Guardius)
+GitHub Actions                            # CI/CD + GitHub Pages (julienlach.ovh)
+
+# Outils du quotidien
+Claude Code
+Model Context Protocol|MCP SDK            # axelor-mcp, Guardius
+Obsidian                                  # plugin obsidian-budget
+Visual Studio Code|VS Code
+kev:Google Chrome|Chromium
+Express.js|expressjs
+
+# Backend (Guardius, Audit, axelor-mcp)
+npm:express
+npm:express-rate-limit
+npm:cors
+npm:jsonwebtoken
+npm:http-errors
+npm:multer
+npm:nodemailer
+npm:pdfkit
+npm:pg
+npm:sharp
+npm:stripe
+npm:winston
+npm:zod
+npm:dotenv
+npm:archiver
+npm:@modelcontextprotocol/sdk
+npm:pele
+
+# Frontend
+npm:react
+npm:react-dom
+npm:react-router
+npm:react-router-dom
+npm:react-select
+npm:react-chartjs-2
+npm:chart.js
+npm:lucide-react
+npm:qrcode.react
+npm:pdf-lib
+npm:vite
+npm:@vitejs/plugin-react
+npm:vite-plugin-pwa
+npm:workbox-window
+
+# Outillage
+npm:typescript
+npm:tsx
+npm:vitest
+npm:@vitest/ui
+npm:@vitest/coverage-v8
+npm:supertest
+npm:oxlint
+npm:esbuild
+npm:obsidian
+npm:@anthropic-ai/claude-code
