@@ -41,6 +41,7 @@ Chaque section combine **le concept** et **des outils concrets** qui l'illustren
    - [Exemple concret : exposer une app métier comme endpoint MCP](#exemple-concret--exposer-une-app-métier-comme-endpoint-mcp)
 5. [Les modèles : familles, tailles, comment choisir](#5-les-modèles--familles-tailles-comment-choisir)
    - [Propriétaire vs open-weights](#propriétaire-vs-open-weights)
+   - [Les familles open-weights à connaître](#les-familles-open-weights-à-connaître)
    - [Fine-tunes communautaires - l'exemple Nous Hermes](#fine-tunes-communautaires---lexemple-nous-hermes)
    - [Frontier vs petits modèles](#frontier-vs-petits-modèles)
    - [Évaluer et comparer les modèles (benchmarks)](#évaluer-et-comparer-les-modèles-benchmarks)
@@ -330,7 +331,24 @@ On l'ajoute comme **MCP personnalisé** dans Claude Desktop, ou en CLI avec `cla
 ### Propriétaire vs open-weights
 
 - **Modèles propriétaires** : accessibles uniquement via API du fournisseur (Claude/Anthropic, GPT/OpenAI, Gemini/Google, Grok/xAI, Muse Spark/Meta). Pas de poids téléchargeables.
-- **Modèles open-weights** : les poids sont publiés et téléchargeables (Mistral, DeepSeek, Qwen/Alibaba, gpt-oss/OpenAI, Llama/Meta). Un même fournisseur peut proposer les deux : OpenAI publie gpt-oss à côté de GPT, et Meta Llama à côté de Muse Spark. Exécutables en local ou chez n'importe quel hébergeur - utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
+- **Modèles open-weights** : les poids sont publiés et téléchargeables (Qwen/Alibaba, DeepSeek, Kimi/Moonshot, GLM/Zhipu, Gemma/Google, Mistral, gpt-oss/OpenAI, Llama/Meta - détail juste en dessous). Un même fournisseur peut proposer les deux : OpenAI publie gpt-oss à côté de GPT, et Meta Llama à côté de Muse Spark. Exécutables en local ou chez n'importe quel hébergeur - utile pour la confidentialité, la souveraineté des données, ou le coût à très grande échelle.
+
+### Les familles open-weights à connaître
+
+Les noms qui reviennent tout le temps dès qu'on parle d'IA locale. Les versions changent tous les quelques mois : retenir la **famille**, et vérifier la dernière version sur Hugging Face ou llm-stats.com (section 10).
+
+| Famille | Éditeur | À retenir |
+| --- | --- | --- |
+| **Qwen** | Alibaba (Chine) | La famille la plus utilisée en local : toutes les tailles, du petit modèle qui tourne sur un portable au gros MoE. Très bonne en code. Le choix par défaut pour commencer |
+| **Gemma** | Google | Petits et moyens modèles, pensés pour tourner sur un GPU grand public. La version open-weights de la technologie Gemini |
+| **Llama** | Meta | La famille historique qui a lancé l'open-weights en 2023. Encore très présente, même si Meta mise aussi sur d'autres modèles |
+| **Mistral** | Mistral AI (France) | L'acteur européen : petits et moyens modèles, souvent sous licence Apache 2.0. Pertinent pour la souveraineté des données |
+| **gpt-oss** | OpenAI | Les modèles open-weights d'OpenAI, à côté de GPT qui reste propriétaire |
+| **DeepSeek** | DeepSeek (Chine) | Très gros MoE, forts en raisonnement. Trop gros pour un PC : en local, on utilise des versions réduites (distillées) ou très quantifiées |
+| **Kimi** | Moonshot AI (Chine) | MoE géants (plus de mille milliards de paramètres), orientés agents et code. En pratique via API ou sur de gros serveurs, rarement sur un PC |
+| **GLM** | Zhipu AI / Z.ai (Chine) | Forts en code et en usage agentique, souvent cités comme alternative open-weights aux modèles frontier |
+
+> **En local, la taille décide** : sur un PC avec un GPU grand public, on fait tourner les petits et moyens modèles (Qwen, Gemma, Mistral, gpt-oss) ou les MoE dont seule une partie tient en VRAM (section 1). Les géants (DeepSeek, Kimi, GLM dans leurs plus grandes versions) servent surtout via API ou chez un hébergeur. Côté licence, chaque famille a la sienne (Apache 2.0, MIT ou licence maison) : la vérifier avant un usage commercial.
 
 ### Fine-tunes communautaires - l'exemple Nous Hermes
 
@@ -481,7 +499,7 @@ Un système de **mémoire persistante** permet à un agent de se souvenir d'une 
 
 | Catégorie | Outils |
 | --- | --- |
-| **Modèles / plateformes** | Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Llama et Muse Spark (Meta), Mistral, DeepSeek, Qwen (Alibaba) |
+| **Modèles / plateformes** | Propriétaires : Claude (Anthropic), GPT (OpenAI), Gemini (Google), Grok (xAI), Muse Spark (Meta). Open-weights : Qwen (Alibaba), Gemma (Google), Llama (Meta), Mistral, gpt-oss (OpenAI), DeepSeek, Kimi (Moonshot AI), GLM (Zhipu AI) |
 | **Modèles de décision** | Jev (TypeSafe AI), d1-ultra (Liquid AI), GLiDE (Fastino) |
 | **Fine-tunes communautaires** | Nous Hermes (Nous Research) |
 | **Harnais CLI agentique** | Claude Code, OpenCode, Codex CLI, Antigravity CLI, Mistral Vibe |
