@@ -1,6 +1,6 @@
-# Workflow IA - Obsidian → Claude Code → Code → PR GitHub
+# Workflow IA - Obsidian → Orca / Claude Code → Code → PR GitHub
 
-Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**, avec **Claude Code** comme hub central (contexte, plugins, skills, agents), le **CLI Obsidian** et **`gh` CLI**.
+Ce document décrit le cycle complet utilisé pour piloter le développement d'un projet depuis un **vault Obsidian** (backlog/sprints) jusqu'à une **Pull Request GitHub**. Les harnais tournent dans **Orca**, un ADE (Agent Development Environment) qui les fait travailler côte à côte. **Claude Code** reste le harnais principal et le hub central (contexte, plugins, skills, agents), avec le **CLI Obsidian** et **`gh` CLI**.
 
 Il complète le `AGENTS.md` global (guidelines de dev communes) + le `AGENTS.md` du projet (spécificités) et le `README.md` de ce repo (setup des skills/MCP) : ceux-ci décrivent _comment coder_, celui-ci décrit _comment on articule réunion → tâche → conception → code → PR → mise à jour du suivi_.
 
@@ -30,24 +30,30 @@ flowchart TD
         SPRINTS --> TACHES
     end
 
-    subgraph HUB["Étape 3 : Claude Code"]
+    subgraph ORCA["Étape 3 : Orca (ADE), un worktree git par agent"]
         direction TB
-        CONTEXTE["AGENTS.md global + projet<br/>context window"]
-        PLUGINS["Plugins<br/>Context7, Obsidian skills, Playwright"]
-        CANVAS["Étape 0 : schémas<br/>canvas Obsidian, Mermaid, draw.io"]
-        SKILLS["Skills<br/>/prep, /prep-check, /code-review, /debug, /refactor..."]
-        SUBAGENTS["Agents<br/>Plan, obsidian-expert"]
-        MODES["Modes de prompt<br/>agentique standard, pédagogique (sur demande)"]
+        subgraph HUB["Claude Code, harnais principal"]
+            direction TB
+            CONTEXTE["AGENTS.md global + projet<br/>context window"]
+            PLUGINS["Plugins<br/>Context7, Superpowers, Obsidian skills, Playwright"]
+            CANVAS["Étape 0 : schémas<br/>canvas Obsidian, Mermaid, draw.io"]
+            SKILLS["Skills<br/>/prep, /prep-check, /stack-review, /debug, /veille-cve..."]
+            SUBAGENTS["Agents<br/>Plan, obsidian-expert, deep-review"]
+            MODES["Modes de prompt<br/>agentique standard, pédagogique (sur demande)"]
 
-        CONTEXTE ~~~ PLUGINS ~~~ CANVAS ~~~ SKILLS ~~~ SUBAGENTS ~~~ MODES
+            CONTEXTE ~~~ PLUGINS ~~~ CANVAS ~~~ SKILLS ~~~ SUBAGENTS ~~~ MODES
+        end
+        AUTRES["Autres harnais<br/>OpenCode, Codex CLI, Mistral Vibe, Antigravity CLI"]
+        FOURNISSEURS["Fournisseurs LLM<br/>abonnement Claude, OpenRouter"]
+        AUTRES --> FOURNISSEURS
     end
 
     REPO["Repo de code<br/>branche feat/xxx"]
     GITHUB["GitHub<br/>Pull Request"]
     SUIVI["Étape 8 : retour au vault<br/>cocher la tâche, clôturer le sprint"]
 
-    TACHES -->|"Étape 2 : choisir une tâche"| HUB
-    HUB -->|"Étape 4 : implémentation"| REPO
+    TACHES -->|"Étape 2 : choisir une tâche"| ORCA
+    ORCA -->|"Étape 4 : implémentation"| REPO
     REPO -->|"Étapes 5-6 : commit, push, gh pr create"| GITHUB
     GITHUB -->|"Étape 7 : revue solo (/code-review), gh pr merge"| SUIVI
 ```
@@ -70,6 +76,8 @@ Dès qu'il faut concevoir ou expliquer une grande fonctionnalité, un flux ou un
 | **Canvas Obsidian natif** (fichier `.canvas`, skill `obsidian:json-canvas`) | Conception libre avant de coder : idées, modules, liens entre eux | Vault Obsidian |
 | **Mermaid** | Décrire un fonctionnement ou une architecture en texte versionné : `flowchart` pour un flux ou une grande fonctionnalité, `sequenceDiagram` pour une suite d'appels, `erDiagram` pour le schéma de la base | `docs/` de chaque projet, notes de projet, README, PR |
 | **draw.io** (extension VS Code) | Diagramme de classes UML détaillé | Repo du projet |
+| **Mindmap / MoSCoW** | Arborescence de l'application, priorisation des fonctionnalités (Must / Should / Could / Won't) | Vault Obsidian |
+| **Claude Design** + modèles [`design/`](./design/) (`design.md`, `instructions-maquette.md`) | Prototype ou maquette générée à partir du cahier des charges, à faire valider en recette client avant de coder | Repo du projet |
 
 Mermaid s'affiche directement sur GitHub et dans Obsidian. Quand il faut une image (SVG dans une page, un livrable client, une app), la générer avec [Pele](https://pele.run), la librairie de rendu Mermaid de l'équipe d'Obsidian.
 
@@ -152,17 +160,38 @@ Quand un projet couvre plusieurs sous-thèmes (ex. Frontend / API / Intégration
 
 ---
 
-## 3. Claude Code : le hub central
+## 3. Orca et Claude Code : le poste de pilotage
 
-Une fois la tâche identifiée, tout se joue dans Claude Code, qui combine quatre briques :
+### Orca : l'ADE où tournent les harnais
 
-- **Fichiers de contexte** (`AGENTS.md` global + `AGENTS.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation.
-- **Plugins** → `Context7` (doc à jour des librairies), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable - voir étape 4 pour la vérification des changements UI).
-- **Skills** (`.claude/skills/<nom>/SKILL.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` - à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas).
+**Orca** (Stably AI, gratuit, avec ses propres abonnements) est la couche au-dessus des harnais (voir [`CONCEPTS-IA.md`](./CONCEPTS-IA.md#orchestrator-workers), Orchestrator-Workers niveau 2) :
+
+- **Un worktree git isolé par agent** : chaque tâche lancée travaille dans sa propre copie du repo, sur sa propre branche. Plusieurs tâches indépendantes peuvent donc avancer en parallèle sans se marcher dessus.
+- **Tout au même endroit** : les sessions de tous les harnais sont visibles dans une seule interface, avec une notification (y compris sur mobile) quand un agent attend une décision.
+- **Le code ne transite pas par Orca** : chaque harnais garde sa propre connexion à son fournisseur.
+
+Les harnais lancés dans Orca :
+
+| Harnais | Rôle |
+| --- | --- |
+| **Claude Code** | Harnais principal : tout le workflow ci-dessous (contexte, plugins, skills, agents) |
+| **OpenCode, Codex CLI, Mistral Vibe, Antigravity CLI** (ex-Gemini CLI) | Harnais secondaires : comparer une approche, confier une tâche simple à un autre modèle, travailler en parallèle |
+| **Fournisseurs LLM** | Abonnement Claude pour Claude Code ; OpenRouter (modèles gratuits ou crédits) pour les autres harnais |
+
+> Lancer une tâche par agent, et des tâches **indépendantes** en parallèle. Deux agents qui modifient les mêmes fichiers dans deux worktrees produiront des conflits au merge.
+
+### Claude Code : le hub central
+
+Une fois la tâche identifiée et lancée dans Orca, tout se joue dans Claude Code, qui combine quatre briques :
+
+- **Fichiers de contexte** (`AGENTS.md` global + `AGENTS.md` du projet) → chargés automatiquement dans la **context window** de la session, avant toute implémentation. La config globale (`~/.claude/` : `AGENTS.md`, skills, agents) est sauvegardée dans ce repo, cloné une fois par machine.
+- **Plugins** → `Context7` (doc à jour des librairies), **Superpowers** (skills de méthode : brainstorming, plans, TDD, debug systématique), `Obsidian skills` (lecture/écriture du vault, voir Vue d'ensemble) et **Playwright** (MCP, navigateur headless scriptable - voir étape 4 pour la vérification des changements UI).
+- **Skills** (`.claude/skills/<nom>/SKILL.md`) → invoqués à la demande selon le besoin, liste complète dans [Skills disponibles du `README.md`](./README.md#skills-disponibles). Le skill de revue de ce repo est `/stack-review` - à ne pas confondre avec `/code-review`, le skill **natif** de Claude Code (revue de diff générique, voir plus bas). Côté veille : `/veille-cve` (failles de la stack) et `/ai-news` (actualité IA).
 
 - **Agents personnalisés** (`.claude/agents/*.md`) → subagents avec instructions et outils dédiés, invocables via l'outil `Agent` ou automatiquement selon leur description :
     - `Plan` - agent intégré à Claude Code pour concevoir des plans d'implémentation.
     - `obsidian-expert` - agent custom inclus dans ce repo (`.claude/agents/obsidian-expert.md`), voir la section « Agents personnalisés » du `README.md`.
+    - `deep-review` - agent orchestrateur inclus dans ce repo : revue en trois passes parallèles (sécurité, performance, tests), voir étape 7.
 
 Deux **modes d'interaction** viennent s'ajouter par-dessus - ce ne sont pas des agents séparés, juste la façon dont la demande est formulée dans le prompt :
 
@@ -175,7 +204,7 @@ Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et l
 
 - **`/clear` entre deux tâches sans rapport.** Ne pas enchaîner une tâche sur une autre dans la même conversation « pour gagner du temps » - le contexte pollué par la tâche précédente dégrade la suivante.
 - **Après 2 corrections ratées sur le même point, `/clear` plutôt qu'insister.** Une session avec des tentatives échouées accumulées performe moins bien qu'une session neuve avec un prompt initial qui intègre ce qu'on vient d'apprendre.
-- **Subagents pour la recherche/exploration**, pas seulement pour la revue (`/code-review`). « Utilise un subagent pour investiguer comment X gère Y » garde les dizaines de fichiers lus hors du contexte principal, qui reste focalisé sur l'implémentation.
+- **Subagents pour la recherche/exploration et les tâches complexes**, pas seulement pour la revue (`/code-review`). « Utilise un subagent pour investiguer comment X gère Y » garde les dizaines de fichiers lus hors du contexte principal, qui reste focalisé sur l'implémentation.
 - **`/compact <instructions>`** pour un compactage ciblé (ex. `/compact garde la liste des fichiers modifiés et les commandes de test`) plutôt que de laisser l'auto-compaction générique décider seule sur une tâche longue.
 
 ---
@@ -194,6 +223,8 @@ Le contexte se remplit vite (chaque fichier lu, chaque commande exécutée) et l
     ```bash
     git checkout -b feat/nom-de-la-feature
     ```
+
+    Dans Orca, l'agent travaille déjà dans son propre worktree, sur une branche dédiée : vérifier que son nom suit la même convention.
 
 3. Implémenter en suivant `AGENTS.md` (stack, conventions, tests) et le `AGENTS.md` du projet (spécificités).
 4. Vérifier avant de committer : tests, lint, exécution locale - et pour tout changement **UI/frontend**, passage réel dans un navigateur via le **MCP Playwright** (parcours nominal + cas limites, pas seulement la compilation/les tests unitaires qui ne garantissent pas le comportement visuel).
@@ -240,7 +271,7 @@ EOF
 
 Pas de reviewer tiers humain sur ce workflow : **c'est le développeur qui fait la revue lui-même**, assisté par Claude Code, avant de merger. Ne pas sauter cette étape sous prétexte d'être seul sur le projet - c'est justement ce qui remplace la revue par les pairs.
 
-1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code - bugs, cohérence, sécurité).
+1. Lancer une revue automatisée sur la branche de la PR : `/code-review` (skill natif Claude Code - bugs, cohérence, sécurité). Avant un merge sensible, `deep-review` ajoute trois passes parallèles (sécurité, performance, tests).
 2. Traiter les findings : corriger ce qui est bloquant, committer les corrections (nouveau commit, toujours Conventional Commits - pas d'amend sur un commit déjà pushé sans raison explicite).
 3. Relire soi-même le diff final (`gh pr diff` ou l'interface GitHub) avant de merger.
 4. Merger :
@@ -274,9 +305,9 @@ Ne pas oublier cette dernière étape - c'est elle qui garde le vault Obsidian c
 | 0     | Claude Code (canvas, Mermaid, draw.io) | Schéma de la fonctionnalité ou de l'architecture : canvas pour concevoir, Mermaid dans `docs/` pour documenter, draw.io pour les classes |
 | 1     | Réunion → Vault Obsidian     | Capturer les notes (`obsidian daily:append`/`create`), en extraire des tâches sous le bon sous-titre    |
 | 2     | Vault Obsidian               | Repérer une tâche `- [ ]` dans le sprint courant                                                        |
-| 3     | Claude Code                  | Contexte (`AGENTS.md`), plugins (Context7, Obsidian skills), skills et agents mobilisés selon le besoin |
+| 3     | Orca → Claude Code           | Lancer la tâche dans Orca (un worktree par agent) ; dans Claude Code : contexte (`AGENTS.md`), plugins (Context7, Superpowers, Obsidian skills), skills et agents selon le besoin |
 | 4     | Repo de code                 | Préparer si complexe (`/prep`→`/prep-check`→plan), créer une branche, implémenter, tester                |
 | 5     | Repo de code                 | Commit (manuel ou via prompt Claude, Conventional Commits, anglais, sans `Co-Authored-By`) + push       |
 | 6     | GitHub (`gh` CLI)            | `gh pr create`                                                                                          |
-| 7     | Repo de code / GitHub        | Revue solo dev (`/code-review`) puis `gh pr merge`                                                      |
+| 7     | Repo de code / GitHub        | Revue solo dev (`/code-review`, `deep-review` si sensible) puis `gh pr merge`                           |
 | 8     | Vault Obsidian               | Cocher la tâche `- [x] ... ✅ date`, passer le sprint en `statut: terminé` à sa clôture                 |
